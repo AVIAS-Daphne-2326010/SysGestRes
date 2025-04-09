@@ -1,9 +1,12 @@
+<?php
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
+#[ORM\Table(name: 'utilisateur')]
 class Utilisateur
 {
     #[ORM\Id]
@@ -20,7 +23,7 @@ class Utilisateur
     #[ORM\Column(type: 'string', length: 255)]
     private $mot_de_passe;
 
-    #[ORM\OneToMany(mappedBy: 'utilisateur', targerEntity: Reservation::class)]
+    #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Reservation::class)]
     private $reservations;
 
     public function __construct()
@@ -28,7 +31,7 @@ class Utilisateur
         $this->reservations = new ArrayCollection();
     }
 
-    // Getter et Setter
+    
 
     public function getId(): ?int
     {

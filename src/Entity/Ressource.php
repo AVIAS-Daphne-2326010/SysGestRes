@@ -1,4 +1,12 @@
+<?php
+
+namespace App\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
 #[ORM\Entity]
+#[ORM\Table(name: 'ressource')]
 class Ressource
 {
     #[ORM\Id]
@@ -22,6 +30,7 @@ class Ressource
     {
         $this->creneaux = new ArrayCollection();
     }
+
 
     public function getId(): ?int
     {
