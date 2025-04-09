@@ -3,11 +3,14 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'utilisateur')]
-class Utilisateur
+class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -50,7 +53,7 @@ class Utilisateur
         return $this;
     }
 
-    public function getEmail(): ?string
+    public function getUsername(): string
     {
         return $this->email;
     }
@@ -62,15 +65,32 @@ class Utilisateur
         return $this;
     }
 
-    public function getMotDePasse(): ?string
+    public function getPassword(): string
     {
         return $this->mot_de_passe;
     }
 
     public function setMotDePasse(string $mot_de_passe): self
     {
-        $this->mot_de_passe = password_hash($mot_de_passe, PASSWORD_BCRYPT);
+        $this->mot_de_passe = $mot_de_passe;
 
         return $this;
     }
+
+    public function getRoles(): array
+    {
+        return ['ROLE_USER'];
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
+    }
+
+    public function eraseCredentials(): void
+    {
+        
+    }
+
+
 }

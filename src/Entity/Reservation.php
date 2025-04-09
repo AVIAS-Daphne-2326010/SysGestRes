@@ -44,25 +44,25 @@ class Reservation
         return $this->id;
     }
 
-    public function getUtilisateurId(): ?Utilisateur
+    public function getUtilisateur(): ?Utilisateur
     {
-        return $this->utilisateur_id;
+        return $this->utilisateur;
     }
 
-    public function setUtilisateurId(?Utilisateur $utilisateur_id): self
+    public function setUtilisateur(?Utilisateur $utilisateur): self
     {
-        $this->utilisateur_id = $utilisateur_id;
+        $this->utilisateur = $utilisateur;
         return $this;
     }
 
-    public function getCreneauId(): ?Creneau
+    public function getCreneau(): ?Creneau
     {
-        return $this->creneau_id;
+        return $this->creneau;
     }
 
-    public function setCreneauId(?Creneau $creneau_id): self
+    public function setCreneau(?Creneau $creneau): self
     {
-        $this->creneau_id = $creneau_id;
+        $this->creneau = $creneau;
         return $this;
     }
 

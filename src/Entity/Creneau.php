@@ -55,14 +55,14 @@ class Creneau
         return $this;
     }
 
-    public function getRessourceId(): ?Ressource
+    public function getRessource(): ?Ressource
     {
-        return $this->ressource_id;
+        return $this->ressource;
     }
 
-    public function setRessourceId(?Ressource $ressource_id): self
+    public function setRessource(?Ressource $ressource): self
     {
-        $this->ressource_id = $ressource_id;
+        $this->ressource = $ressource;
         return $this;
     }
 
