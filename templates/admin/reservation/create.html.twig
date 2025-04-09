@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer une réservation{% endblock %}
+
+{% block body %}
+    <h1>Réserver un créneau</h1>
+
+    {{ form_start(form) }}
+        {{ form_row(form.date_reservation) }}
+        {{ form_row(form.utilisateur) }}
+        {{ form_row(form.creneau) }}
+        <button type="submit">Réserver</button>
+    {{ form_end(form) }}
+{% endblock %}

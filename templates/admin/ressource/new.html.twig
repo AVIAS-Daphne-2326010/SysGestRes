@@ -1,0 +1,9 @@
+{# templates/admin/ressources/new.html.twig #}
+<h1>Ajouter une Ressource</h1>
+
+{{ form_start(form) }}
+    {{ form_row(form.nom) }}
+    {{ form_row(form.type) }}
+    {{ form_row(form.description) }}
+    <button type="submit">Ajouter</button>
+{{ form_end(form) }}
