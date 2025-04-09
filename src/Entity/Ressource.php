@@ -95,7 +95,6 @@ class Ressource
     public function removeCreneau(Creneau $creneau): self
     {
         if ($this->creneaux->removeElement($creneau)) {
-            // set the owning side to null (unless already changed)
             if ($creneau->getRessource() === $this) {
                 $creneau->setRessource(null);
             }
