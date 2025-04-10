@@ -3,10 +3,10 @@
 {% block title %}Modifier une Ressource{% endblock %}
 
 {% block body %}
-    <h1>Modifier la Ressource : {{ ressource.nom }}</h1>
+    <h1>Modifier la Ressource : {{ ressource.name }}</h1>
 
     {{ form_start(form) }}
-        {{ form_row(form.nom) }}
+        {{ form_row(form.name) }}
         {{ form_row(form.type) }}
         {{ form_row(form.description) }}
         <button type="submit">Mettre à jour</button>

@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'ressource')]
@@ -16,10 +17,10 @@ class Ressource
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $nom;
+    private $name;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $type; // 'salle', 'coworking', 'restaurant'
+    private $type; 
 
     #[ORM\Column(type: 'text', nullable: true)]
     private $description;
@@ -38,14 +39,14 @@ class Ressource
         return $this->id;
     }
 
-    public function getNom(): ?string
+    public function getName(): ?string
     {
-        return $this->nom;
+        return $this->name;
     }
 
-    public function setNom(string $nom): self
+    public function setName(string $name): self
     {
-        $this->nom = $nom;
+        $this->name = $name;
 
         return $this;
     }

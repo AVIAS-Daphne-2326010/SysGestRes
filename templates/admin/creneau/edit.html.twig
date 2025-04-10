@@ -1,17 +1,17 @@
-{# templates/admin/creneau/create.html.twig #}
+{# templates/admin/creneau/edit.html.twig #}
 
 {% extends 'base.html.twig' %}
 
-{% block title %}Créer un créneau{% endblock %}
+{% block title %}Modifier un créneau{% endblock %}
 
 {% block body %}
-    <h1>Créer un créneau</h1>
+    <h1>Modifier un créneau</h1>
 
     {{ form_start(form) }}
         {{ form_row(form.date_debut) }}
         {{ form_row(form.date_fin) }}
         {{ form_row(form.ressource) }}
-        <button class="btn">Créer</button>
+        <button class="btn">Enregistrer</button>
     {{ form_end(form) }}
 
     <a href="{{ path('admin_creneaux') }}">Retour à la liste</a>

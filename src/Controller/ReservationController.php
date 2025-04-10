@@ -34,7 +34,7 @@ class ReservationController extends AbstractController
     }
 
 
-    #[Route('/reservations', name: 'list_reservations')]
+    #[Route('/reservation', name: 'list_reservation')]
     public function list(EntityManagerInterface $entityManager): Response
     {
         $reservations = $entityManager->getRepository(Reservation::class)->findAll();
@@ -43,4 +43,16 @@ class ReservationController extends AbstractController
             'reservations' => $reservations,
         ]);
     }
+
+    #[Route('/reservation/{id}/annuler', name: 'annuler_reservation')]
+    public function annuler(Reservation $reservation, EntityManagerInterface $entityManager): Response
+    {
+        $entityManager->remove($reservation);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Réservation annulée avec succès.');
+
+        return $this->redirectToRoute('list_reservations');
+    }
+
 }

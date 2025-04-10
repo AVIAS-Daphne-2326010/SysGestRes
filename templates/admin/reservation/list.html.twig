@@ -21,6 +21,11 @@
                     <td>{{ reservation.date_reservation|date('Y-m-d H:i') }}</td>
                     <td>{{ reservation.utilisateur.nom }}</td>
                     <td>{{ reservation.creneau.date_debut|date('Y-m-d H:i') }} - {{ reservation.creneau.date_fin|date('Y-m-d H:i') }}</td>
+                    
+                    <td>
+                        <a href="{{ path('annuler_reservation', {'id': reservation.id}) }}">Annuler</a>
+                    </td>
+
                 </tr>
             {% endfor %}
         </tbody>

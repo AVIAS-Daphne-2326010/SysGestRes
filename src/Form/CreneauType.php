@@ -9,27 +9,26 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
 class CreneauType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('date_debut', null, [
+            ->add('date_debut', DateTimeType::class, [
                 'widget' => 'single_text',
+                'label' => 'Date et heure de début',
             ])
-            ->add('date_fin', null, [
+            ->add('date_fin', DateTimeType::class, [
                 'widget' => 'single_text',
+                'label' => 'Date et heure de fin',
             ])
             ->add('ressource', EntityType::class, [
                 'class' => Ressource::class,
-                'choice_label' => 'id',
-            ])
-            ->add('reservation', EntityType::class, [
-                'class' => Reservation::class,
-                'choice_label' => 'id',
-            ])
-        ;
+                'choice_label' => 'name', 
+                'label' => 'Ressource'
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

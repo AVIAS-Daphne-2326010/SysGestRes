@@ -9,25 +9,32 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Doctrine\ORM\EntityRepository;
+
 
 class ReservationType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options): void
-    {
-        $builder
-            ->add('date_reservation', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('utilisateur', EntityType::class, [
-                'class' => Utilisateur::class,
-                'choice_label' => 'id',
-            ])
-            ->add('creneau', EntityType::class, [
-                'class' => Creneau::class,
-                'choice_label' => 'id',
-            ])
-        ;
-    }
+public function buildForm(FormBuilderInterface $builder, array $options): void
+{
+    $builder
+        ->add('date_reservation', null, [
+            'widget' => 'single_text',
+        ])
+        ->add('utilisateur', EntityType::class, [
+            'class' => Utilisateur::class,
+            'choice_label' => 'id',
+        ])
+        ->add('creneau', EntityType::class, [
+            'class' => Creneau::class,
+            'choice_label' => 'id',
+            'query_builder' => function (EntityRepository $er) {
+                return $er->createQueryBuilder('c')
+                          ->leftJoin('c.reservation', 'r')
+                          ->where('r.id IS NULL');
+            }
+        ]);
+}
+
 
     public function configureOptions(OptionsResolver $resolver): void
     {

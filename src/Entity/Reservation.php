@@ -34,11 +34,11 @@ class Reservation
     public function verifierDisponibilite()
     {
         if ($this->creneau->getReservation() !== null) {
-            throw new \RuntimeException('Ce créneau est déjà réservé');
+            throw new \RuntimeException('Ce créneau est déjà réservé.');
         }
     }
 
-    
+
     public function getId(): ?int
     {
         return $this->id;

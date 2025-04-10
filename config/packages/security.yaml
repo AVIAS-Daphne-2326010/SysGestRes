@@ -21,7 +21,7 @@ security:
                 check_path: login
                 username_parameter: email
                 password_parameter: password
-                enable_csrf: true
+                enable_csrf: false
                 default_target_path: accueil
             logout:
                 path: logout
