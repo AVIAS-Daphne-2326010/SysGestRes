@@ -34,7 +34,7 @@ class CreneauController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/creneau/index', name: 'admin_creneaux')]
+    #[Route('/admin/creneau', name: 'admin_creneaux')]
     public function index(EntityManagerInterface $em): Response
     {
         $creneaux = $em->getRepository(Creneau::class)->findAll();

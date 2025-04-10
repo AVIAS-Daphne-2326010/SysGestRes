@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créneaux disponibles{% endblock %}
+
+{% block body %}
+    <h1>Créneaux disponibles</h1>
+
+    <ul>
+        {% for creneau in creneaux %}
+            <li>
+                Du {{ creneau.dateDebut|date('d/m H:i') }} au {{ creneau.dateFin|date('d/m H:i') }} —
+                {{ creneau.ressource.name }}
+            </li>
+        {% else %}
+            <li>Aucun créneau pour le moment.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
