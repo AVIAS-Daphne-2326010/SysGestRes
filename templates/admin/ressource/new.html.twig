@@ -1,9 +1,22 @@
-{# templates/admin/ressources/new.html.twig #}
-<h1>Ajouter une Ressource</h1>
+{# templates/admin/ressource/new.html.twig #}
+{% extends 'base.html.twig' %}
 
-{{ form_start(form) }}
-    {{ form_row(form.nom) }}
-    {{ form_row(form.type) }}
-    {{ form_row(form.description) }}
-    <button type="submit">Ajouter</button>
-{{ form_end(form) }}
+{% block title %}Nouvelle Ressource{% endblock %}
+
+{% block body %}
+    <h1>Ajouter une Ressource</h1>
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
+
+    {{ form_start(form) }}
+        {{ form_errors(form) }}
+        {{ form_row(form.nom) }}
+        {{ form_row(form.type) }}
+        {{ form_row(form.description) }}
+        <button type="submit" class="btn btn-primary">Ajouter</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('admin_ressource') }}">Retour à la liste</a>
+{% endblock %}

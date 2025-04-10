@@ -17,8 +17,8 @@
                 <td>{{ ressource.type }}</td>
                 <td>{{ ressource.description }}</td>
                 <td>
-                    <a href="#">Modifier</a> |
-                    <a href="#">Supprimer</a>
+                    <a href="{{ path('admin_ressource_edit', {'id': ressource.id}) }}">Modifier</a> |
+                    <a href="{{ path('admin_ressource_delete', {'id': ressource.id}) }}">Supprimer</a>
                 </td>
             </tr>
         {% endfor %}
