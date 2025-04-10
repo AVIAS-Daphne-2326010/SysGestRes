@@ -25,7 +25,7 @@ security:
                 default_target_path: accueil
             logout:
                 path: logout
-                target: login
+                target: home
             security: true
             stateless: false
 
@@ -42,7 +42,9 @@ security:
         # - { path: ^/profile, roles: ROLE_USER }
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
-        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/, roles: PUBLIC_ACCESS }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/reservation, roles: ROLE_USER }
 
 when@test:
     security:
