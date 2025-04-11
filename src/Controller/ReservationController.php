@@ -22,6 +22,12 @@ class ReservationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $creneau = $reservation->getCreneau();
+            if ($creneau->getReservation() !== null) {
+                $this->addFlash('error', 'Ce créneau est déjà réservé.');
+                return $this->redirectToRoute('create_reservation');
+            }
+
             $entityManager->persist($reservation);
             $entityManager->flush();
 
@@ -34,12 +40,18 @@ class ReservationController extends AbstractController
     }
 
 
-    #[Route('/reservation', name: 'list_reservation')]
-    public function list(EntityManagerInterface $entityManager): Response
+    #[Route('/reservation', name: 'reservation_index')]
+    public function index(EntityManagerInterface $entityManager): Response
     {
-        $reservations = $entityManager->getRepository(Reservation::class)->findAll();
+        $user = $this->getUser();
+        
+        if (in_array('ROLE_ADMIN', $user->getRoles())) {
+            $reservations = $entityManager->getRepository(Reservation::class)->findAll();
+        } else {
+            $reservations = $entityManager->getRepository(Reservation::class)->findBy(['utilisateur' => $user]);
+        }
 
-        return $this->render('reservation/list.html.twig', [
+        return $this->render('reservation/index.html.twig', [
             'reservations' => $reservations,
         ]);
     }
@@ -47,6 +59,10 @@ class ReservationController extends AbstractController
     #[Route('/reservation/{id}/annuler', name: 'annuler_reservation')]
     public function annuler(Reservation $reservation, EntityManagerInterface $entityManager): Response
     {
+        if ($reservation->getUtilisateur() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('Vous ne pouvez pas annuler cette réservation.');
+        }
+        
         $entityManager->remove($reservation);
         $entityManager->flush();
 

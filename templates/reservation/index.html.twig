@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des réservations{% endblock %}
+{% block title %}Mes réservations{% endblock %}
 
 {% block body %}
     <h1>Liste des réservations</h1>
@@ -12,6 +12,9 @@
                 <th>Date de réservation</th>
                 <th>Utilisateur</th>
                 <th>Créneau</th>
+                {% if is_granted('ROLE_ADMIN') %}
+                    <th>Actions</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
@@ -21,11 +24,12 @@
                     <td>{{ reservation.date_reservation|date('Y-m-d H:i') }}</td>
                     <td>{{ reservation.utilisateur.nom }}</td>
                     <td>{{ reservation.creneau.date_debut|date('Y-m-d H:i') }} - {{ reservation.creneau.date_fin|date('Y-m-d H:i') }}</td>
-                    
-                    <td>
-                        <a href="{{ path('annuler_reservation', {'id': reservation.id}) }}">Annuler</a>
-                    </td>
 
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <td>
+                            <a href="{{ path('annuler_reservation', {'id': reservation.id}) }}">Annuler</a>
+                        </td>
+                    {% endif %}
                 </tr>
             {% endfor %}
         </tbody>
