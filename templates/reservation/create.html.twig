@@ -6,9 +6,11 @@
     <h1>Réserver un créneau</h1>
 
     {{ form_start(form) }}
-        {{ form_row(form.date_reservation) }}
+        {{ form_row(form.dateReservation) }}
         {{ form_row(form.utilisateur) }}
         {{ form_row(form.creneau) }}
         <button type="submit">Réserver</button>
     {{ form_end(form) }}
+
+    <a href="{{ path('reservation_index') }}">Retour à la liste</a>
 {% endblock %}

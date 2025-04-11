@@ -21,13 +21,16 @@
             {% for reservation in reservations %}
                 <tr>
                     <td>{{ reservation.id }}</td>
-                    <td>{{ reservation.date_reservation|date('Y-m-d H:i') }}</td>
+                    <td>{{ reservation.dateReservation|date('Y-m-d H:i') }}</td>
                     <td>{{ reservation.utilisateur.nom }}</td>
-                    <td>{{ reservation.creneau.date_debut|date('Y-m-d H:i') }} - {{ reservation.creneau.date_fin|date('Y-m-d H:i') }}</td>
+                    <td>{{ reservation.creneau.dateDebut|date('Y-m-d H:i') }} - {{ reservation.creneau.dateFin|date('Y-m-d H:i') }}</td>
 
                     {% if is_granted('ROLE_ADMIN') %}
                         <td>
-                            <a href="{{ path('annuler_reservation', {'id': reservation.id}) }}">Annuler</a>
+                            <a href="{{ path('annuler_reservation', {'id': reservation.id}) }}" 
+                            onclick="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')">
+                            Annuler
+                            </a>
                         </td>
                     {% endif %}
                 </tr>

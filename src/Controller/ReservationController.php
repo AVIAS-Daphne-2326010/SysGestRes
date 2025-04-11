@@ -31,7 +31,7 @@ class ReservationController extends AbstractController
             $entityManager->persist($reservation);
             $entityManager->flush();
 
-            return $this->redirectToRoute('accueil');
+            return $this->redirectToRoute('reservation_index');
         }
 
         return $this->render('reservation/create.html.twig', [
@@ -57,18 +57,23 @@ class ReservationController extends AbstractController
     }
 
     #[Route('/reservation/{id}/annuler', name: 'annuler_reservation')]
-    public function annuler(Reservation $reservation, EntityManagerInterface $entityManager): Response
+    public function annuler(int $id, EntityManagerInterface $entityManager): Response
     {
-        if ($reservation->getUtilisateur() !== $this->getUser()) {
-            throw $this->createAccessDeniedException('Vous ne pouvez pas annuler cette réservation.');
+        $reservation = $entityManager->getRepository(Reservation::class)->find($id);
+        
+        if (!$reservation) {
+            throw $this->createNotFoundException('Réservation non trouvée');
+        }
+    
+        if ($reservation->getUtilisateur() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException();
         }
         
         $entityManager->remove($reservation);
         $entityManager->flush();
-
+    
         $this->addFlash('success', 'Réservation annulée avec succès.');
-
-        return $this->redirectToRoute('list_reservations');
+        return $this->redirectToRoute('reservation_index');
     }
 
 }

@@ -23,11 +23,11 @@ class Reservation
     private $creneau;
 
     #[ORM\Column(type: 'datetime')]
-    private $date_reservation;
+    private $dateReservation;
 
     public function __construct()
     {
-        $this->date_reservation = new \DateTime();
+        $this->dateReservation = new \DateTime();
     }
 
     #[ORM\PrePersist]
@@ -68,12 +68,12 @@ class Reservation
 
     public function getDateReservation(): ?\DateTimeInterface
     {
-        return $this->date_reservation;
+        return $this->dateReservation;
     }
 
-    public function setDateReservation(\DateTimeInterface $date_reservation): self
+    public function setDateReservation(\DateTimeInterface $dateReservation): self
     {
-        $this->date_reservation = $date_reservation;
+        $this->dateReservation = $dateReservation;
         return $this;
     }
 
