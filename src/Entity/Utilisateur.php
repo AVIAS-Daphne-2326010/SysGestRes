@@ -28,12 +28,18 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', length: 255)]
     private $password;
 
+    private ?string $plainPassword = null;
+
+    #[ORM\Column(type: 'boolean')]
+    private $isAdmin = false;
+
     #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Reservation::class)]
     private $reservations;
 
     public function __construct()
     {
         $this->reservations = new ArrayCollection();
+        $this->isAdmin = false;
     }
 
     
@@ -72,21 +78,48 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getPassword(): string
+    public function getPlainPassword(): ?string
     {
-        return $this->password;
+        return $this->plainPassword;
     }
 
-    public function setMotDePasse(string $password): self
+    public function setPlainPassword(?string $plainPassword): self
+    {
+        $this->plainPassword = $plainPassword;
+        $this->password = null;
+        return $this;
+    }
+
+    public function setPassword(string $password): self
     {
         $this->password = $password;
 
         return $this;
     }
 
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function getIsAdmin(): ?bool
+    {
+        return $this->isAdmin;
+    }
+
+    public function setIsAdmin(bool $isAdmin): self
+    {
+        $this->isAdmin = $isAdmin;
+        return $this;
+    }
+
     public function getRoles(): array
     {
-        return ['ROLE_USER'];
+        $roles = ['ROLE_USER'];
+        if ($this->isAdmin) {
+            $roles[] = 'ROLE_ADMIN';
+        }
+        return array_unique($roles);
     }
 
     public function getUserIdentifier(): string

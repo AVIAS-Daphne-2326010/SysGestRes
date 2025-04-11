@@ -13,66 +13,70 @@ use App\Repository\CreneauRepository;
 
 class CreneauController extends AbstractController
 {
-    #[Route('admin/creneau/create', name: 'admin_creneau_create')]
+    #[Route('/creneau/create', name: 'creneau_create')]
     public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN'); 
+
         $creneau = new Creneau();
-
         $form = $this->createForm(CreneauType::class, $creneau);
-
         $form->handleRequest($request);
-        
+
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($creneau);
             $entityManager->flush();
 
-            return $this->redirectToRoute('admin_creneaux');  
+            return $this->redirectToRoute('creneau_index');
         }
 
-        return $this->render('admin/creneau/create.html.twig', [
+        return $this->render('creneau/create.html.twig', [
             'form' => $form->createView(),
         ]);
     }
 
-    #[Route('/admin/creneau', name: 'admin_creneaux')]
+    #[Route('/creneau', name: 'creneau_index')]
     public function index(EntityManagerInterface $em): Response
     {
+        $user = $this->getUser();
+
         $creneaux = $em->getRepository(Creneau::class)->findAll();
-        
-        return $this->render('admin/creneau/index.html.twig', [
+
+        return $this->render('creneau/index.html.twig', [
             'creneaux' => $creneaux,
+            'isAdmin' => in_array('ROLE_ADMIN', $user->getRoles()),
         ]);
     }
 
-    #[Route('/admin/edit/{id}', name: 'admin_creneau_edit')]
+    #[Route('/creneau/edit/{id}', name: 'creneau_edit')]
     public function edit(Request $request, Creneau $creneau, EntityManagerInterface $em): Response
     {
-        $form = $this->createForm(CreneauType::class, $creneau);
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
+        $form = $this->createForm(CreneauType::class, $creneau);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
-
             $this->addFlash('success', 'Le créneau a été modifié avec succès.');
 
-            return $this->redirectToRoute('admin_creneaux');
+            return $this->redirectToRoute('creneau_index');
         }
 
-        return $this->render('admin/creneau/edit.html.twig', [
+        return $this->render('creneau/edit.html.twig', [
             'form' => $form->createView(),
             'creneau' => $creneau,
         ]);
     }
 
-    #[Route('/admin/delete/{id}', name: 'admin_creneau_delete')]
+    #[Route('/creneau/delete/{id}', name: 'creneau_delete')]
     public function delete(Creneau $creneau, EntityManagerInterface $em): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $em->remove($creneau);
         $em->flush();
-
         $this->addFlash('success', 'Le créneau a été supprimé.');
 
-        return $this->redirectToRoute('admin_creneaux');
+        return $this->redirectToRoute('creneau_index');
     }
 }
