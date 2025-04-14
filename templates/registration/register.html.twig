@@ -1,48 +1,25 @@
-{# templates/registration/register.html.twig #}
-
 {% extends 'base.html.twig' %}
 
 {% block title %}Inscription{% endblock %}
 
 {% block body %}
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <h1 class="mb-4">Inscription</h1>
-                
-                {% for message in app.flashes('success') %}
-                    <div class="alert alert-success">{{ message }}</div>
-                {% endfor %}
-                
-                {% for message in app.flashes('error') %}
-                    <div class="alert alert-danger">{{ message }}</div>
-                {% endfor %}
-
-                {{ form_start(registrationForm) }}
-                    {{ form_row(registrationForm.nom) }}
-                    
-                        <div class="mb-3">
-                            {{ form_label(registrationForm.email) }}
-                            {{ form_widget(registrationForm.email, {
-                                'attr': {
-                                    'class': 'form-control' ~ (registrationForm.email.vars.errors|length ? ' is-invalid' : ''),
-                                    'autocomplete': 'email'
-                                }
-                            }) }}
-                            {% if registrationForm.email.vars.errors|length %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in registrationForm.email.vars.errors %}
-                                        {{ error.message }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                    
-                    {{ form_row(registrationForm.plainPassword) }}
-
-                    <button type="submit" class="btn btn-primary">S'inscrire</button>
-                {{ form_end(registrationForm) }}
-            </div>
+<div class="container">
+    {{ form_start(registrationForm) }}
+    
+    {# Champ Email #}
+    <div class="mb-3">
+        {{ form_label(registrationForm.email) }}
+        {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+        <div style="color: red; margin-top: 5px">
+            {{ form_errors(registrationForm.email) }}
         </div>
     </div>
+
+    {# Autres champs #}
+    {{ form_row(registrationForm.nom) }}
+    {{ form_row(registrationForm.plainPassword) }}
+
+    <button type="submit" class="btn btn-primary">S'inscrire</button>
+    {{ form_end(registrationForm) }}
+</div>
 {% endblock %}

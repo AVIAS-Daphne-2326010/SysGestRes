@@ -12,12 +12,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'utilisateur')]
-#[UniqueEntity(
-    fields: ['email'], 
-    message: 'Cette adresse email est déjà utilisée',
-    repositoryMethod: 'findBy',
-    errorPath:'email'
-)]
+//#[UniqueEntity(fields: ['email'],message: 'Cette adresse email est déjà utilisée', errorPath: 'email',repositoryMethod: 'findBy')]
 class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]

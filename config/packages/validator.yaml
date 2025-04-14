@@ -10,3 +10,4 @@ when@test:
         validation:
             not_compromised_password: false
             email_validation_mode: html5
+            enable_annotations: true

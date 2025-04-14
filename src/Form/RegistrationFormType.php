@@ -11,7 +11,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use App\Form\EventListener\FormErrorListener;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class RegistrationFormType extends AbstractType
 {
@@ -22,7 +24,7 @@ class RegistrationFormType extends AbstractType
                 'label' => 'Nom complet'
             ])
             ->add('email', EmailType::class, [
-                'label' => 'Adresse email'
+                'label' => 'Email'
             ])
             ->add('plainPassword', PasswordType::class, [
                 'mapped' => false,
@@ -44,13 +46,8 @@ class RegistrationFormType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Utilisateur::class,
-            'constraints' => [
-                new UniqueEntity([
-                    'entityClass' => Utilisateur::class,
-                    'fields' => 'email',
-                    'message' => 'Cette adresse email est déjà utilisée.'
-                ])
-            ],
+            'csrf_protection' => true,
+            'validation_groups' => ['Default'],
         ]);
     }
 }
