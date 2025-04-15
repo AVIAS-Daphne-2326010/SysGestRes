@@ -26,11 +26,14 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
+            if ($request->headers->get('Turbo-Frame')) {
+                $request->setRequestFormat('json');
+            }
+
             $existingUser = $entityManager->getRepository(Utilisateur::class)
             ->findOneBy(['email' => $user->getEmail()]);
 
             if ($existingUser) {
-                // Ajout DIRECT de l'erreur (sans passer par les validateurs)
                 $form->get('email')->addError(new FormError('Cet email est déjà utilisé'));    
             }
 
@@ -38,7 +41,6 @@ class RegistrationController extends AbstractController
             if (!$form->isValid()) {
                 $this->addFlash('error', 'Il y a des erreurs dans le formulaire');
                 foreach ($form->getErrors(true, true) as $error) {
-                    // Si l'erreur concerne l'email, on l'ajoute spécifiquement au champ
                     if ($error->getCause() instanceof ConstraintViolation && $error->getCause()->getPropertyPath() === 'email') {
                         $form->get('email')->addError(new FormError($error->getMessage()));
                     }
@@ -63,16 +65,13 @@ class RegistrationController extends AbstractController
 
                 $this->addFlash('success', 'Inscription réussie !');
                 return $this->redirectToRoute('login');
-            } else {
-                // Debug final
-                dump([
-                    'form_errors' => iterator_to_array($form->getErrors(true, true)),
-                    'email_errors' => iterator_to_array($form->get('email')->getErrors()),
-                    'submitted_data' => $form->getData()
-                ]);
             }
         }
-
+        if ($request->headers->get('Turbo-Frame')) {
+            return $this->render('registration/register.html.twig', [
+                'registrationForm' => $form->createView(),
+            ], new Response(null, $form->isSubmitted() && !$form->isValid() ? 422 : 200));
+        }
         return $this->render('registration/register.html.twig', [
             'registrationForm' => $form->createView(),
         ]);

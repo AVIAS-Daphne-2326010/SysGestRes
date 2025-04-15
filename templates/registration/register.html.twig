@@ -4,13 +4,13 @@
 
 {% block body %}
 <div class="container">
-    {{ form_start(registrationForm) }}
+    {{ form_start(registrationForm, {'attr': {'data-turbo': 'false'}}) }}
     
     {# Champ Email #}
     <div class="mb-3">
         {{ form_label(registrationForm.email) }}
         {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
-        <div style="color: red; margin-top: 5px">
+        <div class="invalid-feedback d-block">
             {{ form_errors(registrationForm.email) }}
         </div>
     </div>
