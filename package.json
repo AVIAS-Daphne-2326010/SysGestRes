@@ -1,4 +1,12 @@
 {
+  "name": "your-project",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "encore dev",
+    "watch": "encore dev --watch",
+    "build": "encore production",
+    "dev-server": "encore dev-server"
+  },
   "dependencies": {
     "@fullcalendar/bootstrap5": "^6.1.17",
     "@fullcalendar/core": "^6.1.17",
@@ -6,5 +14,8 @@
     "@fullcalendar/interaction": "^6.1.17",
     "@fullcalendar/list": "^6.1.17",
     "@fullcalendar/timegrid": "^6.1.17"
+  },
+  "devDependencies": {
+    "@symfony/webpack-encore": "^5.1.0"
   }
 }
