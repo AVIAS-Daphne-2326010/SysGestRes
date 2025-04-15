@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('build/calendar.css') }}" rel="stylesheet" />
+    <style>
+        #calendar {
+            height: 800px;
+            margin: 20px 0;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Calendrier -->
+        <div class="col-md-9">
+            <div id="calendar" data-events='{{ events|json_encode|e('html_attr') }}'></div>
+        </div>
+        
+        <!-- Sidebar avec créneaux/résas -->
+        <div class="col-md-3 bg-light p-3">
+            <h4>Créneaux disponibles</h4>
+            <div id="timeslots-list">
+                {% for event in events %}
+                    <div class="mb-2 p-2 border rounded">
+                        <strong>{{ event.title }}</strong><br>
+                        {{ event.start|date('d/m/Y H:i') }} - {{ event.end|date('H:i') }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('calendar') }}
+{% endblock %}
