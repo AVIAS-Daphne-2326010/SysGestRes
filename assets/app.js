@@ -1,11 +1,29 @@
+// ==============================
+// Bootstrap de Symfony
+// ==============================
+
 import './bootstrap.js';
- /*
-  * Welcome to your app's main JavaScript file!
-  *
-  * This file will be included onto the page via the importmap() Twig function,
-  * which should already be in your base.html.twig.
-  */
- import './styles/app.css';
- import './calendar.js';
- 
- console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
+
+// ==============================
+// Fichier principal JavaScript de l'application
+// ==============================
+// Ce fichier est automatiquement chargé via la fonction importmap()
+// dans base.html.twig. C’est le point d’entrée principal pour ton JS.
+
+// ==============================
+// Import des styles globaux
+// ==============================
+
+import './styles/app.css'; // Fichier CSS principal de l'application
+
+// ==============================
+// Import du script du calendrier
+// ==============================
+
+import './calendar.js'; // Logique JavaScript pour FullCalendar
+
+// ==============================
+// Log de bienvenue pour vérifier que tout est bien chargé
+// ==============================
+
+console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');

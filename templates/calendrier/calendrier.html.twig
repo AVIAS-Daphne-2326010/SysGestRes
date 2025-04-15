@@ -1,15 +1,25 @@
+{# ====================== 
+   Template du calendrier 
+   ====================== #}
+
 {% extends 'base.html.twig' %}
 
+{# ====================== 
+   Feuilles de style 
+   ====================== #}
 {% block stylesheets %}
     {{ parent() }}
-    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css' rel='stylesheet' />
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css" rel="stylesheet" />
     <style>
+        /* Style principal du calendrier */
         #calendar {
-            height: 800px; /* Hauteur obligatoire */
+            height: 800px;
             width: 100%;
             margin: 20px auto;
             font-family: Arial, sans-serif;
         }
+
+        /* Style de la barre d’outils de FullCalendar */
         .fc-header-toolbar {
             background: #f8f9fa;
             padding: 10px;
@@ -18,37 +28,51 @@
     </style>
 {% endblock %}
 
+{# ====================== 
+   Contenu principal 
+   ====================== #}
 {% block body %}
 <div class="container-fluid">
     <div class="row">
-        <!-- Calendrier -->
+        
+        {# Zone principale : calendrier #}
         <div class="col-md-9">
             <div id="calendar"></div>
         </div>
         
-        <!-- Sidebar -->
+        {# Sidebar : liste des créneaux #}
         <div class="col-md-3 bg-light p-3">
             <h4>Créneaux disponibles</h4>
             <div id="timeslots-list">
                 {% for event in events %}
-                    <div class="mb-2 p-2 rounded" style="background-color: {{ event.color }}; color: white;">
+                    <div 
+                        class="mb-2 p-2 rounded" 
+                        style="background-color: {{ event.color }}; color: white;"
+                    >
                         <strong>{{ event.title }}</strong><br>
                         {{ event.start|date('d/m/Y H:i') }} - {{ event.end|date('H:i') }}<br>
                         {{ event.extendedProps.reserved ? 'Réservé' : 'Disponible' }}
                     </div>
+                {% else %}
+                    <p>Aucun créneau disponible pour le moment.</p>
                 {% endfor %}
             </div>
         </div>
+
     </div>
 </div>
 {% endblock %}
 
+{# ====================== 
+   JavaScript : Passage des événements au JS 
+   ====================== #}
 {% block javascripts %}
     {{ parent() }}
     <script>
-        // On passe les événements au JS via un data-attribute
         document.addEventListener('DOMContentLoaded', function() {
             const calendarDiv = document.getElementById('calendar');
+
+            // Injecter les événements dans un attribut pour récupération côté JS Webpack
             if (calendarDiv) {
                 calendarDiv.setAttribute('data-events', JSON.stringify({{ events|json_encode|raw }}));
             }
