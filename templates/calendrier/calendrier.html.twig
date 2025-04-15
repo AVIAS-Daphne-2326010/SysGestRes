@@ -2,11 +2,18 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <link href="{{ asset('build/calendar.css') }}" rel="stylesheet" />
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css' rel='stylesheet' />
     <style>
         #calendar {
-            height: 800px;
-            margin: 20px 0;
+            height: 800px; /* Hauteur obligatoire */
+            width: 100%;
+            margin: 20px auto;
+            font-family: Arial, sans-serif;
+        }
+        .fc-header-toolbar {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
         }
     </style>
 {% endblock %}
@@ -16,17 +23,18 @@
     <div class="row">
         <!-- Calendrier -->
         <div class="col-md-9">
-            <div id="calendar" data-events='{{ events|json_encode|e('html_attr') }}'></div>
+            <div id="calendar"></div>
         </div>
         
-        <!-- Sidebar avec créneaux/résas -->
+        <!-- Sidebar -->
         <div class="col-md-3 bg-light p-3">
             <h4>Créneaux disponibles</h4>
             <div id="timeslots-list">
                 {% for event in events %}
-                    <div class="mb-2 p-2 border rounded">
+                    <div class="mb-2 p-2 rounded" style="background-color: {{ event.color }}; color: white;">
                         <strong>{{ event.title }}</strong><br>
-                        {{ event.start|date('d/m/Y H:i') }} - {{ event.end|date('H:i') }}
+                        {{ event.start|date('d/m/Y H:i') }} - {{ event.end|date('H:i') }}<br>
+                        {{ event.extendedProps.reserved ? 'Réservé' : 'Disponible' }}
                     </div>
                 {% endfor %}
             </div>
@@ -37,5 +45,13 @@
 
 {% block javascripts %}
     {{ parent() }}
-    {{ encore_entry_script_tags('calendar') }}
+    <script>
+        // On passe les événements au JS via un data-attribute
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarDiv = document.getElementById('calendar');
+            if (calendarDiv) {
+                calendarDiv.setAttribute('data-events', JSON.stringify({{ events|json_encode|raw }}));
+            }
+        });
+    </script>
 {% endblock %}

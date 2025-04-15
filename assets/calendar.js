@@ -20,7 +20,11 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             events: events,
             eventClick: function(info) {
-                alert('Événement : ' + info.event.title);
+                if (info.event.extendedProps.reserved) {
+                    alert('Déjà réservé: ' + info.event.title);
+                } else {
+                    window.location.href = '/reservation/new?start=' + info.event.startStr;
+                }
             }
         });
 
