@@ -11,7 +11,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Validator\ConstraintViolation;
 
 class RegistrationController extends AbstractController
 {
@@ -26,54 +25,53 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
-            if ($request->headers->get('Turbo-Frame')) {
-                $request->setRequestFormat('json');
+            // Gestion Turbo
+            $isTurboRequest = $request->headers->get('Turbo-Frame');
+
+            // Vérification email existant
+            if ($entityManager->getRepository(Utilisateur::class)->findOneBy(['email' => $user->getEmail()])) {
+                $form->get('email')->addError(new FormError('Cet email est déjà utilisé'));
             }
 
-            $existingUser = $entityManager->getRepository(Utilisateur::class)
-            ->findOneBy(['email' => $user->getEmail()]);
-
-            if ($existingUser) {
-                $form->get('email')->addError(new FormError('Cet email est déjà utilisé'));    
-            }
-
-            // Traitement des erreurs de validation
-            if (!$form->isValid()) {
-                $this->addFlash('error', 'Il y a des erreurs dans le formulaire');
-                foreach ($form->getErrors(true, true) as $error) {
-                    if ($error->getCause() instanceof ConstraintViolation && $error->getCause()->getPropertyPath() === 'email') {
-                        $form->get('email')->addError(new FormError($error->getMessage()));
-                    }
-                }
-            }
-
-            // Si le formulaire est valide après traitement des erreurs
             if ($form->isValid()) {
-                // Hash du mot de passe
-                $user->setPassword(
-                    $userPasswordHasher->hashPassword(
-                        $user,
-                        $form->get('plainPassword')->getData()
-                    )
-                );
-                
-                $user->setIsAdmin(false);
-                
-                // Persistance de l'utilisateur
-                $entityManager->persist($user);
-                $entityManager->flush();
-
+                $this->processRegistration($user, $form, $userPasswordHasher, $entityManager);
                 $this->addFlash('success', 'Inscription réussie !');
+                
                 return $this->redirectToRoute('login');
             }
+
+            $this->addFlash('error', 'Il y a des erreurs dans le formulaire');
         }
+
+        return $this->renderFormResponse($form, $request);
+    }
+
+    private function processRegistration(
+        Utilisateur $user,
+        $form,
+        UserPasswordHasherInterface $hasher,
+        EntityManagerInterface $em
+    ): void {
+        $user->setPassword(
+            $hasher->hashPassword(
+                $user,
+                $form->get('plainPassword')->getData()
+            )
+        );
+        $user->setIsAdmin(false);
+        $em->persist($user);
+        $em->flush();
+    }
+
+    private function renderFormResponse($form, Request $request): Response
+    {
+        $template = 'registration/register.html.twig';
+        $status = $form->isSubmitted() && !$form->isValid() ? 422 : 200;
+
         if ($request->headers->get('Turbo-Frame')) {
-            return $this->render('registration/register.html.twig', [
-                'registrationForm' => $form->createView(),
-            ], new Response(null, $form->isSubmitted() && !$form->isValid() ? 422 : 200));
+            return $this->render($template, ['registrationForm' => $form], new Response(null, $status));
         }
-        return $this->render('registration/register.html.twig', [
-            'registrationForm' => $form->createView(),
-        ]);
+
+        return $this->render($template, ['registrationForm' => $form->createView()]);
     }
 }
