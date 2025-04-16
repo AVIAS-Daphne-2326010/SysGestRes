@@ -6,29 +6,57 @@
     <div class="container">
         <h1 class="my-4">Réserver un créneau</h1>
 
-        {# Formulaire de création #}
-        {{ form_start(form, {'attr': {'class': 'reservation-form'}}) }}
-            <div class="form-group">
-                {{ form_label(form.dateReservation) }}
-                {{ form_widget(form.dateReservation, {'attr': {'class': 'form-control'}}) }}
-                {{ form_errors(form.dateReservation) }}
-            </div>
+        <div id="flash-messages"></div>
 
-            <div class="form-group">
-                {{ form_label(form.utilisateur) }}
-                {{ form_widget(form.utilisateur, {'attr': {'class': 'form-control'}}) }}
-                {{ form_errors(form.utilisateur) }}
-            </div>
-
-            <div class="form-group">
-                {{ form_label(form.creneau) }}
-                {{ form_widget(form.creneau, {'attr': {'class': 'form-control'}}) }}
-                {{ form_errors(form.creneau) }}
-            </div>
-
-            {# Boutons d'action #}
-            <button type="submit" class="btn btn-primary">Réserver</button>
-            <a href="{{ path('reservation_index') }}" class="btn btn-secondary">Retour à la liste</a>
-        {{ form_end(form) }}
+        <div id="form-container">
+            {% include 'reservation/_form.html.twig' with {'form': form} %}
+        </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            // Initialisation des gestionnaires de formulaire
+            function initFormHandlers() {
+                $('.reservation-form').off('submit').on('submit', function(e) {
+                    e.preventDefault();
+                    const form = $(this);
+                    
+                    $.ajax({
+                        url: form.attr('action'),
+                        type: form.attr('method'),
+                        data: form.serialize(),
+                        dataType: 'json',
+                        success: function(data) {
+                            if (data.success) {
+                                window.location.href = '{{ path('reservation_index') }}';
+                            } else {
+                                showFlashMessage('error', data.message);
+                            }
+                        }
+                    });
+                });
+            }
+
+            // Fonction pour afficher les messages flash
+            function showFlashMessage(type, message) {
+                const flashDiv = $('<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' +
+                    message +
+                    '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                    '</div>');
+                
+                $('#flash-messages').append(flashDiv);
+                
+                // Supprimer après 5 secondes
+                setTimeout(() => {
+                    flashDiv.remove();
+                }, 5000);
+            }
+
+            // Initialisez les gestionnaires au chargement
+            initFormHandlers();
+        });
+    </script>
 {% endblock %}

@@ -2,73 +2,171 @@
 
 {% block title %}Mes réservations{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+{% endblock %}
+
 {% block body %}
     <div class="container">
         <h1 class="my-4">Liste des réservations</h1>
 
-        {# Affiche les messages flash #}
-        {% for message in app.flashes('success') %}
-            <div class="alert alert-success">
-                {{ message }}
-            </div>
-        {% endfor %}
+        <div id="flash-messages"></div>
 
-        {% for message in app.flashes('error') %}
-            <div class="alert alert-danger">
-                {{ message }}
-            </div>
-        {% endfor %}
-
-        {# Tableau des réservations #}
         <div class="table-responsive">
             <table class="table table-striped">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Date de réservation</th>
-                        <th>Utilisateur</th>
-                        <th>Créneau</th>
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <th>Actions</th>
-                        {% endif %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for reservation in reservations %}
-                        <tr>
-                            <td>{{ reservation.id }}</td>
-                            <td>{{ reservation.dateReservation|date('d/m/Y H:i') }}</td>
-                            <td>{{ reservation.utilisateur.nom }}</td>
-                            <td>
-                                {{ reservation.creneau.dateDebut|date('d/m/Y H:i') }} 
-                                à {{ reservation.creneau.dateFin|date('H:i') }}
-                            </td>
-
-                            {# Bouton d'annulation pour les admins #}
-                            {% if is_granted('ROLE_ADMIN') %}
-                                <td>
-                                    <a href="{{ path('annuler_reservation', {'id': reservation.id}) }}" 
-                                       class="btn btn-danger btn-sm"
-                                       onclick="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')">
-                                        Annuler
-                                    </a>
-                                </td>
-                            {% endif %}
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="{% if is_granted('ROLE_ADMIN') %}5{% else %}4{% endif %}" class="text-center">
-                                Aucune réservation trouvée
-                            </td>
-                        </tr>
-                    {% endfor %}
+                <!-- ... en-têtes du tableau ... -->
+                <tbody id="reservations-list">
+                    {% include 'reservation/_list.html.twig' %}
                 </tbody>
             </table>
         </div>
 
-        {# Bouton pour créer une nouvelle réservation #}
-        <a href="{{ path('create_reservation') }}" class="btn btn-primary">
-            Créer une nouvelle réservation
-        </a>
+        <button id="new-reservation-btn" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Créer une nouvelle réservation
+        </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="modal-container" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Réserver un créneau</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="modal-form-container">
+                        <!-- Le formulaire sera chargé ici -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestion du bouton "Nouvelle réservation"
+            const newReservationBtn = document.getElementById('new-reservation-btn');
+            if (newReservationBtn) {
+                newReservationBtn.addEventListener('click', function() {
+                    fetch('{{ path('create_reservation') }}')
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('modal-form-container').innerHTML = data.html;
+                            // Initialiser le modal Bootstrap
+                            new bootstrap.Modal(document.getElementById('modal-container')).show();
+                        });
+                });
+            }
+
+            // Délégation d'événement pour les boutons d'annulation
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('cancel-reservation') || 
+                    e.target.closest('.cancel-reservation')) {
+                    const button = e.target.classList.contains('cancel-reservation') 
+                        ? e.target 
+                        : e.target.closest('.cancel-reservation');
+                    const reservationId = button.dataset.id;
+
+                    Swal.fire({
+                        title: 'Êtes-vous sûr?',
+                        text: "Vous ne pourrez pas annuler cette action!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Oui, annuler!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(`/reservation/${reservationId}/annuler`, {
+                                method: 'POST',
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'Content-Type': 'application/json'
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    refreshReservationsList();
+                                    showFlashMessage('success', data.message);
+                                } else {
+                                    showFlashMessage('error', data.message);
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+            // Gestion de la soumission du formulaire
+            document.addEventListener('submit', function(e) {
+                if (e.target.classList.contains('ajax-form')) {
+                    e.preventDefault();
+                    const form = e.target;
+                    
+                    fetch(form.action, {
+                        method: form.method,
+                        body: new FormData(form),
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Fermer le modal s'il existe
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('modal-container'));
+                            if (modal) modal.hide();
+                            
+                            refreshReservationsList();
+                            showFlashMessage('success', data.message);
+                        } else {
+                            showFlashMessage('error', data.message);
+                        }
+                    });
+                }
+            });
+
+            // Fonction pour rafraîchir la liste
+            function refreshReservationsList() {
+                fetch('{{ path('reservation_index') }}', {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('reservations-list').innerHTML = data.html;
+                });
+            }
+
+            // Fonction pour afficher les messages
+            function showFlashMessage(type, message) {
+                const flashDiv = document.createElement('div');
+                flashDiv.className = `alert alert-${type} alert-dismissible fade show`;
+                flashDiv.role = 'alert';
+                flashDiv.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                
+                const flashContainer = document.getElementById('flash-messages');
+                flashContainer.appendChild(flashDiv);
+                
+                // Supprimer après 5 secondes
+                setTimeout(() => {
+                    flashDiv.remove();
+                }, 5000);
+            }
+        });
+    </script>
+{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+    <script src="https://kit.fontawesome.com/votre-code.js" crossorigin="anonymous"></script>
 {% endblock %}
