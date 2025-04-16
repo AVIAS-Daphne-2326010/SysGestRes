@@ -3,38 +3,72 @@
 {% block title %}Mes réservations{% endblock %}
 
 {% block body %}
-    <h1>Liste des réservations</h1>
+    <div class="container">
+        <h1 class="my-4">Liste des réservations</h1>
 
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Date de réservation</th>
-                <th>Utilisateur</th>
-                <th>Créneau</th>
-                {% if is_granted('ROLE_ADMIN') %}
-                    <th>Actions</th>
-                {% endif %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for reservation in reservations %}
-                <tr>
-                    <td>{{ reservation.id }}</td>
-                    <td>{{ reservation.dateReservation|date('Y-m-d H:i') }}</td>
-                    <td>{{ reservation.utilisateur.nom }}</td>
-                    <td>{{ reservation.creneau.dateDebut|date('Y-m-d H:i') }} - {{ reservation.creneau.dateFin|date('Y-m-d H:i') }}</td>
+        {# Affiche les messages flash #}
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
 
-                    {% if is_granted('ROLE_ADMIN') %}
-                        <td>
-                            <a href="{{ path('annuler_reservation', {'id': reservation.id}) }}" 
-                            onclick="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')">
-                            Annuler
-                            </a>
-                        </td>
-                    {% endif %}
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {# Tableau des réservations #}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Date de réservation</th>
+                        <th>Utilisateur</th>
+                        <th>Créneau</th>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <th>Actions</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reservation in reservations %}
+                        <tr>
+                            <td>{{ reservation.id }}</td>
+                            <td>{{ reservation.dateReservation|date('d/m/Y H:i') }}</td>
+                            <td>{{ reservation.utilisateur.nom }}</td>
+                            <td>
+                                {{ reservation.creneau.dateDebut|date('d/m/Y H:i') }} 
+                                à {{ reservation.creneau.dateFin|date('H:i') }}
+                            </td>
+
+                            {# Bouton d'annulation pour les admins #}
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <td>
+                                    <a href="{{ path('annuler_reservation', {'id': reservation.id}) }}" 
+                                       class="btn btn-danger btn-sm"
+                                       onclick="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')">
+                                        Annuler
+                                    </a>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="{% if is_granted('ROLE_ADMIN') %}5{% else %}4{% endif %}" class="text-center">
+                                Aucune réservation trouvée
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {# Bouton pour créer une nouvelle réservation #}
+        <a href="{{ path('create_reservation') }}" class="btn btn-primary">
+            Créer une nouvelle réservation
+        </a>
+    </div>
 {% endblock %}

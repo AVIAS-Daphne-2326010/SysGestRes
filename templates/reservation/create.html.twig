@@ -3,14 +3,32 @@
 {% block title %}Créer une réservation{% endblock %}
 
 {% block body %}
-    <h1>Réserver un créneau</h1>
+    <div class="container">
+        <h1 class="my-4">Réserver un créneau</h1>
 
-    {{ form_start(form) }}
-        {{ form_row(form.dateReservation) }}
-        {{ form_row(form.utilisateur) }}
-        {{ form_row(form.creneau) }}
-        <button type="submit">Réserver</button>
-    {{ form_end(form) }}
+        {# Formulaire de création #}
+        {{ form_start(form, {'attr': {'class': 'reservation-form'}}) }}
+            <div class="form-group">
+                {{ form_label(form.dateReservation) }}
+                {{ form_widget(form.dateReservation, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.dateReservation) }}
+            </div>
 
-    <a href="{{ path('reservation_index') }}">Retour à la liste</a>
+            <div class="form-group">
+                {{ form_label(form.utilisateur) }}
+                {{ form_widget(form.utilisateur, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.utilisateur) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.creneau) }}
+                {{ form_widget(form.creneau, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.creneau) }}
+            </div>
+
+            {# Boutons d'action #}
+            <button type="submit" class="btn btn-primary">Réserver</button>
+            <a href="{{ path('reservation_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        {{ form_end(form) }}
+    </div>
 {% endblock %}
