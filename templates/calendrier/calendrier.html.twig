@@ -1,15 +1,11 @@
-{# ====================== 
-   Template du calendrier 
-   ====================== #}
-
+{# calendrier/calendrier.html.twig #}
 {% extends 'base.html.twig' %}
 
-{# ====================== 
-   Feuilles de style 
-   ====================== #}
 {% block stylesheets %}
     {{ parent() }}
+    {# Intégration de FullCalendar CSS #}
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css" rel="stylesheet" />
+    
     <style>
         /* Style principal du calendrier */
         #calendar {
@@ -18,63 +14,184 @@
             margin: 20px auto;
             font-family: Arial, sans-serif;
         }
-
-        /* Style de la barre d’outils de FullCalendar */
+        
+        /* Style de la barre d'outils du calendrier */
         .fc-header-toolbar {
             background: #f8f9fa;
             padding: 10px;
             border-radius: 5px;
         }
+        
+        /* Styles pour les créneaux disponibles */
+        .timeslot-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .timeslot-item:hover {
+            background-color: rgb(200, 200, 200);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Structure flex pour aligner le chevron et le texte */
+        .timeslot-content {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Style du chevron */
+        .timeslot-chevron {
+            font-size: 1rem;
+            color: #007bff;
+            margin-right: 12px;
+            flex-shrink: 0; /* Empêche le chevron de rétrécir */
+        }
+
+        /* Détails du créneau */
+        .timeslot-details {
+            flex-grow: 1; /* Prend tout l'espace disponible */
+        }
+
+        /* Style de l'heure */
+        .timeslot-time {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
     </style>
 {% endblock %}
 
-{# ====================== 
-   Contenu principal 
-   ====================== #}
 {% block body %}
 <div class="container-fluid">
     <div class="row">
-        
-        {# Zone principale : calendrier #}
+        {# Colonne principale avec le calendrier #}
         <div class="col-md-9">
             <div id="calendar"></div>
         </div>
         
-        {# Sidebar : liste des créneaux #}
+        {# Colonne latérale avec les créneaux disponibles #}
         <div class="col-md-3 bg-light p-3">
             <h4>Créneaux disponibles</h4>
             <div id="timeslots-list">
-                {% for event in events %}
-                    <div 
-                        class="mb-2 p-2 rounded" 
-                        style="background-color: {{ event.color }}; color: white;"
-                    >
-                        <strong>{{ event.title }}</strong><br>
-                        {{ event.start|date('d/m/Y H:i') }} - {{ event.end|date('H:i') }}<br>
-                        {{ event.extendedProps.reserved ? 'Réservé' : 'Disponible' }}
-                    </div>
-                {% else %}
-                    <p>Aucun créneau disponible pour le moment.</p>
-                {% endfor %}
+                <p>Chargement...</p>
             </div>
         </div>
-
     </div>
 </div>
 {% endblock %}
 
-{# ====================== 
-   JavaScript : Passage des événements au JS 
-   ====================== #}
 {% block javascripts %}
     {{ parent() }}
+    {# Intégration de FullCalendar JS #}
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const calendarDiv = document.getElementById('calendar');
+            // Initialisation du calendrier
+            const calendarEl = document.getElementById('calendar');
+            
+            if (calendarEl) {
+                const calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    locale: 'fr',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    events: '/api/creneaux',
+                    eventClick: function(info) {
+                        if (info.event.extendedProps.reserved) {
+                            alert('Déjà réservé: ' + info.event.title);
+                        } else {
+                            window.location.href = '/reservation/create?start=' + 
+                                encodeURIComponent(info.event.startStr);
+                        }
+                    },
+                    timeZone: 'Europe/Paris'
+                });
 
-            // Injecter les événements dans un attribut pour récupération côté JS Webpack
-            if (calendarDiv) {
-                calendarDiv.setAttribute('data-events', JSON.stringify({{ events|json_encode|raw }}));
+                calendar.render();
+            }
+
+            // Récupération et affichage des créneaux disponibles
+            fetch('/api/creneaux')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erreur réseau');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const container = document.getElementById('timeslots-list');
+                    container.innerHTML = '';
+
+                    // Gestion du cas où il n'y a pas de créneaux
+                    if (!data || data.length === 0) {
+                        container.innerHTML = '<p class="text-muted">Aucun créneau disponible pour le moment.</p>';
+                        return;
+                    }
+
+                    // Filtrage des créneaux non réservés
+                    const availableSlots = data.filter(e => !e.extendedProps?.reserved);
+
+                    // Création des éléments HTML pour chaque créneau disponible
+                    availableSlots.forEach(event => {
+                        const slotElement = createTimeslotElement(event);
+                        container.appendChild(slotElement);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    document.getElementById('timeslots-list').innerHTML = 
+                        '<p class="text-danger">Erreur lors du chargement des créneaux. Veuillez rafraîchir la page.</p>';
+                });
+
+            /**
+             * Crée un élément DOM pour un créneau horaire
+             * @param {Object} event - Données du créneau
+             * @return {HTMLElement} - Élément HTML du créneau
+             */
+            function createTimeslotElement(event) {
+                const slot = document.createElement('div');
+                slot.className = 'timeslot-item';
+                slot.innerHTML = `
+                    <div class="timeslot-content">
+                        <span class="timeslot-chevron">➤</span>
+                        <div class="timeslot-details">
+                            <strong>${event.title || 'Créneau'}</strong>
+                            <div class="timeslot-time">
+                                ${formatTime(event.start)} - ${formatTime(event.end)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Redirection vers la page de réservation au clic
+                slot.addEventListener('click', () => {
+                    window.location.href = '/reservation/create?start=' + 
+                        encodeURIComponent(event.start);
+                });
+                
+                return slot;
+            }
+
+            /**
+             * Formate une date en heure locale (HH:MM)
+             * @param {string} dateString - Date au format ISO
+             * @return {string} - Heure formatée
+             */
+            function formatTime(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: false // Format 24h
+                });
             }
         });
     </script>

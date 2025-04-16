@@ -17,12 +17,6 @@ import './bootstrap.js';
 import './styles/app.css'; // Fichier CSS principal de l'application
 
 // ==============================
-// Import du script du calendrier
-// ==============================
-
-import './calendar.js'; // Logique JavaScript pour FullCalendar
-
-// ==============================
 // Log de bienvenue pour vérifier que tout est bien chargé
 // ==============================
 
