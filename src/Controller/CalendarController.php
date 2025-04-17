@@ -12,16 +12,20 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class CalendarController extends AbstractController
 {
+    // Route pour afficher le calendrier
     #[Route('/calendrier', name: 'calendrier')]
     public function calendrier(): Response
     {
+        // Rendu de la vue du calendrier
         return $this->render('calendrier/calendrier.html.twig');
     }
 
+    // Route pour récupérer les créneaux en format JSON via une API
     #[Route('/api/creneaux', name: 'api_creneaux')]
     public function apiCreneaux(EntityManagerInterface $em, LoggerInterface $logger): JsonResponse
     {
         try {
+            // Récupération des créneaux depuis la base de données
             $creneaux = $em->getRepository(Creneau::class)
                 ->createQueryBuilder('c')
                 ->leftJoin('c.reservation', 'r')
@@ -30,6 +34,7 @@ class CalendarController extends AbstractController
                 ->getQuery()
                 ->getResult();
 
+            // Formatage des créneaux pour l'affichage dans le calendrier
             $events = array_map(function($creneau) {
                 return [
                     'id' => $creneau->getId(),
@@ -47,6 +52,7 @@ class CalendarController extends AbstractController
             return new JsonResponse($events);
             
         } catch (\Exception $e) {
+            // Log l'erreur en cas de problème
             $logger->error('API Creneaux Error: ' . $e->getMessage());
             return new JsonResponse(
                 ['error' => 'Erreur lors de la récupération des créneaux'],

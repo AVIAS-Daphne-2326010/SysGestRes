@@ -13,6 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ReservationController extends AbstractController
 {
+    // Route pour créer une nouvelle réservation
     #[Route('/reservation/create', name: 'create_reservation')]
     public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -20,9 +21,11 @@ class ReservationController extends AbstractController
         $form = $this->createForm(ReservationType::class, $reservation);
         $form->handleRequest($request);
     
+        // Traitement de la requête AJAX (pour la soumission du formulaire)
         if ($request->isXmlHttpRequest()) {
             if ($form->isSubmitted()) {
                 if (!$form->isValid()) {
+                    // Gestion des erreurs de validation
                     $errors = [];
                     foreach ($form->getErrors(true) as $error) {
                         $errors[$error->getOrigin()->getName()] = $error->getMessage();
@@ -34,6 +37,7 @@ class ReservationController extends AbstractController
                     ], 400);
                 }
         
+                // Vérification si le créneau est déjà réservé
                 if ($reservation->getCreneau()->getReservation() !== null) {
                     return $this->json([
                         'success' => false, 
@@ -41,11 +45,12 @@ class ReservationController extends AbstractController
                     ], 400);
                 }
         
+                // Attribution de l'utilisateur à la réservation
                 $reservation->setUtilisateur($this->getUser());
                 $entityManager->persist($reservation);
                 $entityManager->flush();
         
-                // 💡 ajout de reservationRow ici :
+                // Retourne la ligne de réservation à insérer dans la liste
                 return $this->json([
                     'success' => true,
                     'message' => 'Réservation créée avec succès!',
@@ -56,6 +61,7 @@ class ReservationController extends AbstractController
                 ]);
             }
         
+            // Retourne le formulaire sous forme HTML en cas de requête AJAX
             return $this->json([
                 'html' => $this->renderView('reservation/_form.html.twig', [
                     'form' => $form->createView()
@@ -63,17 +69,20 @@ class ReservationController extends AbstractController
             ]);
         }
         
-    
+        // Rendu de la page de création de réservation
         return $this->render('reservation/create.html.twig', [
             'form' => $form->createView()
         ]);
     }
 
+    // Route pour afficher la liste des réservations
     #[Route('/reservations', name: 'reservation_index')]
     public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
+        // Récupération des réservations triées par date
         $reservations = $entityManager->getRepository(Reservation::class)->findBy([], ['dateReservation' => 'DESC']);
         
+        // Traitement de la requête AJAX pour afficher la liste des réservations
         if ($request->isXmlHttpRequest()) {
             return new JsonResponse([
                 'html' => $this->renderView('reservation/_list.html.twig', [
@@ -82,17 +91,20 @@ class ReservationController extends AbstractController
             ]);
         }
         
+        // Rendu de la page avec les réservations
         return $this->render('reservation/index.html.twig', [
             'reservations' => $reservations,
         ]);
     }
     
-
+    // Route pour annuler une réservation
     #[Route('/reservation/{id}/annuler', name: 'annuler_reservation', methods: ['POST'])]
     public function annuler(int $id, EntityManagerInterface $entityManager, Request $request): Response
     {
+        // Récupération de la réservation
         $reservation = $entityManager->getRepository(Reservation::class)->find($id);
         
+        // Gestion du cas où la réservation n'existe pas
         if (!$reservation) {
             if ($request->isXmlHttpRequest()) {
                 return new JsonResponse(['success' => false, 'message' => 'Réservation non trouvée'], 404);
@@ -100,6 +112,7 @@ class ReservationController extends AbstractController
             throw $this->createNotFoundException('Réservation non trouvée');
         }
     
+        // Vérification des droits de l'utilisateur
         if ($reservation->getUtilisateur() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
             if ($request->isXmlHttpRequest()) {
                 return new JsonResponse(['success' => false, 'message' => 'Accès refusé'], 403);
@@ -107,9 +120,11 @@ class ReservationController extends AbstractController
             throw $this->createAccessDeniedException();
         }
         
+        // Suppression de la réservation
         $entityManager->remove($reservation);
         $entityManager->flush();
     
+         // Retourne une réponse JSON après suppression
         if ($request->isXmlHttpRequest()) {
             return new JsonResponse([
                 'success' => true,
@@ -118,21 +133,25 @@ class ReservationController extends AbstractController
             ]);
         }
         
+        // Message flash et redirection vers la liste des réservations
         $this->addFlash('success', 'Réservation annulée avec succès.');
         return $this->redirectToRoute('reservation_index');
     }
 
+    // Route pour récupérer les réservations via une API
     #[Route('/api/reservations', name: 'api_reservations')]
     public function getReservationsApi(EntityManagerInterface $entityManager): JsonResponse
     {
         $user = $this->getUser();
         
+        // Récupération des réservations selon le rôle de l'utilisateur
         if ($this->isGranted('ROLE_ADMIN')) {
             $reservations = $entityManager->getRepository(Reservation::class)->findAll();
         } else {
             $reservations = $entityManager->getRepository(Reservation::class)->findBy(['utilisateur' => $user]);
         }
 
+        // Formatage des données des réservations pour la réponse JSON
         $data = [];
         foreach ($reservations as $reservation) {
             $data[] = [
