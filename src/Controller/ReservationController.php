@@ -18,35 +18,54 @@ class ReservationController extends AbstractController
     {
         $reservation = new Reservation();
         $form = $this->createForm(ReservationType::class, $reservation);
-    
         $form->handleRequest($request);
     
-        if ($form->isSubmitted() && $form->isValid()) {
-            $creneau = $reservation->getCreneau();
-            if ($creneau->getReservation() !== null) {
+        if ($request->isXmlHttpRequest()) {
+            if ($form->isSubmitted()) {
+                if (!$form->isValid()) {
+                    $errors = [];
+                    foreach ($form->getErrors(true) as $error) {
+                        $errors[$error->getOrigin()->getName()] = $error->getMessage();
+                    }
+                    return $this->json([
+                        'success' => false,
+                        'message' => 'Erreur de validation',
+                        'errors' => $errors
+                    ], 400);
+                }
+    
+                if ($reservation->getCreneau()->getReservation() !== null) {
+                    return $this->json([
+                        'success' => false, 
+                        'message' => 'Ce créneau est déjà réservé.'
+                    ], 400);
+                }
+    
+                $reservation->setUtilisateur($this->getUser());
+                $entityManager->persist($reservation);
+                $entityManager->flush();
+    
                 return $this->json([
-                    'success' => false,
-                    'message' => 'Ce créneau est déjà réservé.'
+                    'success' => true,
+                    'message' => 'Réservation créée avec succès!',
+                    'reservation' => [
+                        'id' => $reservation->getId(),
+                        'date' => $reservation->getDateReservation()->format('d/m/Y H:i'),
+                        'creneau' => $reservation->getCreneau()->getDateDebut()->format('H:i').' - '.$reservation->getCreneau()->getDateFin()->format('H:i')
+                    ],
+                    'wasEmpty' => false
                 ]);
             }
     
-            $reservation->setUtilisateur($this->getUser());
-            $entityManager->persist($reservation);
-            $entityManager->flush();
-    
             return $this->json([
-                'success' => true,
-                'message' => 'Réservation créée avec succès!',
-                'reservationRow' => $this->renderView('reservation/_row.html.twig', [
-                    'reservation' => $reservation
+                'html' => $this->renderView('reservation/_form.html.twig', [
+                    'form' => $form->createView()
                 ])
             ]);
         }
     
-        return $this->json([
-            'html' => $this->renderView('reservation/_form.html.twig', [
-                'form' => $form->createView(),
-            ])
+        return $this->render('reservation/create.html.twig', [
+            'form' => $form->createView()
         ]);
     }
 
@@ -92,7 +111,11 @@ class ReservationController extends AbstractController
         $entityManager->flush();
     
         if ($request->isXmlHttpRequest()) {
-            return new JsonResponse(['success' => true, 'message' => 'Réservation annulée avec succès.']);
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Réservation annulée avec succès.',
+                'isEmpty' => count($entityManager->getRepository(Reservation::class)->findAll()) === 0
+            ]);
         }
         
         $this->addFlash('success', 'Réservation annulée avec succès.');

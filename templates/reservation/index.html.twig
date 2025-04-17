@@ -95,7 +95,20 @@
                             .then(data => {
                                 if (data.success) {
                                     document.querySelector(`tr[data-reservation-id="${reservationId}"]`).remove();
-                                    checkEmptyList(); // <-- Juste besoin d'appeler cette fonction
+                                    
+                                    // Utilisez la réponse du serveur pour gérer l'affichage du message vide
+                                    if (data.isEmpty) {
+                                        const tbody = document.getElementById('reservations-list');
+                                        tbody.innerHTML = `
+                                            <tr>
+                                                <td colspan="5" class="text-center text-muted">
+                                                    <i class="fas fa-calendar-times fa-2x mb-2"></i><br>
+                                                    Aucune réservation trouvée
+                                                </td>
+                                            </tr>
+                                        `;
+                                    }
+                                    
                                     showFlashMessage('success', data.message);
                                 }
                             });
@@ -136,23 +149,26 @@
 
             function checkEmptyList() {
                 const tbody = document.getElementById('reservations-list');
-                const hasReservations = tbody.querySelector('tr[data-reservation-id]');
-                const emptyMessage = tbody.querySelector('tr.text-center.text-muted');
+                const reservations = tbody.querySelectorAll('tr[data-reservation-id]');
+                const emptyRow = tbody.querySelector('.text-center.text-muted'); // Sélecteur plus précis
                 
-                // Si aucune réservation et pas déjà de message vide
-                if (!hasReservations && !emptyMessage) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="5" class="text-center text-muted">
-                                <i class="fas fa-calendar-times fa-2x mb-2"></i><br>
-                                Aucune réservation trouvée
-                            </td>
-                        </tr>
-                    `;
-                }
-                // Si des réservations mais message vide présent
-                else if (hasReservations && emptyMessage) {
-                    emptyMessage.remove();
+                if (reservations.length === 0) {
+                    // Vérifie si le message vide n'existe pas déjà
+                    if (!emptyRow) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">
+                                    <i class="fas fa-calendar-times fa-2x mb-2"></i><br>
+                                    Aucune réservation trouvée
+                                </td>
+                            </tr>
+                        `;
+                    }
+                } else {
+                    // Supprime le message vide s'il existe et qu'il y a des réservations
+                    if (emptyRow) {
+                        emptyRow.remove();
+                    }
                 }
             }
 

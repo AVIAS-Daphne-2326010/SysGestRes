@@ -10,32 +10,34 @@
     </tr>
 </thead>
 
-{% for reservation in reservations %}
-    <tr data-reservation-id="{{ reservation.id }}">
-        <td>{{ reservation.id }}</td>
-        <td>{{ reservation.dateReservation|date('d/m/Y H:i') }}</td>
-        <td>{{ reservation.utilisateur.nom }}</td>
-        <td>
-            {{ reservation.creneau.dateDebut|date('d/m/Y H:i') }} 
-            à {{ reservation.creneau.dateFin|date('H:i') }}
-        </td>
-
-        {% if is_granted('ROLE_ADMIN') %}
+<tbody id="reservations-list">
+    {% for reservation in reservations %}
+        <tr data-reservation-id="{{ reservation.id }}">
+            <td>{{ reservation.id }}</td>
+            <td>{{ reservation.dateReservation|date('d/m/Y H:i') }}</td>
+            <td>{{ reservation.utilisateur.nom }}</td>
             <td>
-                <button class="btn btn-danger btn-sm cancel-reservation" 
-                        data-id="{{ reservation.id }}"
-                        data-toggle="tooltip" 
-                        title="Annuler cette réservation">
-                    <i class="fas fa-trash-alt"></i> Annuler
-                </button>
+                {{ reservation.creneau.dateDebut|date('d/m/Y H:i') }} 
+                à {{ reservation.creneau.dateFin|date('H:i') }}
             </td>
-        {% endif %}
-    </tr>
-{% else %}
-    <tr>
-        <td colspan="{% if is_granted('ROLE_ADMIN') %}5{% else %}4{% endif %}" class="text-center text-muted">
-            <i class="fas fa-calendar-times fa-2x mb-2"></i><br>
-            Aucune réservation trouvée
-        </td>
-    </tr>
-{% endfor %}
+
+            {% if is_granted('ROLE_ADMIN') %}
+                <td>
+                    <button class="btn btn-danger btn-sm cancel-reservation" 
+                            data-id="{{ reservation.id }}"
+                            data-toggle="tooltip" 
+                            title="Annuler cette réservation">
+                        <i class="fas fa-trash-alt"></i> Annuler
+                    </button>
+                </td>
+            {% endif %}
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="5" class="text-center text-muted">
+                <i class="fas fa-calendar-times fa-2x mb-2"></i><br>
+                Aucune réservation trouvée
+            </td>
+        </tr>
+    {% endfor %}
+</tbody>
