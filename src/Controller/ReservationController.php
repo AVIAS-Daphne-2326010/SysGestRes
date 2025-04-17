@@ -33,36 +33,36 @@ class ReservationController extends AbstractController
                         'errors' => $errors
                     ], 400);
                 }
-    
+        
                 if ($reservation->getCreneau()->getReservation() !== null) {
                     return $this->json([
                         'success' => false, 
                         'message' => 'Ce créneau est déjà réservé.'
                     ], 400);
                 }
-    
+        
                 $reservation->setUtilisateur($this->getUser());
                 $entityManager->persist($reservation);
                 $entityManager->flush();
-    
+        
+                // 💡 ajout de reservationRow ici :
                 return $this->json([
                     'success' => true,
                     'message' => 'Réservation créée avec succès!',
-                    'reservation' => [
-                        'id' => $reservation->getId(),
-                        'date' => $reservation->getDateReservation()->format('d/m/Y H:i'),
-                        'creneau' => $reservation->getCreneau()->getDateDebut()->format('H:i').' - '.$reservation->getCreneau()->getDateFin()->format('H:i')
-                    ],
+                    'reservationRow' => $this->renderView('reservation/_row.html.twig', [
+                        'reservation' => $reservation
+                    ]),
                     'wasEmpty' => false
                 ]);
             }
-    
+        
             return $this->json([
                 'html' => $this->renderView('reservation/_form.html.twig', [
                     'form' => $form->createView()
                 ])
             ]);
         }
+        
     
         return $this->render('reservation/create.html.twig', [
             'form' => $form->createView()
