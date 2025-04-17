@@ -1,0 +1,18 @@
+{# reservation/_row.html.twig #}
+<tr data-reservation-id="{{ reservation.id }}">
+    <td>{{ reservation.id }}</td>
+    <td>{{ reservation.dateReservation|date('d/m/Y H:i') }}</td>
+    <td>{{ reservation.utilisateur.nom }}</td>
+    <td>
+        {{ reservation.creneau.dateDebut|date('d/m/Y H:i') }} 
+        à {{ reservation.creneau.dateFin|date('H:i') }}
+    </td>
+    {% if is_granted('ROLE_ADMIN') %}
+        <td>
+            <button class="btn btn-danger btn-sm cancel-reservation" 
+                    data-id="{{ reservation.id }}">
+                <i class="fas fa-trash-alt"></i> Annuler
+            </button>
+        </td>
+    {% endif %}
+</tr>

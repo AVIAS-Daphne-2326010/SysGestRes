@@ -18,56 +18,43 @@ class ReservationController extends AbstractController
     {
         $reservation = new Reservation();
         $form = $this->createForm(ReservationType::class, $reservation);
-
+    
         $form->handleRequest($request);
-
+    
         if ($form->isSubmitted() && $form->isValid()) {
             $creneau = $reservation->getCreneau();
             if ($creneau->getReservation() !== null) {
-                if ($request->isXmlHttpRequest()) {
-                    return new JsonResponse(['success' => false, 'message' => 'Ce créneau est déjà réservé.']);
-                }
-                $this->addFlash('error', 'Ce créneau est déjà réservé.');
-                return $this->redirectToRoute('create_reservation');
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Ce créneau est déjà réservé.'
+                ]);
             }
-
+    
+            $reservation->setUtilisateur($this->getUser());
             $entityManager->persist($reservation);
             $entityManager->flush();
-
-            if ($request->isXmlHttpRequest()) {
-                return new JsonResponse(['success' => true, 'message' => 'Réservation créée avec succès!']);
-            }
-            
-            $this->addFlash('success', 'Réservation créée avec succès!');
-            return $this->redirectToRoute('reservation_index');
-        }
-
-        // Retourne uniquement le HTML du formulaire pour les requêtes AJAX
-        if ($request->isXmlHttpRequest()) {
-            return new JsonResponse([
-                'html' => $this->renderView('reservation/_form.html.twig', [
-                    'form' => $form->createView(),
+    
+            return $this->json([
+                'success' => true,
+                'message' => 'Réservation créée avec succès!',
+                'reservationRow' => $this->renderView('reservation/_row.html.twig', [
+                    'reservation' => $reservation
                 ])
             ]);
         }
-
-        return $this->render('reservation/create.html.twig', [
-            'form' => $form->createView(),
+    
+        return $this->json([
+            'html' => $this->renderView('reservation/_form.html.twig', [
+                'form' => $form->createView(),
+            ])
         ]);
     }
 
-    #[Route('/reservation', name: 'reservation_index')]
-    public function index(EntityManagerInterface $entityManager, Request $request): Response
+    #[Route('/reservations', name: 'reservation_index')]
+    public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
-        $user = $this->getUser();
+        $reservations = $entityManager->getRepository(Reservation::class)->findBy([], ['dateReservation' => 'DESC']);
         
-        if ($this->isGranted('ROLE_ADMIN')) {
-            $reservations = $entityManager->getRepository(Reservation::class)->findAll();
-        } else {
-            $reservations = $entityManager->getRepository(Reservation::class)->findBy(['utilisateur' => $user]);
-        }
-
-        // Retourne uniquement le HTML du tableau pour les requêtes AJAX
         if ($request->isXmlHttpRequest()) {
             return new JsonResponse([
                 'html' => $this->renderView('reservation/_list.html.twig', [
@@ -75,11 +62,12 @@ class ReservationController extends AbstractController
                 ])
             ]);
         }
-
+        
         return $this->render('reservation/index.html.twig', [
             'reservations' => $reservations,
         ]);
     }
+    
 
     #[Route('/reservation/{id}/annuler', name: 'annuler_reservation', methods: ['POST'])]
     public function annuler(int $id, EntityManagerInterface $entityManager, Request $request): Response

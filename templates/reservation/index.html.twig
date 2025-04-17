@@ -52,13 +52,16 @@
             const newReservationBtn = document.getElementById('new-reservation-btn');
             if (newReservationBtn) {
                 newReservationBtn.addEventListener('click', function() {
-                    fetch('{{ path('create_reservation') }}')
-                        .then(response => response.json())
-                        .then(data => {
-                            document.getElementById('modal-form-container').innerHTML = data.html;
-                            // Initialiser le modal Bootstrap
-                            new bootstrap.Modal(document.getElementById('modal-container')).show();
-                        });
+                    fetch('{{ path('create_reservation') }}', {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('modal-form-container').innerHTML = data.html;
+                        new bootstrap.Modal(document.getElementById('modal-container')).show();
+                    });
                 });
             }
 
@@ -91,10 +94,9 @@
                             .then(response => response.json())
                             .then(data => {
                                 if (data.success) {
-                                    refreshReservationsList();
+                                    document.querySelector(`tr[data-reservation-id="${reservationId}"]`).remove();
+                                    checkEmptyList(); // <-- Juste besoin d'appeler cette fonction
                                     showFlashMessage('success', data.message);
-                                } else {
-                                    showFlashMessage('error', data.message);
                                 }
                             });
                         }
@@ -118,11 +120,12 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Fermer le modal s'il existe
                             const modal = bootstrap.Modal.getInstance(document.getElementById('modal-container'));
                             if (modal) modal.hide();
                             
-                            refreshReservationsList();
+                            const tbody = document.getElementById('reservations-list');
+                            tbody.insertAdjacentHTML('afterbegin', data.reservationRow);
+                            checkEmptyList();
                             showFlashMessage('success', data.message);
                         } else {
                             showFlashMessage('error', data.message);
@@ -131,20 +134,28 @@
                 }
             });
 
-            // Fonction pour rafraîchir la liste
-            function refreshReservationsList() {
-                fetch('{{ path('reservation_index') }}', {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('reservations-list').innerHTML = data.html;
-                });
+            function checkEmptyList() {
+                const tbody = document.getElementById('reservations-list');
+                const hasReservations = tbody.querySelector('tr[data-reservation-id]');
+                const emptyMessage = tbody.querySelector('tr.text-center.text-muted');
+                
+                // Si aucune réservation et pas déjà de message vide
+                if (!hasReservations && !emptyMessage) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">
+                                <i class="fas fa-calendar-times fa-2x mb-2"></i><br>
+                                Aucune réservation trouvée
+                            </td>
+                        </tr>
+                    `;
+                }
+                // Si des réservations mais message vide présent
+                else if (hasReservations && emptyMessage) {
+                    emptyMessage.remove();
+                }
             }
 
-            // Fonction pour afficher les messages
             function showFlashMessage(type, message) {
                 const flashDiv = document.createElement('div');
                 flashDiv.className = `alert alert-${type} alert-dismissible fade show`;
@@ -157,10 +168,7 @@
                 const flashContainer = document.getElementById('flash-messages');
                 flashContainer.appendChild(flashDiv);
                 
-                // Supprimer après 5 secondes
-                setTimeout(() => {
-                    flashDiv.remove();
-                }, 5000);
+                setTimeout(() => flashDiv.remove(), 5000);
             }
         });
     </script>
