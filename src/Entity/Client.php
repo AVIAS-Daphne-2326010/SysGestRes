@@ -1,0 +1,63 @@
+<?php
+
+namespace App\Entity;
+
+use App\Repository\ClientRepository;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity(repositoryClass: ClientRepository::class)]
+class Client
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'client_id')]
+    private ?int $id = null;
+
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    private ?string $organizationName = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $address = null;
+
+    #[ORM\OneToOne]
+    #[ORM\JoinColumn(name: 'user_account_id', referencedColumnName: 'user_account_id', nullable: false, unique: true)]
+    private UserAccount $userAccount;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getOrganizationName(): ?string
+    {
+        return $this->organizationName;
+    }
+
+    public function setOrganizationName(?string $organizationName): self
+    {
+        $this->organizationName = $organizationName;
+        return $this;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?string $address): self
+    {
+        $this->address = $address;
+        return $this;
+    }
+
+    public function getUserAccount(): UserAccount
+    {
+        return $this->userAccount;
+    }
+
+    public function setUserAccount(UserAccount $userAccount): self
+    {
+        $this->userAccount = $userAccount;
+        return $this;
+    }
+}
