@@ -1,9 +1,16 @@
 doctrine:
     dbal:
-        driver: pdo_sqlite
+        driver: pdo_mysql
         url: '%env(resolve:DATABASE_URL)%'
-        profiling_collect_backtrace: '%kernel.debug%'
-        use_savepoints: true
+        server_version: 'mariadb-10.4.32'
+        charset: utf8mb4
+        default_table_options:
+            charset: utf8mb4
+            collate: utf8mb4_unicode_ci
+        options:
+            1002: "SET SESSION sql_mode='NO_ENGINE_SUBSTITUTION'"
+        mapping_types:
+            enum: string
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
