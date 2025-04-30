@@ -1,22 +1,28 @@
+{# templates/home/index.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}Page d'accueil{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    <h1>Réservez facilement, gérez efficacement – votre espace, vos horaires, votre tranquillité...</h1>
+    
+    <section id="resources">
+        <h2>Ressources</h2>
+        <p>Voici toutes les ressources disponibles...</p>
+    </section>
 
-<div class="example-wrapper">
-    <h1>Bienvenue sur le système de gestion de réservations !</h1>
+    <section id="features">
+        <h2>Fonctionnalités</h2>
+        <p>Des créneaux personnalisables</p>
+        <p>Sécurité et Confidentialité</p>
+        <p>Des réservations en temps réel</p>
+        <p>Un accès administrateur et client dédiés</p>
+    </section>
 
-    <p>
-        <a href="{{ path('login') }}">🔐 Se connecter</a>
-    </p>
+    <h2> Comment ça marche ? </h2>
+    <section>1. Créer un compte</section>
+    <section>2. Configurer vos ressources et vos horaires</section>
+    <section>3. Vos clients réservent en toute simplicité</section>
 
-    <p>
-        <a href="{{ path('admin_ressource') }}">⚙️ Accéder à l’administration</a>
-    </p>
-</div>
+    <p>Inscrivez-vous gratuitement et testez notre outil de réservation en ligne !</p>
 {% endblock %}

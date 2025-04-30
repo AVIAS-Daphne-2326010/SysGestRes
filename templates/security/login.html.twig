@@ -1,16 +1,19 @@
 {# templates/security/login.html.twig #}
+{% extends 'base.html.twig' %}
 
-<h2>Login</h2>
+{% block title %}Connexion{% endblock %}
 
-<form method="post" action="{{ path('login') }}">
-    {% if error %}
-        <div style="color: red">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
-
-    <input type="email" name="email" value="{{ last_username }}" placeholder="Email" required>
-    <input type="password" name="password" placeholder="Mot de passe" required>
-    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
-    <button type="submit">Login</button>
-</form>
-
+{% block body %}
+    <h1>Se connecter</h1>
+    <form action="{{ path('app_login') }}" method="post">
+        <div>
+            <label for="email">Email</label>
+            <input type="email" id="email" name="_username" required autofocus />
+        </div>
+        <div>
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" name="_password" required />
+        </div>
+        <button type="submit">Se connecter</button>
+    </form>
+{% endblock %}

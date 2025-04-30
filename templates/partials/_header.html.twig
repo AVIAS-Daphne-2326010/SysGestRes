@@ -1,0 +1,14 @@
+{# templates/partials/_header.html.twig #}
+<header style="background: #f8f9fa; padding: 10px 20px;">
+    <nav style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="nav-left">
+            <a href="{{ path('homepage') }}">Accueil</a>
+            <a href="#resources">Ressources</a>
+            <a href="#features">Fonctionnalités</a>
+        </div>
+        <div class="nav-right">
+            <a href="{{ path('app_register') }}" style="margin-right: 10px;">Inscription</a>
+            <a href="{{ path('app_login') }}">Connexion</a>
+        </div>
+    </nav>
+</header>

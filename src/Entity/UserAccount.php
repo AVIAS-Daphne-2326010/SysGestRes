@@ -4,8 +4,10 @@ namespace App\Entity;
 
 use App\Repository\UserAccountRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: UserAccountRepository::class)]
+#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class UserAccount
 {
     #[ORM\Id]
@@ -34,6 +36,9 @@ class UserAccount
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'role_id', referencedColumnName: 'role_id', nullable: false)]
     private Role $role;
+
+    #[ORM\Column]
+    private bool $isVerified = false;
 
     public function getId(): ?int
     {
@@ -114,6 +119,18 @@ class UserAccount
     public function setRole(Role $role): self
     {
         $this->role = $role;
+        return $this;
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
+
         return $this;
     }
 }
