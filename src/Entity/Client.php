@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ClientRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
@@ -22,6 +24,19 @@ class Client
     #[ORM\OneToOne]
     #[ORM\JoinColumn(name: 'user_account_id', referencedColumnName: 'user_account_id', nullable: false, unique: true)]
     private UserAccount $userAccount;
+
+    #[ORM\OneToMany(mappedBy: 'client', targetEntity: Resource::class)]
+    private Collection $resources;
+
+    public function __construct()
+    {
+        $this->resources = new ArrayCollection();
+    }
+
+    public function getResources(): Collection
+    {
+        return $this->resources;
+    }
 
     public function getId(): ?int
     {

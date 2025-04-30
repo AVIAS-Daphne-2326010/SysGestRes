@@ -36,6 +36,10 @@ class Resource
     #[ORM\OneToMany(mappedBy: 'resource', targetEntity: Timeslot::class)]
     private Collection $timeslots;
 
+    #[ORM\ManyToOne(inversedBy: 'resources')]
+    #[ORM\JoinColumn(name: 'client_id', referencedColumnName: 'client_id', nullable: false)]
+    private Client $client;
+
     public function __construct()
     {
         $this->timeslots = new ArrayCollection();
@@ -132,5 +136,16 @@ class Resource
         $this->timeslots->removeElement($timeslot);
         return $this;
     }
-    
+
+    public function getClient(): Client
+    {
+        return $this->client;
+    }
+
+    public function setClient(Client $client): self
+    {
+        $this->client = $client;
+        return $this;
+    }
+        
 }

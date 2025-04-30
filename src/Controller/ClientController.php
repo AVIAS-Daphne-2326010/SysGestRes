@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Client;
-use App\Entity\UserAccount;
 use App\Form\ClientType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,27 +27,22 @@ class ClientController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $client = new Client();
-
+    
         $form = $this->createForm(ClientType::class, $client);
         $form->handleRequest($request);
-
+    
         if ($form->isSubmitted() && $form->isValid()) {
-            $userAccount = $client->getUserAccount();
-            if (!$userAccount) {
-                $userAccount = $entityManager->getRepository(UserAccount::class)->findOneBy(['email' => $form->get('user_account')->getData()]);
-                $client->setUserAccount($userAccount);
-            }
-
             $entityManager->persist($client);
             $entityManager->flush();
-
+    
             return $this->redirectToRoute('client_index');
         }
-
+    
         return $this->render('client/new.html.twig', [
             'form' => $form->createView(),
         ]);
     }
+    
 
     #[Route('/{id}', name: 'client_show', methods: ['GET'])]
     public function show(Client $client): Response
