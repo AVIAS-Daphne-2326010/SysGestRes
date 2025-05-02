@@ -8,6 +8,9 @@
     {% endfor %}
 
     <h1>Register</h1>
+    <p style="margin-top: 1rem;">
+        Déjà enregistré ? <a href="{{ path('app_login') }}">Connectez-vous</a>
+    </p>
 
     {{ form_start(registrationForm) }}
         {{ form_row(registrationForm.firstName) }}

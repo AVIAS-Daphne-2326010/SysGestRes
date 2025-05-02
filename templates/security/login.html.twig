@@ -5,6 +5,10 @@
 
 {% block body %}
     <h1>Se connecter</h1>
+    <p style="margin-top: 1rem;">
+        Vous n'avez pas de compte ? <a href="{{ path('app_register') }}">Inscrivez-vous</a>
+    </p>
+
     <form action="{{ path('app_login') }}" method="post">
         <div>
             <label for="email">Email</label>

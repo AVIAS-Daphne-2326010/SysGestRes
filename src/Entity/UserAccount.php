@@ -2,13 +2,16 @@
 
 namespace App\Entity;
 
+use App\Entity\Client;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use App\Repository\UserAccountRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: UserAccountRepository::class)]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
-class UserAccount
+class UserAccount implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -39,6 +42,9 @@ class UserAccount
 
     #[ORM\Column]
     private bool $isVerified = false;
+
+    #[ORM\OneToOne(mappedBy: 'userAccount', targetEntity: Client::class)]
+    private ?Client $client = null;
 
     public function getId(): ?int
     {
@@ -111,10 +117,17 @@ class UserAccount
         return $this;
     }
 
-    public function getRole(): Role
+    public function getRoles(): array
     {
-        return $this->role;
+        $roles = [$this->role->getName()];
+    
+        if (!in_array('ROLE_USER', $roles)) {
+            $roles[] = 'ROLE_USER';
+        }
+    
+        return $roles;
     }
+    
 
     public function setRole(Role $role): self
     {
@@ -131,6 +144,27 @@ class UserAccount
     {
         $this->isVerified = $isVerified;
 
+        return $this;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
+    }
+
+    public function eraseCredentials(): void
+    {
+
+    }
+
+    public function getClient(): ?Client
+    {
+        return $this->client;
+    }
+
+    public function setClient(?Client $client): self
+    {
+        $this->client = $client;
         return $this;
     }
 }

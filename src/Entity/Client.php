@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\UserAccount;
 use App\Repository\ClientRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -21,12 +22,12 @@ class Client
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $address = null;
 
-    #[ORM\OneToOne]
-    #[ORM\JoinColumn(name: 'user_account_id', referencedColumnName: 'user_account_id', nullable: false, unique: true)]
-    private UserAccount $userAccount;
-
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Resource::class)]
     private Collection $resources;
+
+    #[ORM\OneToOne(inversedBy: 'client')]
+    #[ORM\JoinColumn(name: 'user_account_id', referencedColumnName: 'user_account_id', nullable: false)]
+    private UserAccount $userAccount;
 
     public function __construct()
     {

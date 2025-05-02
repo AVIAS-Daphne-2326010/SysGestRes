@@ -1,0 +1,6 @@
+<h1>Bonjour {{ prenom }}</h1>
+{% if nextBooking %}
+    <p>Votre prochaine réservation : {{ nextBooking.timeslot.resource.address }} - {{ nextBooking.timeslot.startDatetime|date('d/m/Y H:i') }}</p>
+{% else %}
+    <p>Vous n’avez pas de réservation à venir.</p>
+{% endif %}
