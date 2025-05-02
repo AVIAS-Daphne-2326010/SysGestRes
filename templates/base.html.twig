@@ -22,6 +22,9 @@
     {% include 'partials/_header.html.twig' %}
 
     <main>
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger">{{ message }}</div>
+        {% endfor %}
         {% block body %}{% endblock %}
     </main>
 

@@ -5,15 +5,16 @@ namespace App\Entity;
 use App\Repository\RoleRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: RoleRepository::class)]
+#[ORM\Entity]
+#[ORM\Table(name:"role")]
 class Role
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'role_id')]
+    #[ORM\Column(name: 'role_id',type:'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 50, unique: true)]
+    #[ORM\Column(name: 'name', type: 'string', length: 50)]
     private string $name;
 
     public function getId(): ?int

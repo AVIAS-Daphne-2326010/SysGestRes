@@ -2,17 +2,16 @@
 
 namespace App\Controller;
 
+use Psr\Log\LoggerInterface;
 use App\Entity\UserAccount;
 use App\Entity\Client;
+use App\Entity\Role;
 use App\Form\RegistrationFormType;
 use App\Security\EmailVerifier;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -25,50 +24,61 @@ class RegistrationController extends AbstractController
     }
 
     #[Route('/register', name: 'app_register')]
-    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, Security $security, EntityManagerInterface $entityManager): Response
-    {
+    public function register(
+        Request $request, 
+        UserPasswordHasherInterface $userPasswordHasher,
+        EntityManagerInterface $em,
+        LoggerInterface $logger
+    ): Response {
         $user = new UserAccount();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $plainPassword = $form->get('plainPassword')->getData();
-
+            try {
             // Encodage du mot de passe
-            $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
-            $user->setCreatedAt(new \DateTime());
-
-            $entityManager->persist($user);
-
-            // Vérifie si des données client sont fournies
-            $organizationName = $form->get('organizationName')->getData();
-            $address = $form->get('address')->getData();
-
-            if ($organizationName || $address) {
+            $user->setPassword(
+                $userPasswordHasher->hashPassword(
+                    $user,
+                    $form->get('plainPassword')->getData()
+                )
+            );
+            
+            // Attribution du rôle
+            $role = $em->getRepository(Role::class)->findOneBy(['name' => 'ROLE_USER']);
+            $user->setRole($role);
+            
+            // Gestion client
+            if ($form->get('organizationName')->getData()) {
                 $client = new Client();
-                $client->setUserAccount($user);
-                $client->setOrganizationName($organizationName);
-                $client->setAddress($address);
-                $entityManager->persist($client);
+                $client->setOrganizationName($form->get('organizationName')->getData())
+                    ->setAddress($form->get('address')->getData())
+                    ->setUserAccount($user);
+                
+                $clientRole = $em->getRepository(Role::class)->findOneBy(['name' => 'ROLE_CLIENT']);
+                $user->setRole($clientRole);
+                
+                $em->persist($client);
             }
 
-            $entityManager->flush();
+            $user->setCreatedAt(new \DateTime());
+            $em->persist($user);
+            $em->flush();
 
-            // Envoie de l’email de confirmation
-            $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
-                (new TemplatedEmail())
-                    ->from(new Address('noreply@sysgestres.com', 'SysGestRes Mail Bot'))
-                    ->to((string) $user->getEmail())
-                    ->subject('Please Confirm your Email')
-                    ->htmlTemplate('registration/confirmation_email.html.twig')
-            );
+            $this->addFlash('success', 'Inscription réussie ! Vous pouvez maintenant vous connecter.');
+            return $this->redirectToRoute('app_login');
 
-            // Connexion automatique
-            return $security->login($user, 'form_login', 'main');
+            } catch (\Exception $e) {
+                $logger->error('Erreur inscription: '.$e->getMessage());
+            
+                $this->addFlash('error', "Une erreur s'est produite lors de l'inscription.");
+            }
+        } elseif ($form->isSubmitted()) {
+            $this->addFlash('error','Le formulaire contient des erreurs');
         }
 
         return $this->render('registration/register.html.twig', [
-            'registrationForm' => $form,
+            'registrationForm' => $form->createView(),
         ]);
     }
 

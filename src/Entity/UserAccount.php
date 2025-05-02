@@ -9,13 +9,14 @@ use App\Repository\UserAccountRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
-#[ORM\Entity(repositoryClass: UserAccountRepository::class)]
+#[ORM\Entity]
+#[ORM\Table(name:'user_account')]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class UserAccount implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'user_account_id')]
+    #[ORM\Column(name: 'user_account_id',type:'integer')]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 150, unique: true)]
@@ -36,9 +37,9 @@ class UserAccount implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'date')]
     private \DateTimeInterface $createdAt;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(name: 'role_id', referencedColumnName: 'role_id', nullable: false)]
-    private Role $role;
+    #[ORM\ManyToOne(targetEntity:Role::class)]
+    #[ORM\JoinColumn(name: "role_id", referencedColumnName: "role_id")]
+    private ?Role $role = null;
 
     #[ORM\Column]
     private bool $isVerified = false;
@@ -119,13 +120,7 @@ class UserAccount implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        $roles = [$this->role->getName()];
-    
-        if (!in_array('ROLE_USER', $roles)) {
-            $roles[] = 'ROLE_USER';
-        }
-    
-        return $roles;
+        return [$this->role->getName()];
     }
     
 
