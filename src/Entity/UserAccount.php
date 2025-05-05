@@ -120,9 +120,23 @@ class UserAccount implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        return [$this->role->getName()];
+        if (!$this->role) {
+            return ['ROLE_USER'];
+        }
+    
+        $roleName = strtoupper($this->role->getName());
+    
+        if (!str_starts_with($roleName, 'ROLE_')) {
+            $roleName = 'ROLE_' . $roleName;
+        }
+    
+        return [$roleName];
     }
     
+    public function getRole(): ?Role
+    {
+        return $this->role;
+    }
 
     public function setRole(Role $role): self
     {

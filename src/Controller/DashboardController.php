@@ -9,8 +9,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class DashboardController extends AbstractController
 {
-    #[Route('/dashboard', name: 'app_dashboard')]
-    public function index(EntityManagerInterface $em): Response
+    // Route pour le tableau de bord Admin
+    #[Route('/admin/dashboard', name: 'admin_dashboard')]
+    public function adminDashboard(EntityManagerInterface $em): Response
     {
         /** @var \App\Entity\UserAccount $user */
         $user = $this->getUser();
@@ -19,19 +20,28 @@ class DashboardController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        // Si administrateur
-        if ($this->isGranted('ROLE_ADMIN')) {
-            $stats = [
-                'users' => $em->createQuery('SELECT COUNT(u.id) FROM App\Entity\UserAccount u')->getSingleScalarResult(),
-                'clients' => $em->createQuery('SELECT COUNT(c.id) FROM App\Entity\Client c')->getSingleScalarResult(),
-                'resources' => $em->createQuery('SELECT COUNT(r.id) FROM App\Entity\Resource r')->getSingleScalarResult(),
-                'bookings' => $em->createQuery('SELECT COUNT(b.id) FROM App\Entity\Booking b')->getSingleScalarResult(),
-            ];
+        $stats = [
+            'users' => $em->createQuery('SELECT COUNT(u.id) FROM App\Entity\UserAccount u')->getSingleScalarResult(),
+            'clients' => $em->createQuery('SELECT COUNT(c.id) FROM App\Entity\Client c')->getSingleScalarResult(),
+            'resources' => $em->createQuery('SELECT COUNT(r.id) FROM App\Entity\Resource r')->getSingleScalarResult(),
+            'bookings' => $em->createQuery('SELECT COUNT(b.id) FROM App\Entity\Booking b')->getSingleScalarResult(),
+        ];
 
-            return $this->render('dashboard/admin.html.twig', [
-                'prenom' => $user->getFirstName(),
-                'stats' => $stats
-            ]);
+        return $this->render('admin/dashboard.html.twig', [  // Correct path to admin dashboard
+            'prenom' => $user->getFirstName(),
+            'stats' => $stats
+        ]);
+    }
+
+    // Route pour le tableau de bord Client
+    #[Route('/client/dashboard', name: 'client_dashboard')]
+    public function clientDashboard(EntityManagerInterface $em): Response
+    {
+        /** @var \App\Entity\UserAccount $user */
+        $user = $this->getUser();
+
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
         }
 
         $nextBooking = $em->createQuery(
@@ -45,19 +55,38 @@ class DashboardController extends AbstractController
         ->setMaxResults(1)
         ->getOneOrNullResult();
 
-        // Si client
-        if ($this->isGranted('ROLE_CLIENT')) {
-            $organization = $user->getClient()?->getOrganizationName(); // relation avec Client
+        $organization = $user->getClient()?->getOrganizationName(); // relation avec Client
 
-            return $this->render('dashboard/client.html.twig', [
-                'prenom' => $user->getFirstName(),
-                'organization' => $organization,
-                'nextBooking' => $nextBooking
-            ]);
+        return $this->render('client/dashboard.html.twig', [  // Correct path to client dashboard
+            'prenom' => $user->getFirstName(),
+            'organization' => $organization,
+            'nextBooking' => $nextBooking
+        ]);
+    }
+
+    // Route pour le tableau de bord Utilisateur (par défaut)
+    #[Route('/user/dashboard', name: 'user_dashboard')]
+    public function userDashboard(EntityManagerInterface $em): Response
+    {
+        /** @var \App\Entity\UserAccount $user */
+        $user = $this->getUser();
+
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
         }
 
-        // Si simple utilisateur
-        return $this->render('dashboard/user.html.twig', [
+        $nextBooking = $em->createQuery(
+            'SELECT b FROM App\Entity\Booking b 
+             JOIN b.timeslot t 
+             WHERE b.userAccount = :user AND t.startDatetime > :now 
+             ORDER BY t.startDatetime ASC'
+        )
+        ->setParameter('user', $user)
+        ->setParameter('now', new \DateTime())
+        ->setMaxResults(1)
+        ->getOneOrNullResult();
+
+        return $this->render('user/dashboard.html.twig', [  // Correct path to user dashboard
             'prenom' => $user->getFirstName(),
             'nextBooking' => $nextBooking
         ]);

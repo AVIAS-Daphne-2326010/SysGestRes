@@ -18,8 +18,8 @@ class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
         $roleName = $user->getRole()->getName();
 
         return match ($roleName) {
-            'admin' => new RedirectResponse($this->router->generate('admin_dashboard')),
-            'client' => new RedirectResponse($this->router->generate('client_dashboard')),
+            'ROLE_ADMIN' => new RedirectResponse($this->router->generate('admin_dashboard')),
+            'ROLE_CLIENT' => new RedirectResponse($this->router->generate('client_dashboard')),
             default => new RedirectResponse($this->router->generate('user_dashboard')),
         };
     }

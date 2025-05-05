@@ -3,12 +3,39 @@
     <nav style="display: flex; justify-content: space-between; align-items: center;">
         <div class="nav-left">
             <a href="{{ path('homepage') }}">Accueil</a>
-            <a href="#resources">Ressources</a>
-            <a href="#features">Fonctionnalités</a>
+
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('admin_resources') }}">Ressources</a>
+                <a href="{{ path('admin_bookings') }}">Réservations</a>
+                <a href="{{ path('admin_users') }}">Utilisateurs</a>
+                <a href="{{ path('admin_logs') }}">Logs</a>
+
+            {% elseif is_granted('ROLE_CLIENT') %}
+                <a href="{{ path('client_resources') }}">Ressources</a>
+                <a href="{{ path('client_calendar') }}">Calendrier</a>
+                <a href="{{ path('client_bookings') }}">Réservations</a>
+
+            {% elseif is_granted('ROLE_USER') %}
+                <a href="{{ path('user_resources') }}">Ressources</a>
+                <a href="{{ path('user_calendar') }}">Calendrier</a>
+                <a href="{{ path('user_bookings') }}">Réservations</a>
+
+            {% else %}
+                <a href="#resources">Ressources</a>
+                <a href="#features">Fonctionnalités</a>
+            {% endif %}
         </div>
+
         <div class="nav-right">
-            <a href="{{ path('app_register') }}" style="margin-right: 10px;">Inscription</a>
-            <a href="{{ path('app_login') }}">Connexion</a>
+            {% if app.user %}
+                <a href="{{ path('app_logout') }}">Déconnexion</a>
+                <a href="{{ path('user_profile') }}">
+                    <img src="{{ asset('images/profile-icon.png') }}" alt="Profil" style="height: 24px; vertical-align: middle;">
+                </a>
+            {% else %}
+                <a href="{{ path('app_register') }}" style="margin-right: 10px;">Inscription</a>
+                <a href="{{ path('app_login') }}">Connexion</a>
+            {% endif %}
         </div>
     </nav>
 </header>
