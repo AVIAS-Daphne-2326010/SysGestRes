@@ -23,5 +23,15 @@
         {{ form_row(registrationForm.agreeTerms) }}
 
         <button type="submit" class="btn btn-primary">S'inscrire</button>
+    
+    {% if not registrationForm.vars.valid %}
+        <ul class="text-danger">
+            {% for error in registrationForm.vars.errors %}
+                <li>{{ error.message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+
     {{ form_end(registrationForm) }}
 {% endblock %}

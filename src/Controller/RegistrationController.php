@@ -25,7 +25,7 @@ class RegistrationController extends AbstractController
 
     #[Route('/register', name: 'app_register')]
     public function register(
-        Request $request, 
+        Request $request,
         UserPasswordHasherInterface $userPasswordHasher,
         EntityManagerInterface $em,
         LoggerInterface $logger
@@ -36,45 +36,50 @@ class RegistrationController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-            // Encodage du mot de passe
-            $user->setPassword(
-                $userPasswordHasher->hashPassword(
-                    $user,
-                    $form->get('plainPassword')->getData()
-                )
-            );
-            
-            // Attribution du rôle
-            $role = $em->getRepository(Role::class)->findOneBy(['name' => 'ROLE_USER']);
-            $user->setRole($role);
-            
-            // Gestion client
-            if ($form->get('organizationName')->getData()) {
-                $client = new Client();
-                $client->setOrganizationName($form->get('organizationName')->getData())
-                    ->setAddress($form->get('address')->getData())
-                    ->setUserAccount($user);
-                
-                $clientRole = $em->getRepository(Role::class)->findOneBy(['name' => 'ROLE_CLIENT']);
-                $user->setRole($clientRole);
-                
-                $em->persist($client);
-            }
+                // Encodage du mot de passe
+                $user->setPassword(
+                    $userPasswordHasher->hashPassword(
+                        $user,
+                        $form->get('plainPassword')->getData()
+                    )
+                );
 
-            $user->setCreatedAt(new \DateTime());
-            $em->persist($user);
-            $em->flush();
+                // Vérification des champs pour déterminer le rôle
+                if ($form->get('organizationName')->getData()) {
+                    // Rôle client
+                    $clientRole = $em->getRepository(Role::class)->findOneBy(['name' => 'client']);
+                    if (!$clientRole) {
+                        throw new \Exception("Le rôle 'client' n'existe pas dans la base de données.");
+                    }
+                    $user->setRole($clientRole);
 
-            $this->addFlash('success', 'Inscription réussie ! Vous pouvez maintenant vous connecter.');
-            return $this->redirectToRoute('app_login');
+                    // Création du client
+                    $client = new Client();
+                    $client->setOrganizationName($form->get('organizationName')->getData())
+                        ->setAddress($form->get('address')->getData())
+                        ->setUserAccount($user);
+                    $em->persist($client);
+                } else {
+                    // Rôle utilisateur standard
+                    $userRole = $em->getRepository(Role::class)->findOneBy(['name' => 'user']);
+                    if (!$userRole) {
+                        throw new \Exception("Le rôle 'user' n'existe pas dans la base de données.");
+                    }
+                    $user->setRole($userRole);
+                }
 
+                $user->setCreatedAt(new \DateTime());
+                $em->persist($user);
+                $em->flush();
+
+                $this->addFlash('success', 'Inscription réussie ! Vous pouvez maintenant vous connecter.');
+                return $this->redirectToRoute('app_login');
             } catch (\Exception $e) {
-                $logger->error('Erreur inscription: '.$e->getMessage());
-            
+                $logger->error('Erreur inscription: ' . $e->getMessage());
                 $this->addFlash('error', "Une erreur s'est produite lors de l'inscription.");
             }
         } elseif ($form->isSubmitted()) {
-            $this->addFlash('error','Le formulaire contient des erreurs');
+            $this->addFlash('error', 'Le formulaire contient des erreurs');
         }
 
         return $this->render('registration/register.html.twig', [
