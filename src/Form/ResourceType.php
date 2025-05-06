@@ -3,12 +3,13 @@
 namespace App\Form;
 
 use App\Entity\Resource;
+use App\Entity\Client; 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\EntityType; 
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -41,6 +42,13 @@ class ResourceType extends AbstractType
             ->add('createdAt', DateType::class, [
                 'label' => 'Creation Date',
                 'widget' => 'single_text',
+                'required' => true,
+            ])
+
+            ->add('client', EntityType::class, [
+                'class' => Client::class, 
+                'choice_label' => 'organizationName', 
+                'label' => 'Client',
                 'required' => true,
             ]);
     }

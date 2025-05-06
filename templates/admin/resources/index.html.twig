@@ -1,7 +1,12 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Liste des ressources</h1>
+    <h1>Gestion des ressources</h1>
+
+    <a href="{{ path('admin_resource_new') }}" class="btn btn-primary" style="margin-bottom: 15px;">
+        + Ajouter une ressource
+    </a>
+
 
     {% if resources is empty %}
         <p>Aucune ressource n'a encore été créée.</p>
