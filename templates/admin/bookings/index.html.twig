@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Liste des réservations</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Commentaire</th>
+                <th>Date de création</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking.id }}</td>
+                    <td>{{ booking.comment }}</td>
+                    <td>{{ booking.createdAt|date('d/m/Y H:i') }}</td>
+                    <td>
+                        <a href="{{ path('admin_booking_show', {'id': booking.id}) }}">Voir</a>
+                        <form action="{{ path('admin_booking_delete', {'id': booking.id}) }}" method="POST" style="display:inline;">
+                            <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?')">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">Aucune réservation trouvée.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -6,11 +6,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class DashboardController extends AbstractController
 {
     // Route pour le tableau de bord Admin
     #[Route('/admin/dashboard', name: 'admin_dashboard')]
+    #[IsGranted('ROLE_ADMIN')]
     public function adminDashboard(EntityManagerInterface $em): Response
     {
         /** @var \App\Entity\UserAccount $user */
@@ -27,7 +29,7 @@ class DashboardController extends AbstractController
             'bookings' => $em->createQuery('SELECT COUNT(b.id) FROM App\Entity\Booking b')->getSingleScalarResult(),
         ];
 
-        return $this->render('admin/dashboard.html.twig', [  // Correct path to admin dashboard
+        return $this->render('admin/dashboard.html.twig', [  
             'prenom' => $user->getFirstName(),
             'stats' => $stats
         ]);

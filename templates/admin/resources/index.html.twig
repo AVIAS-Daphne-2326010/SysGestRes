@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Liste des ressources</h1>
+
+    {% if resources is empty %}
+        <p>Aucune ressource n'a encore été créée.</p>
+    {% else %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Type</th>
+                    <th>Capacité</th>
+                    <th>Localisation</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resource in resources %}
+                    <tr>
+                        <td>{{ resource.id }}</td>
+                        <td>{{ resource.name }}</td>
+                        <td>{{ resource.type }}</td>
+                        <td>{{ resource.capacity }}</td>
+                        <td>{{ resource.location }}</td>
+                        <td>
+                            <a href="{{ path('admin_resource_show', {'id': resource.id}) }}">Voir</a>
+                            <a href="{{ path('admin_resource_edit', {'id': resource.id}) }}">Modifier</a>
+                            <form action="{{ path('admin_resource_delete', {'id': resource.id}) }}" method="POST" style="display:inline;">
+                                <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette ressource ?')">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}

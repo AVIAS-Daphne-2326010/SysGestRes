@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Liste des logs</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Status</th>
+                <th>Date de modification</th>
+                <th>Modifié par</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+                <tr>
+                    <td>{{ log.id }}</td>
+                    <td>{{ log.status }}</td>
+                    <td>{{ log.changedAt|date('d/m/Y H:i') }}</td>
+                    <td>{{ log.changedBy }}</td>
+                    <td>
+                        <a href="{{ path('admin_log_show', {'id': log.id}) }}">Voir</a>
+                        <form action="{{ path('admin_log_delete', {'id': log.id}) }}" method="POST" style="display:inline;">
+                            <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce log ?')">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
