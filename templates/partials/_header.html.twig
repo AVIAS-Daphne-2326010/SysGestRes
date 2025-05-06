@@ -5,12 +5,15 @@
             <a href="{{ path('homepage') }}">Accueil</a>
 
             {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('admin_dashboard') }}">Dashboard</a>
                 <a href="{{ path('admin_resources') }}">Ressources</a>
                 <a href="{{ path('admin_bookings') }}">Réservations</a>
                 <a href="{{ path('admin_users') }}">Utilisateurs</a>
                 <a href="{{ path('admin_logs') }}">Logs</a>
 
             {% elseif is_granted('ROLE_CLIENT') %}
+                <a href="{{ path('user_dashboard') }}">Dashboard</a>
+                <a href="{{ path('client_dashboard') }}">Dashboard</a>
                 <a href="{{ path('client_resources') }}">Ressources</a>
                 <a href="{{ path('client_calendar') }}">Calendrier</a>
                 <a href="{{ path('client_bookings') }}">Réservations</a>
