@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/client/resources')]
 class ClientResourceController extends AbstractController
 {
-    #[Route('/', name: 'client_resources_index', methods: ['GET'])]
+    #[Route('/', name: 'client_resources', methods: ['GET'])]
     public function index(EntityManagerInterface $em): Response
     {
         // Récupérer l'utilisateur connecté

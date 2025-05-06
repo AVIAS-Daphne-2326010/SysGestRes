@@ -44,7 +44,7 @@ class ClientController extends AbstractController
     }
     
 
-    #[Route('/{id}', name: 'client_show', methods: ['GET'])]
+    #[Route('/{id<\d+>}', name: 'client_show', methods: ['GET'])]
     public function show(Client $client): Response
     {
         return $this->render('client/show.html.twig', [
@@ -70,7 +70,7 @@ class ClientController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'client_delete', methods: ['POST'])]
+    #[Route('/{id<\d+>}', name: 'client_delete', methods: ['POST'])]
     public function delete(Request $request, Client $client, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete' . $client->getId(), $request->request->get('_token'))) {
