@@ -1,11 +1,15 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Détails de la réservation</h1>
-    <p><strong>ID :</strong> {{ booking.id }}</p>
-    <p><strong>Commentaire :</strong> {{ booking.comment }}</p>
-    <p><strong>Date de création :</strong> {{ booking.createdAt|date('d/m/Y H:i') }}</p>
-    <p><strong>Statut :</strong> {{ booking.status }}</p>
+    <h1>Détail de la ressource</h1>
 
-    <a href="{{ path('admin_bookings') }}">Retour à la liste des réservations</a>
+    <p><strong>ID :</strong> {{ resource.id }}</p>
+    <p><strong>Nom :</strong> {{ resource.name }}</p>
+    <p><strong>Type :</strong> {{ resource.type }}</p>
+    <p><strong>Capacité :</strong> {{ resource.capacity }}</p>
+    <p><strong>Localisation :</strong> {{ resource.location }}</p>
+    <p><strong>Description :</strong> {{ resource.description }}</p>
+    <p><strong>Client :</strong> {{ resource.client.organizationName }}</p>
+
+    <a href="{{ path('admin_resources') }}">← Retour à la liste</a>
 {% endblock %}

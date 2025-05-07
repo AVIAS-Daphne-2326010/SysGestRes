@@ -1,16 +1,12 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier une Ressource{% endblock %}
-
 {% block body %}
-    <h1>Modifier la Ressource : {{ ressource.name }}</h1>
+    <h1>Modifier la ressource</h1>
 
     {{ form_start(form) }}
-        {{ form_row(form.name) }}
-        {{ form_row(form.type) }}
-        {{ form_row(form.description) }}
-        <button type="submit">Mettre à jour</button>
+        {{ form_widget(form) }}
+        <button class="btn btn-success">Enregistrer</button>
     {{ form_end(form) }}
 
-    <a href="{{ path('admin_ressource') }}">Retour à la liste</a>
+    <a href="{{ path('admin_resources') }}">← Retour à la liste</a>
 {% endblock %}

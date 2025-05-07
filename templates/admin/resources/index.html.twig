@@ -34,6 +34,7 @@
                             <a href="{{ path('admin_resource_show', {'id': resource.id}) }}">Voir</a>
                             <a href="{{ path('admin_resource_edit', {'id': resource.id}) }}">Modifier</a>
                             <form action="{{ path('admin_resource_delete', {'id': resource.id}) }}" method="POST" style="display:inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ resource.id) }}">
                                 <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette ressource ?')">Supprimer</button>
                             </form>
                         </td>

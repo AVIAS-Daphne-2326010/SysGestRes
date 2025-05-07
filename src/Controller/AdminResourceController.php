@@ -59,5 +59,47 @@ class AdminResourceController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
+    #[Route('/{id}/edit', name: 'admin_resource_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Resource $resource, EntityManagerInterface $em): Response
+    {
+        $form = $this->createForm(ResourceType::class, $resource);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->flush();
+
+            $this->addFlash('success', 'Ressource modifiée avec succès.');
+
+            return $this->redirectToRoute('admin_resources');
+        }
+
+        return $this->render('admin/resources/edit.html.twig', [
+            'form' => $form->createView(),
+            'resource' => $resource,
+        ]);
+    }
+
+    #[Route('/{id}/delete', name: 'admin_resource_delete', methods: ['POST'])]
+    public function delete(Request $request, Resource $resource, EntityManagerInterface $em): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$resource->getId(), $request->request->get('_token'))) {
+            $em->remove($resource);
+            $em->flush();
+
+            $this->addFlash('success', 'Ressource supprimée avec succès.');
+        }
+
+        return $this->redirectToRoute('admin_resources');
+    }
+
+    #[Route('/{id}', name: 'admin_resource_show', methods: ['GET'])]
+    public function show(Resource $resource): Response
+    {
+        return $this->render('admin/resources/show.html.twig', [
+            'resource' => $resource,
+        ]);
+    }
+
 }
 
