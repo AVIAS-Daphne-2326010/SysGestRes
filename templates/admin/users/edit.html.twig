@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Modifier l'utilisateur</h1>
+
+    {{ form_start(form, { attr: { class: 'user-edit-form' } }) }}
+        <div class="form-group mb-3">
+            {{ form_row(form.email) }}
+        </div>
+        <div class="form-group mb-3">
+            {{ form_row(form.first_name) }}
+        </div>
+        <div class="form-group mb-3">
+            {{ form_row(form.last_name) }}
+        </div>
+        <div class="form-group mb-3">
+            {{ form_row(form.phone) }}
+        </div>
+        <div class="form-group mb-3">
+            {{ form_row(form.role) }}
+        </div>
+        {% if form.organization_name is defined %}
+            <div class="form-group mb-3">
+                {{ form_row(form.organization_name) }}
+            </div>
+        {% endif %}
+        {% if form.address is defined %}
+            <div class="form-group mb-3">
+                {{ form_row(form.address) }}
+            </div>
+        {% endif %}
+        <div class="form-group mb-3">
+            {{ form_row(form.password, { help: 'Laisser vide pour conserver le mot de passe actuel.' }) }}
+        </div>
+
+        {{ form_row(form._token) }}
+
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+    {{ form_end(form, { render_rest: false }) }}
+
+    <a href="{{ path('admin_users') }}" class="btn btn-link mt-3">← Retour à la liste des utilisateurs</a>
+{% endblock %}
