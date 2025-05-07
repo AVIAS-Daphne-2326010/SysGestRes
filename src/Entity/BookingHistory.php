@@ -2,10 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\BookingHistoryRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: BookingHistoryRepository::class)]
+#[ORM\Entity]
 class BookingHistory
 {
     #[ORM\Id]
@@ -22,14 +21,20 @@ class BookingHistory
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private ?string $changedBy = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(name: 'booking_id', referencedColumnName: 'booking_id', nullable: false)]
-    private Booking $booking;
+    #[ORM\ManyToOne(targetEntity: Booking::class)]
+    #[ORM\JoinColumn(name: "booking_id", referencedColumnName: "booking_id", nullable: true)] // rendre nullable
+    private ?Booking $booking = null;
+
+    // Ajout de la relation Resource
+    #[ORM\ManyToOne(targetEntity: Resource::class)]
+    #[ORM\JoinColumn(name: "resource_id", referencedColumnName: "resource_id", nullable: true)] // rendre nullable
+    private ?Resource $resource = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'user_account_id', referencedColumnName: 'user_account_id', nullable: false)]
     private UserAccount $userAccount;
 
+    // Getters et setters
     public function getId(): ?int
     {
         return $this->id;
@@ -68,18 +73,18 @@ class BookingHistory
         return $this;
     }
 
-    public function getBooking(): Booking
+    public function getBooking(): ?Booking
     {
         return $this->booking;
     }
 
-    public function setBooking(Booking $booking): self
+    public function setBooking(?Booking $booking): self
     {
         $this->booking = $booking;
         return $this;
     }
 
-    public function getUserAccount(): UserAccount
+    public function getUserAccount(): ?UserAccount
     {
         return $this->userAccount;
     }
@@ -89,4 +94,17 @@ class BookingHistory
         $this->userAccount = $userAccount;
         return $this;
     }
+
+    // Getter et setter pour la ressource
+    public function getResource(): ?Resource
+    {
+        return $this->resource;
+    }
+
+    public function setResource(?Resource $resource): self
+    {
+        $this->resource = $resource;
+        return $this;
+    }
 }
+

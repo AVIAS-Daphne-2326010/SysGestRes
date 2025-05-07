@@ -176,4 +176,10 @@ class UserAccount implements UserInterface, PasswordAuthenticatedUserInterface
         $this->client = $client;
         return $this;
     }
+
+    public function getUsername(): string
+    {
+        return $this->getUserIdentifier();
+    }
+
 }

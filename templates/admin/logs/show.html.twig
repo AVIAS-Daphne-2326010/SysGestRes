@@ -6,7 +6,12 @@
     <p><strong>Status :</strong> {{ log.status }}</p>
     <p><strong>Date de modification :</strong> {{ log.changedAt|date('d/m/Y H:i') }}</p>
     <p><strong>Modifié par :</strong> {{ log.changedBy }}</p>
-    <p><strong>Commentaire :</strong> {{ log.comment }}</p>
+
+    {% if log.resource %}
+        <p><strong>Action :</strong> Modification de la ressource "{{ log.resource.name }}"</p>
+    {% else %}
+        <p><strong>Action :</strong> Modification sans ressource associée</p>
+    {% endif %}
 
     <a href="{{ path('admin_logs') }}">Retour à la liste des logs</a>
 {% endblock %}
