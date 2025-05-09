@@ -3,6 +3,7 @@
 {% block body %}
     <h1>Détail de la ressource</h1>
 
+    <p><strong>Créée le :</strong> {{ resource.createdAt|date('d/m/Y H:i') }}</p>
     <p><strong>ID :</strong> {{ resource.id }}</p>
     <p><strong>Nom :</strong> {{ resource.name }}</p>
     <p><strong>Type :</strong> {{ resource.type }}</p>

@@ -45,7 +45,7 @@ class RegistrationController extends AbstractController
                 );
 
                 // Vérification des champs pour déterminer le rôle
-                if ($form->get('organizationName')->getData()) {
+                if ($form->get('organizationName')->getData() && $form->get('address')->getData()) {
                     // Rôle client
                     $clientRole = $em->getRepository(Role::class)->findOneBy(['name' => 'client']);
                     if (!$clientRole) {
@@ -104,4 +104,54 @@ class RegistrationController extends AbstractController
         $this->addFlash('success', 'Your email address has been verified.');
         return $this->redirectToRoute('app_register');
     }
+
+    public function updateUser(
+        Request $request,
+        EntityManagerInterface $em,
+        UserAccount $user // L'utilisateur que tu modifies
+    ): Response {
+        $form = $this->createForm(RegistrationFormType::class, $user);
+        $form->handleRequest($request);
+    
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Vérification des champs pour déterminer le rôle
+            if ($form->get('organizationName')->getData() && $form->get('address')->getData()) {
+                // Rôle client
+                $clientRole = $em->getRepository(Role::class)->findOneBy(['name' => 'client']);
+                if (!$clientRole) {
+                    throw new \Exception("Le rôle 'client' n'existe pas dans la base de données.");
+                }
+                $user->setRole($clientRole);
+    
+                // Vérifier si l'utilisateur a déjà un client associé
+                if (!$user->getClient()) {
+                    // Si non, créer un nouveau client
+                    $client = new Client();
+                    $client->setOrganizationName($form->get('organizationName')->getData())
+                        ->setAddress($form->get('address')->getData())
+                        ->setUserAccount($user);
+                    $em->persist($client);
+                }
+            } else {
+                // Rôle utilisateur standard
+                $userRole = $em->getRepository(Role::class)->findOneBy(['name' => 'user']);
+                if (!$userRole) {
+                    throw new \Exception("Le rôle 'user' n'existe pas dans la base de données.");
+                }
+                $user->setRole($userRole);
+            }
+    
+            // Mettre à jour les autres informations de l'utilisateur
+            $em->persist($user);
+            $em->flush();
+    
+            $this->addFlash('success', 'Modification réussie !');
+            return $this->redirectToRoute('app_profile');
+        }
+    
+        return $this->render('user/update.html.twig', [
+            'updateForm' => $form->createView(),
+        ]);
+    }
+    
 }

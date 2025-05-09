@@ -1,8 +1,7 @@
 <?php
 
 namespace App\Entity;
-
-use App\Repository\ResourceRepository;
+ 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -27,11 +26,11 @@ class Resource
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $location = null;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(type: "integer")] 
     private ?int $capacity = null;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $createdAt = null;
+    #[ORM\Column(type: "datetime_immutable")]
+    private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\OneToMany(mappedBy: 'resource', targetEntity: Timeslot::class)]
     private Collection $timeslots;
@@ -43,6 +42,7 @@ class Resource
     public function __construct()
     {
         $this->timeslots = new ArrayCollection();
+        $this->created_at = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -101,6 +101,9 @@ class Resource
 
     public function setCapacity(?int $capacity): self
     {
+        if ($capacity !== null && $capacity < 0) {
+            $capacity = 0; 
+        }
         $this->capacity = $capacity;
         return $this;
     }

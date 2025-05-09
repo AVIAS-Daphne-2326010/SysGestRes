@@ -4,8 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Role;
 use App\Entity\UserAccount;
-use App\Entity\Client; // Importation de l'entité Client
-use App\Entity\BookingHistory; 
+use App\Entity\Client;
+use App\Entity\BookingHistory;
 use App\Form\UserAccountType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -36,6 +36,7 @@ class AdminUserController extends AbstractController
         UserPasswordHasherInterface $passwordHasher
     ): Response {
         $user = new UserAccount();
+        $user->setCreatedAt(new \DateTime());
 
         $form = $this->createForm(UserAccountType::class, $user, [
             'is_edit' => false,
@@ -47,8 +48,10 @@ class AdminUserController extends AbstractController
             $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
             $user->setPassword($hashedPassword);
 
-            // Vérifier si l'utilisateur devient un client
-            if ($form->get('role')->getData()->getName() === 'ROLE_CLIENT') {
+            $role = $form->get('role')->getData();
+            $user->setRole($role);
+
+            if ($role->getName() === 'ROLE_CLIENT') {
                 $organizationName = $form->get('organization_name')->getData();
                 $address = $form->get('address')->getData();
 
@@ -56,14 +59,13 @@ class AdminUserController extends AbstractController
                 $client->setUserAccount($user);
                 $client->setOrganizationName($organizationName);
                 $client->setAddress($address);
-
                 $em->persist($client);
             }
 
             $em->persist($user);
             $em->flush();
 
-            // Ajouter un log pour la création de l'utilisateur
+            // Log admin action
             /** @var UserAccount $admin */
             $admin = $this->getUser();
             $log = new BookingHistory();
@@ -96,38 +98,43 @@ class AdminUserController extends AbstractController
             throw $this->createNotFoundException('Utilisateur non trouvé');
         }
 
-        $isClient = false;
-        if ($user->getRole()->getName() === 'ROLE_CLIENT') {
-            $isClient = true; // Indiquer que l'utilisateur est un client
-        }
-
+        $isClient = $user->getRole()?->getName() === 'ROLE_CLIENT';
         $form = $this->createForm(UserAccountType::class, $user, [
             'is_edit' => true,
-            'is_client' => $isClient,  // Passer l'option à l'formulaire
+            'is_client' => $isClient,
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $roleId = $form->get('role')->getData();
-            $role = $em->getRepository(Role::class)->find($roleId); 
-            $user->setRole($role);
-            
-            if ($role->getName() === 'ROLE_CLIENT') {
-                // Associer les informations de client
+            $newRole = $form->get('role')->getData();
+            $user->setRole($newRole);
+
+            var_dump($user->getId());
+            $em->persist($user);
+            $em->flush();
+
+            if ($newRole->getName() === 'ROLE_CLIENT') {
                 $organizationName = $form->get('organization_name')->getData();
                 $address = $form->get('address')->getData();
 
-                $client = new Client();
-                $client->setUserAccount($user);
+                $client = $user->getClient();
+                if (!$client) {
+                    $client = new Client();
+                    $client->setUserAccount($user);
+                }
                 $client->setOrganizationName($organizationName);
                 $client->setAddress($address);
-
                 $em->persist($client);
+            } else {
+                // Supprimer les infos client si le rôle n'est plus "ROLE_CLIENT"
+                if ($user->getClient()) {
+                    $em->remove($user->getClient());
+                }
             }
 
             $em->flush();
 
-            // Ajouter un log pour la modification de l'utilisateur
+            // Log admin action
             /** @var UserAccount $admin */
             $admin = $this->getUser();
             $log = new BookingHistory();
@@ -156,7 +163,7 @@ class AdminUserController extends AbstractController
             throw $this->createNotFoundException('Utilisateur non trouvé');
         }
 
-        // Ajouter un log pour la suppression de l'utilisateur
+        // Log admin action
         /** @var UserAccount $admin */
         $admin = $this->getUser();
         $log = new BookingHistory();
@@ -165,7 +172,6 @@ class AdminUserController extends AbstractController
             ->setChangedBy($admin->getUsername())
             ->setUserAccount($admin);
         $em->persist($log);
-        $em->flush();
 
         $em->remove($user);
         $em->flush();

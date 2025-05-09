@@ -49,7 +49,7 @@ class AdminResourceController extends AbstractController
             $user = $this->getUser();
 
             $log = new BookingHistory();
-            $log->setStatus('Création')
+            $log->setStatus('Création de ressource')
                 ->setChangedAt(new \DateTime())
                 ->setChangedBy($user->getUsername())
                 ->setUserAccount($user)
@@ -81,7 +81,7 @@ class AdminResourceController extends AbstractController
             $user = $this->getUser();
 
             $log = new BookingHistory();
-            $log->setStatus('Modification')
+            $log->setStatus('Modification de ressource')
                 ->setChangedAt(new \DateTime())
                 ->setChangedBy($user->getUsername())
                 ->setUserAccount($user)
@@ -109,7 +109,7 @@ class AdminResourceController extends AbstractController
             $user = $this->getUser();
 
             $log = new BookingHistory();
-            $log->setStatus('Suppression')
+            $log->setStatus('Suppression de ressource')
                 ->setChangedAt(new \DateTime())
                 ->setChangedBy($user->getUsername())
                 ->setUserAccount($user)

@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
 class ResourceType extends AbstractType
 {
@@ -38,13 +39,15 @@ class ResourceType extends AbstractType
             ->add('capacity', IntegerType::class, [
                 'label' => 'Capacity',
                 'required' => true,
+                'attr' => [
+                    'min' => 0, 
+                ],
+                'constraints' => [
+                    new PositiveOrZero([
+                        'message' => 'La capacité ne peut pas être négative.',
+                    ])
+                ]
             ])
-            ->add('createdAt', DateType::class, [
-                'label' => 'Creation Date',
-                'widget' => 'single_text',
-                'required' => true,
-            ])
-
             ->add('client', EntityType::class, [
                 'class' => Client::class, 
                 'choice_label' => 'organizationName', 

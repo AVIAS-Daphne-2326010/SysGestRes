@@ -1,5 +1,6 @@
 doctrine:
     dbal:
+        logging: true
         driver: pdo_mysql
         url: '%env(resolve:DATABASE_URL)%'
         server_version: 'mariadb-10.4.32'
