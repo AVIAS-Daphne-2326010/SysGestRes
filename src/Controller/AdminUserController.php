@@ -50,16 +50,20 @@ class AdminUserController extends AbstractController
             $role = $form->get('role')->getData();
             $user->setRole($role);
 
+            // Persist et flush d'abord l'utilisateur pour obtenir un ID
+            $em->persist($user);
+            $em->flush();
+
             if ($role->getName() === 'ROLE_CLIENT') {
                 $clientData = $form->get('client')->getData();
                 if ($clientData) {
                     $clientData->setUserAccount($user);
                     $user->setClient($clientData);
                     $em->persist($clientData);
+                    $em->flush(); // Second flush pour le client
                 }
             }
 
-            $em->persist($user);
             $this->logAdminAction($em, 'Création utilisateur');
             $em->flush();
 
