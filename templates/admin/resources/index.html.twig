@@ -16,6 +16,7 @@
                     <th>ID</th>
                     <th>Nom</th>
                     <th>Client</th>
+                    <th>Organisation</th>
                     <th>Type</th>
                     <th>Localisation</th>
                     <th>Capacité</th>
@@ -28,13 +29,14 @@
                     <tr>
                         <td>{{ resource.id }}</td>
                         <td>{{ resource.name }}</td>
+                        <td>{{ resource.client.userAccount.firstName }} {{ resource.client.userAccount.lastName }}</td>
                         <td>{{ resource.client.organizationName }}</td>
                         <td>{{ resource.type }}</td>
                         <td>{{ resource.location }}</td>
                         <td>{{ resource.capacity }}</td>
                         <td>{{ resource.createdAt|date('d/m/Y H:i') }}</td>
                         <td>
-                            <a href="{{ path('admin_resource_show', {'id': resource.id}) }}">Voir</a>
+                            <a href="{{ path('admin_timeslot_index', {'id': resource.id}) }}">Créneaux</a>
                             <a href="{{ path('admin_resource_edit', {'id': resource.id}) }}">Modifier</a>
                             <form action="{{ path('admin_resource_delete', {'id': resource.id}) }}" method="POST" style="display:inline;">
                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ resource.id) }}">

@@ -1,0 +1,82 @@
+<?php
+
+namespace App\Controller\Admin;
+
+use App\Entity\Resource;
+use App\Entity\Timeslot;
+use App\Form\TimeslotType;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
+#[Route('/admin/resource/{id}/timeslots', name: 'admin_timeslot_')]
+class AdminTimeslotController extends AbstractController
+{
+    #[Route('/', name: 'index', methods: ['GET'])]
+    public function index(Resource $resource, EntityManagerInterface $em): Response
+    {
+        $timeslots = $em->getRepository(Timeslot::class)->findBy(['resource' => $resource]);
+
+        return $this->render('admin/timeslot/index.html.twig', [
+            'resource' => $resource,
+            'timeslots' => $timeslots,
+        ]);
+    }
+
+    #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $em, Resource $resource): Response
+    {
+        $timeslot = new Timeslot();
+        $timeslot->setResource($resource);
+
+        $form = $this->createForm(TimeslotType::class, $timeslot);
+        $form->remove('resource'); // champ retiré car déjà assigné
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($timeslot);
+            $em->flush();
+
+            return $this->redirectToRoute('admin_timeslot_index', ['id' => $resource->getId()]);
+        }
+
+        return $this->render('admin/timeslot/new.html.twig', [
+            'resource' => $resource,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/{timeslot_id}/edit', name: 'edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Timeslot $timeslot, EntityManagerInterface $em): Response
+    {
+        $form = $this->createForm(TimeslotType::class, $timeslot);
+        $form->remove('resource');
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->flush();
+            return $this->redirectToRoute('admin_timeslot_index', ['id' => $timeslot->getResource()->getId()]);
+        }
+
+        return $this->render('admin/timeslot/edit.html.twig', [
+            'resource' => $timeslot->getResource(),
+            'form' => $form->createView(),
+            'timeslot' => $timeslot,
+        ]);
+    }
+
+    #[Route('/{timeslot_id}/delete', name: 'delete', methods: ['POST'])]
+    public function delete(Request $request, Timeslot $timeslot, EntityManagerInterface $em): Response
+    {
+        $resourceId = $timeslot->getResource()->getId();
+
+        if ($this->isCsrfTokenValid('delete' . $timeslot->getId(), $request->request->get('_token'))) {
+            $em->remove($timeslot);
+            $em->flush();
+        }
+
+        return $this->redirectToRoute('admin_timeslot_index', ['id' => $resourceId]);
+    }
+}

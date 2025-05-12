@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créneaux - {{ resource.name }}{% endblock %}
+
+{% block body %}
+<h1>Créneaux pour la ressource : {{ resource.name }}</h1>
+
+<a href="{{ path('admin_timeslot_new', { id: resource.id }) }}" class="btn btn-primary mb-3">Ajouter un créneau</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Début</th>
+            <th>Fin</th>
+            <th>Disponible</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for timeslot in timeslots %}
+            <tr>
+                <td>{{ timeslot.id }}</td>
+                <td>{{ timeslot.startDatetime|date('d/m/Y H:i') }}</td>
+                <td>{{ timeslot.endDatetime|date('d/m/Y H:i') }}</td>
+                <td>
+                    {% if timeslot.isAvailable %}
+                        ✅
+                    {% else %}
+                        ❌
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ path('admin_timeslot_edit', { id: resource.id, timeslot_id: timeslot.id }) }}" class="btn btn-sm btn-warning">Modifier</a>
+                    <form method="post" action="{{ path('admin_timeslot_delete', { id: resource.id, timeslot_id: timeslot.id }) }}" style="display:inline-block;" onsubmit="return confirm('Confirmer la suppression ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ timeslot.id) }}">
+                        <button class="btn btn-sm btn-danger">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">Aucun créneau disponible.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{{ path('admin_resource_index') }}" class="btn btn-secondary">Retour aux ressources</a>
+{% endblock %}

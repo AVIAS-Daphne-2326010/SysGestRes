@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier créneau - {{ resource.name }}{% endblock %}
+
+{% block body %}
+<h1>Modifier le créneau #{{ timeslot.id }} de {{ resource.name }}</h1>
+
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button class="btn btn-primary">Mettre à jour</button>
+    <a href="{{ path('admin_timeslot_index', { id: resource.id }) }}" class="btn btn-secondary">Retour</a>
+{{ form_end(form) }}
+{% endblock %}
