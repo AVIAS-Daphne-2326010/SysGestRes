@@ -18,7 +18,7 @@ class UserAccountType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $isEdit = $options['is_edit'] ?? false;
-        $isClient = $options['is_client'] ?? false; 
+
         $builder
             ->add('email', EmailType::class, [
                 'label' => 'Adresse email',
@@ -28,6 +28,10 @@ class UserAccountType extends AbstractType
                 'label' => 'Mot de passe',
                 'required' => !$isEdit,
                 'mapped' => false,
+                'attr' => [
+                    'autocomplete' => 'new-password'
+                ],
+                'help' => $isEdit ? 'Laisser vide pour conserver le mot de passe actuel' : '',
             ])
             ->add('firstName', TextType::class, [
                 'label' => 'Prénom',
@@ -48,21 +52,15 @@ class UserAccountType extends AbstractType
             ->add('client', ClientType::class, [
                 'required' => false,
                 'label' => false,
+                'by_reference' => false,
             ]);
-            if ($isClient) {
-                $builder->add('client', ClientType::class, [
-                    'required' => false,
-                    'label' => false,
-                ]);
-            }
-        }
+    }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => UserAccount::class,
             'is_edit' => false,
-            'is_client' => false, 
         ]);
     }
 }

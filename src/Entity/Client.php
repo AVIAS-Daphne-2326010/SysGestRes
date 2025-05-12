@@ -25,7 +25,7 @@ class Client
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Resource::class)]
     private Collection $resources;
 
-    #[ORM\OneToOne(inversedBy: 'client')]
+    #[ORM\OneToOne(inversedBy: 'client', targetEntity: UserAccount::class)]
     #[ORM\JoinColumn(name: 'user_account_id', referencedColumnName: 'user_account_id', nullable: false)]
     private UserAccount $userAccount;
 

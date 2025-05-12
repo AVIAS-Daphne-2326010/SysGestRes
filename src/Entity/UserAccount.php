@@ -44,7 +44,7 @@ class UserAccount implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private bool $isVerified = false;
 
-    #[ORM\OneToOne(mappedBy: 'userAccount', targetEntity: Client::class, cascade: ["persist"])]
+    #[ORM\OneToOne(mappedBy: 'userAccount', targetEntity: Client::class, cascade: ["persist","remove"])]
     private ?Client $client = null;
 
     public function getId(): ?int
