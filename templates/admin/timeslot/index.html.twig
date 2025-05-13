@@ -3,48 +3,73 @@
 {% block title %}Créneaux - {{ resource.name }}{% endblock %}
 
 {% block body %}
-<h1>Créneaux pour la ressource : {{ resource.name }}</h1>
+<div class="container">
+    <h1 class="my-4">Créneaux pour la ressource : {{ resource.name }}</h1>
 
-<a href="{{ path('admin_timeslot_new', { resource: resource.id }) }}" class="btn btn-primary mb-3">Ajouter un créneau</a>
+    <div class="mb-4">
+        <a href="{{ path('admin_timeslot_new', { 'resource': resource.id }) }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Ajouter un créneau
+        </a>
+        <a href="{{ path('admin_resources') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour aux ressources
+        </a>
+    </div>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Début</th>
-            <th>Fin</th>
-            <th>Disponible</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for timeslot in timeslots %}
-            <tr>
-                <td>{{ timeslot.id }}</td>
-                <td>{{ timeslot.startDatetime|date('d/m/Y H:i') }}</td>
-                <td>{{ timeslot.endDatetime|date('d/m/Y H:i') }}</td>
-                <td>
-                    {% if timeslot.isAvailable %}
-                        ✅
-                    {% else %}
-                        ❌
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{{ path('admin_timeslot_edit', { resource: resource.id, timeslot_id: timeslot.id }) }}" class="btn btn-sm btn-warning">Modifier</a>
-                    <form method="post" action="{{ path('admin_timeslot_delete', { resource: resource.id, timeslot_id: timeslot.id }) }}" style="display:inline-block;" onsubmit="return confirm('Confirmer la suppression ?');">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ timeslot.id) }}">
-                        <button class="btn btn-sm btn-danger">Supprimer</button>
-                    </form>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">Aucun créneau disponible.</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<a href="{{ path('admin_resource_index') }}" class="btn btn-secondary">Retour aux ressources</a>
+    {% if timeslots is empty %}
+        <div class="alert alert-info">
+            Aucun créneau disponible pour cette ressource.
+        </div>
+    {% else %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Début</th>
+                        <th>Fin</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for timeslot in timeslots %}
+                        <tr>
+                            <td>{{ timeslot.id }}</td>
+                            <td>{{ timeslot.startDatetime|date('d/m/Y H:i') }}</td>
+                            <td>{{ timeslot.endDatetime|date('d/m/Y H:i') }}</td>
+                            <td>
+                                {% if timeslot.isAvailable %}
+                                    <span class="badge badge-success">Disponible</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Réservé</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ path('admin_timeslot_edit', { 
+                                        'resource': resource.id, 
+                                        'timeslot_id': timeslot.id 
+                                    }) }}" class="btn btn-warning" title="Modifier">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    
+                                    <form method="post" action="{{ path('admin_timeslot_delete', { 
+                                        'resource': resource.id, 
+                                        'timeslot_id': timeslot.id 
+                                    }) }}" onsubmit="return confirm('Confirmer la suppression ?');">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ timeslot.id) }}">
+                                        <button class="btn btn-danger" title="Supprimer">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

@@ -11,11 +11,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/admin/resource/{resource}/timeslots', name: 'admin_timeslot_', requirements: ['resource' => '\d+'])]  
+#[Route('/admin/resource/{resource}/timeslots', requirements: ['resource' => '\d+'])]  
 class AdminTimeslotController extends AbstractController
 {
     
-    #[Route('/', name: 'index', methods: ['GET'])]
+    #[Route('/', name: 'admin_timeslot_index', methods: ['GET'])]
     public function index(Resource $resource, EntityManagerInterface $em): Response
     {
         $timeslots = $em->getRepository(Timeslot::class)->findBy(['resource' => $resource]);
@@ -26,7 +26,7 @@ class AdminTimeslotController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
+    #[Route('/new', name: 'admin_timeslot_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $em, Resource $resource): Response
     {
         $timeslot = new Timeslot();
@@ -49,7 +49,7 @@ class AdminTimeslotController extends AbstractController
         ]);
     }
 
-    #[Route('/{timeslot_id}/edit', name: 'edit', methods: ['GET', 'POST'])]
+    #[Route('/{timeslot_id}/edit', name: 'admin_timeslot_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Timeslot $timeslot, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(TimeslotType::class, $timeslot);
@@ -68,7 +68,7 @@ class AdminTimeslotController extends AbstractController
         ]);
     }
 
-    #[Route('/{timeslot_id}/delete', name: 'delete', methods: ['POST'])]
+    #[Route('/{timeslot_id}/delete', name: 'admin_timeslot_delete', methods: ['POST'])]
     public function delete(Request $request, Timeslot $timeslot, EntityManagerInterface $em): Response
     {
         $resourceId = $timeslot->getResource()->getId();

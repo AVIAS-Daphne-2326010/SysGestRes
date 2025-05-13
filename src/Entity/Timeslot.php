@@ -2,10 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\TimeslotRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: TimeslotRepository::class)]
+#[ORM\Entity]
 class Timeslot
 {
     #[ORM\Id]
