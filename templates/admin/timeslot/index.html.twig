@@ -8,10 +8,7 @@
 
     <div class="mb-4">
         <a href="{{ path('admin_timeslot_new', { 'resource': resource.id }) }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Ajouter un créneau
-        </a>
-        <a href="{{ path('admin_resources') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Retour aux ressources
+            <i class="fas fa-plus"></i> + Ajouter un créneau
         </a>
     </div>
 
@@ -45,22 +42,22 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <a href="{{ path('admin_timeslot_edit', { 
-                                        'resource': resource.id, 
-                                        'timeslot_id': timeslot.id 
-                                    }) }}" class="btn btn-warning" title="Modifier">
-                                        <i class="fas fa-edit"></i>
+                                <div class="d-flex align-items-center">
+                                    <a href="{{ path('admin_timeslot_edit', {
+                                        'resource': resource.id,
+                                        'timeslot_id': timeslot.id
+                                    }) }}" class="btn btn-sm btn-warning me-2" title="Modifier">
+                                        <i class="fas fa-edit"></i> Modifier
                                     </a>
-                                    
-                                    <form method="post" action="{{ path('admin_timeslot_delete', { 
-                                        'resource': resource.id, 
-                                        'timeslot_id': timeslot.id 
-                                    }) }}" onsubmit="return confirm('Confirmer la suppression ?');">
+
+                                    <form method="post" action="{{ path('admin_timeslot_delete', {
+                                        'resource': resource.id,
+                                        'timeslot_id': timeslot.id
+                                    }) }}" onsubmit="return confirm('Confirmer la suppression ?');" class="mb-0">
                                         <input type="hidden" name="_method" value="DELETE">
                                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ timeslot.id) }}">
-                                        <button class="btn btn-danger" title="Supprimer">
-                                            <i class="fas fa-trash"></i>
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Supprimer">
+                                            <i class="fas fa-trash-alt"></i> Supprimer
                                         </button>
                                     </form>
                                 </div>
@@ -71,5 +68,10 @@
             </table>
         </div>
     {% endif %}
+    <div class="mb-4">
+        <a href="{{ path('admin_resources') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour aux ressources
+        </a>
+    </div>
 </div>
 {% endblock %}
