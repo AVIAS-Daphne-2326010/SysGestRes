@@ -36,7 +36,7 @@
                         <td>{{ resource.capacity }}</td>
                         <td>{{ resource.createdAt|date('d/m/Y H:i') }}</td>
                         <td>
-                            <a href="{{ path('admin_timeslot_index', {'id': resource.id}) }}">Créneaux</a>
+                            <a href="{{ path('admin_timeslot_index', {'resource': resource.id}) }}">Créneaux</a>
                             <a href="{{ path('admin_resource_edit', {'id': resource.id}) }}">Modifier</a>
                             <form action="{{ path('admin_resource_delete', {'id': resource.id}) }}" method="POST" style="display:inline;">
                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ resource.id) }}">

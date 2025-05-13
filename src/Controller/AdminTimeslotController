@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Admin;
+namespace App\Controller;
 
 use App\Entity\Resource;
 use App\Entity\Timeslot;
@@ -11,9 +11,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/admin/resource/{id}/timeslots', name: 'admin_timeslot_')]
+#[Route('/admin/resource/{resource}/timeslots', name: 'admin_timeslot_', requirements: ['resource' => '\d+'])]  
 class AdminTimeslotController extends AbstractController
 {
+    
     #[Route('/', name: 'index', methods: ['GET'])]
     public function index(Resource $resource, EntityManagerInterface $em): Response
     {
@@ -32,14 +33,14 @@ class AdminTimeslotController extends AbstractController
         $timeslot->setResource($resource);
 
         $form = $this->createForm(TimeslotType::class, $timeslot);
-        $form->remove('resource'); // champ retiré car déjà assigné
+        $form->remove('resource');
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($timeslot);
             $em->flush();
 
-            return $this->redirectToRoute('admin_timeslot_index', ['id' => $resource->getId()]);
+            return $this->redirectToRoute('admin_timeslot_index', ['resource' => $resource->getId()]);
         }
 
         return $this->render('admin/timeslot/new.html.twig', [
@@ -57,7 +58,7 @@ class AdminTimeslotController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
-            return $this->redirectToRoute('admin_timeslot_index', ['id' => $timeslot->getResource()->getId()]);
+            return $this->redirectToRoute('admin_timeslot_index', ['resource' => $timeslot->getResource()->getId()]);
         }
 
         return $this->render('admin/timeslot/edit.html.twig', [
@@ -77,6 +78,6 @@ class AdminTimeslotController extends AbstractController
             $em->flush();
         }
 
-        return $this->redirectToRoute('admin_timeslot_index', ['id' => $resourceId]);
+        return $this->redirectToRoute('admin_timeslot_index', ['resource' => $resourceId]);
     }
 }
