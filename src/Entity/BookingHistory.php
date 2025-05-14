@@ -22,17 +22,21 @@ class BookingHistory
     private ?string $changedBy = null;
 
     #[ORM\ManyToOne(targetEntity: Booking::class)]
-    #[ORM\JoinColumn(name: "booking_id", referencedColumnName: "booking_id", nullable: true)] // rendre nullable
+    #[ORM\JoinColumn(name: "booking_id", referencedColumnName: "booking_id", nullable: true)] 
     private ?Booking $booking = null;
 
     // Ajout de la relation Resource
     #[ORM\ManyToOne(targetEntity: Resource::class)]
-    #[ORM\JoinColumn(name: "resource_id", referencedColumnName: "resource_id", nullable: true)] // rendre nullable
+    #[ORM\JoinColumn(name: "resource_id", referencedColumnName: "resource_id", nullable: true)] 
     private ?Resource $resource = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'user_account_id', referencedColumnName: 'user_account_id', nullable: false)]
     private UserAccount $userAccount;
+
+    #[ORM\ManyToOne(targetEntity: Timeslot::class)]
+    #[ORM\JoinColumn(name: "timeslot_id", referencedColumnName: "timeslot_id", nullable: true)]
+    private ?Timeslot $timeslot = null;
 
     // Getters et setters
     public function getId(): ?int
@@ -95,7 +99,6 @@ class BookingHistory
         return $this;
     }
 
-    // Getter et setter pour la ressource
     public function getResource(): ?Resource
     {
         return $this->resource;
@@ -106,5 +109,17 @@ class BookingHistory
         $this->resource = $resource;
         return $this;
     }
+
+    public function getTimeslot(): ?Timeslot
+    {
+        return $this->timeslot;
+    }
+
+    public function setTimeslot(?Timeslot $timeslot): self
+    {
+        $this->timeslot = $timeslot;
+        return $this;
+    }
+
 }
 

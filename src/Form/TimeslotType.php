@@ -5,7 +5,7 @@ namespace App\Form;
 use App\Entity\Timeslot;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -16,17 +16,21 @@ class TimeslotType extends AbstractType
         $builder
             ->add('start_datetime', DateTimeType::class, [
                 'label' => 'Date/Heure de début',
-                'required' => true,
                 'widget' => 'single_text',
             ])
             ->add('end_datetime', DateTimeType::class, [
                 'label' => 'Date/Heure de fin',
-                'required' => true,
                 'widget' => 'single_text',
             ])
-            ->add('is_available', CheckboxType::class, [
-                'label' => 'Cocher si disponible',
-                'required' => false,
+            ->add('is_available', ChoiceType::class, [
+                'label' => false, // On désactive le label automatique
+                'choices' => [
+                    'Disponible' => true,
+                    'Indisponible' => false,
+                ],
+                'expanded' => true,
+                'multiple' => false,
+                'label_attr' => ['class' => 'd-none'], // Cache les labels automatiques
             ]);
     }
 

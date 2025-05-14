@@ -2,12 +2,105 @@
 
 {% block title %}Modifier créneau - {{ resource.name }}{% endblock %}
 
-{% block body %}
-<h1>Modifier le créneau #{{ timeslot.id }} de {{ resource.name }}</h1>
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .availability-container {
+            margin-bottom: 1.5rem;
+        }
+        .availability-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        .availability-option {
+            position: relative;
+        }
+        .availability-option input {
+            position: absolute;
+            opacity: 0;
+        }
+        .availability-option label {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border: 2px solid #dee2e6;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .availability-option input:checked + label {
+            color: white;
+            font-weight: bold;
+        }
+        .option-available label {
+            border-color: #28a745;
+            color: #28a745;
+        }
+        .option-available input:checked + label {
+            background-color: #28a745;
+        }
+        .option-unavailable label {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+        .option-unavailable input:checked + label {
+            background-color: #dc3545;
+        }
+    </style>
+{% endblock %}
 
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn btn-primary">Mettre à jour</button>
-    <a href="{{ path('admin_timeslot_index', { resource: resource.id }) }}" class="btn btn-secondary">Retour</a>
-{{ form_end(form) }}
+{% block body %}
+<div class="container mt-4">
+    <h1 class="mb-4">Modifier le créneau #{{ timeslot.id }}</h1>
+
+    {{ form_start(form) }}
+        <div class="row mb-3">
+            <div class="col-md-6">
+                {{ form_row(form.start_datetime) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.end_datetime) }}
+            </div>
+        </div>
+
+        <div class="availability-container">
+            <label class="form-label">Statut du créneau</label>
+            <div class="availability-options">
+                {% for child in form.is_available %}
+                    <div class="availability-option option-{% if child.vars.value %}available{% else %}unavailable{% endif %}">
+                        <input
+                            type="radio"
+                            id="{{ child.vars.id }}"
+                            name="{{ child.vars.full_name }}"
+                            value="{{ child.vars.value }}"
+                            {% if child.vars.checked %}checked{% endif %}
+                        >
+                        <label for="{{ child.vars.id }}">
+                            {{ child.vars.label }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-1"></i> Mettre à jour
+            </button>
+            <a href="{{ path('admin_timeslot_index', {resource: resource.id}) }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Retour
+            </a>
+        </div>
+
+        {# Important : on ne rend QUE les champs non affichés, en excluant is_available #}
+        {% for field in form %}
+            {% if field is not same as(form.start_datetime)
+                and field is not same as(form.end_datetime)
+                and field is not same as(form.is_available) %}
+                {{ form_row(field) }}
+            {% endif %}
+        {% endfor %}
+
+    {{ form_end(form, {'render_rest': false}) }}
+</div>
 {% endblock %}

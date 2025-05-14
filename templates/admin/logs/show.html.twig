@@ -7,10 +7,14 @@
     <p><strong>Date de modification :</strong> {{ log.changedAt|date('d/m/Y H:i') }}</p>
     <p><strong>Modifié par :</strong> {{ log.changedBy }}</p>
 
-    {% if log.resource %}
-        <p><strong>Action :</strong> Modification de la ressource "{{ log.resource.name }}"</p>
+    {% if log.status == 'Création de créneau' %}
+        <p><strong>Action :</strong> Création d’un créneau dans la ressource "{{ log.resource.name }}"</p>
+    {% elseif log.status == 'Suppression de créneau' %}
+        <p><strong>Action :</strong> Suppression d’un créneau dans la ressource "{{ log.resource.name }}"</p>
+    {% elseif log.status == 'Modification de créneau' %}
+        <p><strong>Action :</strong> Modification de créneau dans la ressource "{{ log.resource.name }}"</p>
     {% else %}
-        <p><strong>Action :</strong> Modification sans ressource associée</p>
+        <p><strong>Action :</strong> {{ log.status }}</p>
     {% endif %}
 
     <a href="{{ path('admin_logs') }}">Retour à la liste des logs</a>
