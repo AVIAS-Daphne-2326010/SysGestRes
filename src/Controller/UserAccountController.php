@@ -33,11 +33,6 @@ class UserAccountController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $userAccount->setCreatedAt(new \DateTime());
 
-            // Lier le client au userAccount si besoin
-            if ($client = $userAccount->getClient()) {
-                $client->setUserAccount($userAccount);
-            }
-
             $entityManager->persist($userAccount);
             $entityManager->flush();
 
@@ -60,7 +55,9 @@ class UserAccountController extends AbstractController
     #[Route('/{id}/edit', name: 'user_account_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, UserAccount $userAccount, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(UserAccountType::class, $userAccount);
+        $form = $this->createForm(UserAccountType::class, $userAccount, [
+            'is_edit' => true,
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

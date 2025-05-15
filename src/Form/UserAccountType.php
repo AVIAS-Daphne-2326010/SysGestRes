@@ -12,6 +12,8 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 class UserAccountType extends AbstractType
 {
@@ -54,6 +56,15 @@ class UserAccountType extends AbstractType
                 'label' => false,
                 'by_reference' => false,
             ]);
+
+        // 🔗 Lier le client à l'utilisateur si le formulaire contient un client
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+            $user = $event->getData();
+            $client = $user->getClient();
+            if ($client) {
+                $client->setUserAccount($user);
+            }
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver): void

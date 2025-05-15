@@ -29,6 +29,7 @@ class Client
     #[ORM\JoinColumn(name: 'user_account_id', referencedColumnName: 'user_account_id', nullable: false)]
     private UserAccount $userAccount;
 
+
     public function __construct()
     {
         $this->resources = new ArrayCollection();
