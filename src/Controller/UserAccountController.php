@@ -31,7 +31,13 @@ class UserAccountController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $userAccount->setCreatedAt(new \DateTime()); // Set current date for createdAt
+            $userAccount->setCreatedAt(new \DateTime());
+
+            // Lier le client au userAccount si besoin
+            if ($client = $userAccount->getClient()) {
+                $client->setUserAccount($userAccount);
+            }
+
             $entityManager->persist($userAccount);
             $entityManager->flush();
 

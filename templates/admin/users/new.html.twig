@@ -23,8 +23,56 @@
             {{ form_row(form.password) }}
         </div>
 
+        {# Champs imbriqués dans form.client #}
+        <div class="form-group mb-3">
+            {{ form_row(form.client.organizationName) }}
+        </div>
+        <div class="form-group mb-3">
+            {{ form_row(form.client.address) }}
+        </div>
+
+        <div id="org-warning" class="alert alert-warning" style="display: none;">
+            ⚠️ Les champs "Nom de votre organisation" et "Adresse" doivent être vides pour un utilisateur ou un administrateur.
+        </div>
+
         <button type="submit" class="btn btn-success">Créer l'utilisateur</button>
+        <a href="{{ path('admin_users') }}" class="btn btn-secondary">Annuler</a>
+
     {{ form_end(form) }}
 
-    <a href="{{ path('admin_users') }}" class="btn btn-link mt-3">← Retour à la liste des utilisateurs</a>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const orgName = document.getElementById('{{ form.client.organizationName.vars.id }}');
+            const address = document.getElementById('{{ form.client.address.vars.id }}');
+            const roleSelect = document.getElementById('{{ form.role.vars.id }}');
+            const submitBtn = document.querySelector('button[type="submit"]');
+            const warningDiv = document.getElementById('org-warning');
+
+            function toggleSubmitButton() {
+                const selectedRole = roleSelect.options[roleSelect.selectedIndex].text.toLowerCase();
+                const isClient = selectedRole.includes('client');
+
+                const hasOrgData = orgName.value.trim() !== '' || address.value.trim() !== '';
+
+                if (!isClient && hasOrgData) {
+                    // Rôle = user ou admin, mais champs client remplis => erreur
+                    submitBtn.disabled = true;
+                    warningDiv.style.display = 'block';
+                } else {
+                    // OK : soit client avec données, soit autres rôles sans données
+                    submitBtn.disabled = false;
+                    warningDiv.style.display = 'none';
+                }
+            }
+
+            // Ajoute les écouteurs
+            orgName.addEventListener('input', toggleSubmitButton);
+            address.addEventListener('input', toggleSubmitButton);
+            roleSelect.addEventListener('change', toggleSubmitButton);
+
+            // Vérifie une première fois à l'affichage
+            toggleSubmitButton();
+        });
+    </script>
+
 {% endblock %}
