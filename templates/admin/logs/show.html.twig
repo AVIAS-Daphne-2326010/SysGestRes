@@ -13,6 +13,8 @@
         <p><strong>Action :</strong> Suppression d’un créneau dans la ressource "{{ log.resource.name }}"</p>
     {% elseif log.status == 'Modification de créneau' %}
         <p><strong>Action :</strong> Modification de créneau dans la ressource "{{ log.resource.name }}"</p>
+    {% elseif log.status == 'Modification de ressource' %}
+    <p><strong>Action :</strong> Modification de la ressource "{{ log.resource.name }}"</p>
     {% else %}
         <p><strong>Action :</strong> {{ log.status }}</p>
     {% endif %}

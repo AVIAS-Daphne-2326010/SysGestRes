@@ -42,7 +42,7 @@ class Resource
     public function __construct()
     {
         $this->timeslots = new ArrayCollection();
-        $this->created_at = new \DateTimeImmutable();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int

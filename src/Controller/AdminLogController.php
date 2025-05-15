@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]
@@ -42,19 +43,20 @@ class AdminLogController extends AbstractController
 
     // Supprimer un log spécifique (si nécessaire)
     #[Route('/{id}/delete', name: 'admin_log_delete', methods: ['POST'])]
-    public function delete(int $id, EntityManagerInterface $em): Response
+    public function delete(int $id, Request $request, EntityManagerInterface $em): Response
     {
-        $log = $em->getRepository(BookingHistory::class)->find($id);
+        if ($this->isCsrfTokenValid('delete_log_' . $id, $request->request->get('_token'))) {
+            $log = $em->getRepository(BookingHistory::class)->find($id);
 
-        if (!$log) {
-            throw $this->createNotFoundException('Log non trouvé');
+            if (!$log) {
+                throw $this->createNotFoundException('Log non trouvé');
+            }
+
+            $em->remove($log);
+            $em->flush();
+
+            $this->addFlash('success', 'Log supprimé avec succès');
         }
-
-        // Supprimer le log
-        $em->remove($log);
-        $em->flush();
-
-        $this->addFlash('success', 'Log supprimé avec succès');
         return $this->redirectToRoute('admin_logs');
     }
 }
