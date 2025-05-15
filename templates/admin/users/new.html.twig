@@ -52,27 +52,41 @@
                 const selectedRole = roleSelect.options[roleSelect.selectedIndex].text.toLowerCase();
                 const isClient = selectedRole.includes('client');
 
-                const hasOrgData = orgName.value.trim() !== '' || address.value.trim() !== '';
+                const orgFilled = orgName.value.trim() !== '';
+                const addressFilled = address.value.trim() !== '';
 
-                if (!isClient && hasOrgData) {
-                    // Rôle = user ou admin, mais champs client remplis => erreur
+                let valid = true;
+
+                if (isClient) {
+                    // Si rôle = Client → les deux champs doivent être remplis
+                    if (!orgFilled || !addressFilled) {
+                        valid = false;
+                        warningDiv.textContent = '⚠️ Pour le rôle "Client", les champs "Nom de votre organisation" et "Adresse" sont obligatoires.';
+                    }
+                } else {
+                    // Si rôle ≠ Client → les deux champs doivent être vides
+                    if (orgFilled || addressFilled) {
+                        valid = false;
+                        warningDiv.textContent = '⚠️ Les champs "Nom de votre organisation" et "Adresse" doivent être vides pour un utilisateur ou un administrateur.';
+                    }
+                }
+
+                if (!valid) {
                     submitBtn.disabled = true;
                     warningDiv.style.display = 'block';
                 } else {
-                    // OK : soit client avec données, soit autres rôles sans données
                     submitBtn.disabled = false;
                     warningDiv.style.display = 'none';
                 }
             }
 
-            // Ajoute les écouteurs
             orgName.addEventListener('input', toggleSubmitButton);
             address.addEventListener('input', toggleSubmitButton);
             roleSelect.addEventListener('change', toggleSubmitButton);
 
-            // Vérifie une première fois à l'affichage
-            toggleSubmitButton();
+            toggleSubmitButton(); // check at load
         });
     </script>
+
 
 {% endblock %}
