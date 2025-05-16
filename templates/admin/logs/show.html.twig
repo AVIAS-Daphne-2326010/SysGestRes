@@ -16,7 +16,7 @@
     {% elseif log.status == 'Modification de ressource' %}
         <p><strong>Action :</strong> Modification de la ressource "{{ log.resource.name }}"</p>
     {% elseif log.status == 'Modification utilisateur' %}
-        <p><strong>Action :</strong> Modification de l'utilisateur "{{ log.resource.name }}</p>
+        <p><strong>Action :</strong> Modification de l'utilisateur "{{ log.userAccount.lastName }} {{ log.userAccount.firstName }}"</p>
     {% else %}
         <p><strong>Action :</strong> {{ log.status }}</p>
     {% endif %}
