@@ -58,16 +58,19 @@ class ClientResourceController extends AbstractController
         $resource = new Resource();
         $resource->setClient($client);
 
+        $existingTypes = $em->getRepository(Resource::class)
+            ->createQueryBuilder('r')
+            ->select('DISTINCT r.type')
+            ->orderBy('r.type', 'ASC')
+            ->getQuery()
+            ->getSingleColumnResult();
+
         $form = $this->createForm(ResourceType::class, $resource);
         $form->remove('client');
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $customType = $form->get('type_custom')->getData();
-            if ($customType) {
-                $resource->setType($customType);
-            }
             $em->persist($resource);
             $em->flush();
 
@@ -78,6 +81,7 @@ class ClientResourceController extends AbstractController
 
         return $this->render('client/resources/new.html.twig', [
             'form' => $form->createView(),
+            'types' => $existingTypes,
         ]);
     }
 
@@ -100,16 +104,19 @@ class ClientResourceController extends AbstractController
             throw $this->createAccessDeniedException('Vous ne pouvez pas modifier cette ressource.');
         }
 
+        $existingTypes = $em->getRepository(Resource::class)
+            ->createQueryBuilder('r')
+            ->select('DISTINCT r.type')
+            ->orderBy('r.type', 'ASC')
+            ->getQuery()
+            ->getSingleColumnResult();
+
         $form = $this->createForm(ResourceType::class, $resource);
         $form->remove('client');
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $customType = $form->get('type_custom')->getData();
-            if ($customType) {
-                $resource->setType($customType);
-            }
             $em->flush();
 
             $this->addFlash('success', 'La ressource a bien été modifiée.');
@@ -120,6 +127,7 @@ class ClientResourceController extends AbstractController
         return $this->render('client/resources/edit.html.twig', [
             'resource' => $resource,
             'form' => $form->createView(),
+            'types' => $existingTypes,
         ]);
     }
 

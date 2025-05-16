@@ -40,20 +40,12 @@ class ResourceType extends AbstractType
                 'label' => 'Resource Name',
                 'required' => true,
             ])
-            ->add('type', ChoiceType::class, [
-                'choices' => [
-                    'Salle de réunion' => 'Salle de réunion',
-                    'Bureau' => 'Bureau',
-                    'Restaurant' => 'Restaurant',
-                    'Salle de sport' => 'Salle de sport',
+            ->add('type', TextType::class, [
+                'required' => false,
+                'attr' => [
+                    'list' => 'resource_type_options', // lien avec le datalist dans le template
                 ],
-                'placeholder' => 'Choisir un type existant',
-                'required' => false,
-            ])
-            ->add('type_custom', TextType::class, [
-                'mapped' => false,
-                'required' => false,
-                'label' => 'Type personnalisé',
+                'label' => 'Type de ressource',
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',

@@ -5,12 +5,19 @@
 
     {{ form_start(form) }}
         {{ form_row(form.name) }}
+
         {{ form_row(form.type) }}
+        <datalist id="resource_type_options">
+            {% for type in types %}
+                <option value="{{ type }}"></option>
+            {% endfor %}
+        </datalist>
+
         {{ form_row(form.location) }}
         {{ form_row(form.capacity) }}
         {{ form_row(form.description) }}
 
-        <button class="btn btn-success">Créer</button>
-        <a href="{{ path('client_resources') }}" class="btn btn-secondary">Annuler</a>
+        <button class="btn btn-primary">Enregistrer</button>
     {{ form_end(form) }}
+
 {% endblock %}
