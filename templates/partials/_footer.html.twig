@@ -7,11 +7,14 @@
         
         <div>
             <h4>Types de ressources</h4>
+            {% set types = resource_types() %}
+
             <ul style="list-style: none; padding: 0;">
-                <li><a href="#">Salles de réunion</a></li>
-                <li><a href="#">Bureaux</a></li>
-                <li><a href="#">Espaces de coworking</a></li>
-                <li><a href="#">Restaurants</a></li>
+                {% for type in types %}
+                    <li><a href="#">{{ type.type }}</a></li>
+                {% else %}
+                    <li>Aucune ressource</li>
+                {% endfor %}
             </ul>
         </div>
 

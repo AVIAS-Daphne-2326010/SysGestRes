@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier la ressource{% endblock %}
+
+{% block body %}
+    <h1>Modifier la ressource</h1>
+
+    {{ form_start(form) }}
+        {{ form_row(form.name) }}
+        {{ form_row(form.type) }}
+        {{ form_row(form.type_custom) }}
+        {{ form_row(form.location) }}
+        {{ form_row(form.capacity) }}
+        {{ form_row(form.description) }}
+        <button class="btn btn-primary">Enregistrer les modifications</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('client_resources') }}" class="btn btn-secondary mt-3">Retour à la liste des ressources</a>
+{% endblock %}

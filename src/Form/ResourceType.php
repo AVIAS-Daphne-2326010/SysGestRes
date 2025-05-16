@@ -3,29 +3,57 @@
 namespace App\Form;
 
 use App\Entity\Resource;
-use App\Entity\Client; 
+use App\Entity\Client;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
+use Doctrine\ORM\EntityManagerInterface;
 
 class ResourceType extends AbstractType
 {
+    private EntityManagerInterface $em;
+
+    public function __construct(EntityManagerInterface $em)
+    {
+        $this->em = $em;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        // Récupère les types distincts depuis la base
+        $types = $this->em->getRepository(Resource::class)
+            ->createQueryBuilder('r')
+            ->select('DISTINCT r.type')
+            ->getQuery()
+            ->getResult();
+
+        $typeChoices = array_map(fn($t) => $t['type'], $types);
+
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Resource Name',
                 'required' => true,
             ])
-            ->add('type', TextType::class, [
-                'label' => 'Type of Resource',
-                'required' => true,
+            ->add('type', ChoiceType::class, [
+                'choices' => [
+                    'Salle de réunion' => 'Salle de réunion',
+                    'Bureau' => 'Bureau',
+                    'Restaurant' => 'Restaurant',
+                    'Salle de sport' => 'Salle de sport',
+                ],
+                'placeholder' => 'Choisir un type existant',
+                'required' => false,
+            ])
+            ->add('type_custom', TextType::class, [
+                'mapped' => false,
+                'required' => false,
+                'label' => 'Type personnalisé',
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
@@ -39,9 +67,7 @@ class ResourceType extends AbstractType
             ->add('capacity', IntegerType::class, [
                 'label' => 'Capacity',
                 'required' => true,
-                'attr' => [
-                    'min' => 0, 
-                ],
+                'attr' => ['min' => 0],
                 'constraints' => [
                     new PositiveOrZero([
                         'message' => 'La capacité ne peut pas être négative.',
@@ -49,8 +75,8 @@ class ResourceType extends AbstractType
                 ]
             ])
             ->add('client', EntityType::class, [
-                'class' => Client::class, 
-                'choice_label' => 'organizationName', 
+                'class' => Client::class,
+                'choice_label' => 'organizationName',
                 'label' => 'Client',
                 'required' => true,
             ]);

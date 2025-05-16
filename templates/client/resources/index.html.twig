@@ -1,8 +1,47 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mes ressources{% endblock %}
-
 {% block body %}
-    <h1>Mes ressources (à venir)</h1>
-    <p>Ici apparaîtra ls ressources du client.</p>
+    <h1>Mes ressources</h1>
+
+    <a href="{{ path('client_resource_new') }}" class="btn btn-primary" style="margin-bottom: 15px;">
+        + Ajouter une ressource
+    </a>
+
+    {% if resources is empty %}
+        <p>Aucune ressource n'a encore été créée.</p>
+    {% else %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Type</th>
+                    <th>Localisation</th>
+                    <th>Capacité</th>
+                    <th>Créé le</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resource in resources %}
+                    <tr>
+                        <td>{{ resource.id }}</td>
+                        <td>{{ resource.name }}</td>
+                        <td>{{ resource.type }}</td>
+                        <td>{{ resource.location }}</td>
+                        <td>{{ resource.capacity }}</td>
+                        <td>{{ resource.createdAt|date('d/m/Y H:i') }}</td>
+                        <td>
+                            <a href="{{ path('client_timeslot_index', {'resource': resource.id}) }}">Créneaux</a>
+                            <a href="{{ path('client_resource_edit', {'id': resource.id}) }}">Modifier</a>
+                            <form action="{{ path('client_resource_delete', {'id': resource.id}) }}" method="POST" style="display:inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ resource.id) }}">
+                                <button type="submit" onclick="return confirm('Confirmer la suppression ?')">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 {% endblock %}

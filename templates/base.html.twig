@@ -31,6 +31,6 @@
         {% block body %}{% endblock %}
     </main>
 
-    {% include 'partials/_footer.html.twig' %}
+    {% include 'partials/_footer.html.twig' with { resourceTypes: resourceTypes|default([]) } %}
 </body>
 </html>

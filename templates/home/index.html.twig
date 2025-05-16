@@ -7,8 +7,14 @@
     <h1>Réservez facilement, gérez efficacement – votre espace, vos horaires, votre tranquillité...</h1>
     
     <section id="resources">
-        <h2>Ressources</h2>
-        <p>Voici toutes les ressources disponibles...</p>
+        <h2>Types de ressources disponibles</h2>
+        <ul>
+            {% for type in resourceTypes %}
+                <li>{{ type.type }}</li>
+            {% else %}
+                <li>Aucune ressource disponible</li>
+            {% endfor %}
+        </ul>
     </section>
 
     <section id="features">
