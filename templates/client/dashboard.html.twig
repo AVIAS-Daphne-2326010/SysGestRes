@@ -1,6 +1,18 @@
-<h1>Bonjour {{ prenom }} - {{ organization }}</h1>
-{% if nextBooking %}
-    <p>Votre prochaine réservation : {{ nextBooking.timeslot.resource.address }} - {{ nextBooking.timeslot.startDatetime|date('d/m/Y H:i') }} | Réservé par {{ nextBooking.userAccount.firstName }}</p>
-{% else %}
-    <p>Vous n’avez pas de réservation à venir.</p>
-{% endif %}
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block body %}
+    <h1>Bonjour {{ prenom }} - {{ organization }}</h1>
+
+    {% if nextBooking %}
+        <p>
+            Votre prochaine réservation :
+            {{ nextBooking.timeslot.resource.address }} - 
+            {{ nextBooking.timeslot.startDatetime|date('d/m/Y H:i') }} |
+            Réservé par {{ nextBooking.userAccount.firstName }}
+        </p>
+    {% else %}
+        <p>Vous n’avez pas de réservation à venir.</p>
+    {% endif %}
+{% endblock %}

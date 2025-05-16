@@ -12,7 +12,6 @@
                 <a href="{{ path('admin_logs') }}">Logs</a>
 
             {% elseif is_granted('ROLE_CLIENT') %}
-                <a href="{{ path('user_dashboard') }}">Dashboard</a>
                 <a href="{{ path('client_dashboard') }}">Dashboard</a>
                 <a href="{{ path('client_resources') }}">Ressources</a>
                 <a href="{{ path('client_calendar') }}">Calendrier</a>

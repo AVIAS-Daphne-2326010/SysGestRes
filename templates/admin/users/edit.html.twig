@@ -27,6 +27,9 @@
                 {{ form_row(form.client.address) }}
             </div>
         </div>
+
+        <div id="org-warning" class="alert alert-warning" style="display: none;"></div>
+
         <div class="form-group mb-3">
             {{ form_row(form.password, { help: 'Laisser vide pour conserver le mot de passe actuel.' }) }}
         </div>
@@ -39,28 +42,51 @@
     <a href="{{ path('admin_users') }}" class="btn btn-link mt-3">← Retour à la liste des utilisateurs</a>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const roleField = document.getElementById("user_account_role");
+            const orgName = document.getElementById("user_account_client_organizationName");
+            const address = document.getElementById("user_account_client_address");
+            const submitBtn = document.querySelector("button[type='submit']");
+            const warningDiv = document.getElementById("org-warning");
             const clientFields = document.getElementById("client-fields");
 
-            if (!roleField || !clientFields) return; // Sécurité
+            if (!roleField || !orgName || !address || !submitBtn || !warningDiv || !clientFields) return;
 
-            function toggleClientFields() {
-                // On récupère la valeur sélectionnée
+            function toggleClientFieldsAndValidation() {
                 const selectedText = roleField.options[roleField.selectedIndex].text.toLowerCase();
+                const isClient = selectedText.includes('client');
+                const orgFilled = orgName.value.trim() !== '';
+                const addressFilled = address.value.trim() !== '';
+                let valid = true;
 
-                if (selectedText === 'client') {
+                if (isClient) {
                     clientFields.style.display = 'block';
+                    if (!orgFilled || !addressFilled) {
+                        valid = false;
+                        warningDiv.textContent = '⚠️ Pour le rôle "Client", les champs "Nom de votre organisation" et "Adresse" sont obligatoires.';
+                    }
                 } else {
                     clientFields.style.display = 'none';
+                    if (orgFilled || addressFilled) {
+                        valid = false;
+                        warningDiv.textContent = '⚠️ Les champs "Nom de votre organisation" et "Adresse" doivent être vides pour un utilisateur ou un administrateur.';
+                    }
+                }
+
+                if (!valid) {
+                    submitBtn.disabled = true;
+                    warningDiv.style.display = 'block';
+                } else {
+                    submitBtn.disabled = false;
+                    warningDiv.style.display = 'none';
                 }
             }
 
-            roleField.addEventListener('change', toggleClientFields);
+            roleField.addEventListener('change', toggleClientFieldsAndValidation);
+            orgName.addEventListener('input', toggleClientFieldsAndValidation);
+            address.addEventListener('input', toggleClientFieldsAndValidation);
 
-            // Appel initial pour afficher les champs si besoin
-            toggleClientFields();
+            toggleClientFieldsAndValidation();
         });
     </script>
-
 {% endblock %}

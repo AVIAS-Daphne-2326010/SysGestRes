@@ -50,6 +50,7 @@ class UserAccountType extends AbstractType
                 'choice_label' => 'name',
                 'label' => 'Rôle',
                 'placeholder' => 'Sélectionnez un rôle',
+                'disabled' => $options['is_edit'],
             ])
             ->add('client', ClientType::class, [
                 'required' => false,
