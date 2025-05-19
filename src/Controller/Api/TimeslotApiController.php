@@ -37,8 +37,7 @@ class TimeslotApiController extends AbstractController
         }
 
         $timeslots = $entityManager->getRepository(Timeslot::class)->createQueryBuilder('t')
-            ->where('t.isAvailable = true')
-            ->andWhere('t.resource IN (:resources)')
+            ->where('t.resource IN (:resources)')
             ->setParameter('resources', $resourceIds)
             ->getQuery()
             ->getResult();
@@ -48,10 +47,14 @@ class TimeslotApiController extends AbstractController
         foreach ($timeslots as $timeslot) {
             $data[] = [
                 'id' => $timeslot->getId(),
-                'title' => 'Créneau disponible',
+                'title' => $timeslot->isAvailable() ? 'Disponible' : 'Réservé',
                 'start' => $timeslot->getStartDatetime()->format('Y-m-d\TH:i:s'),
                 'end' => $timeslot->getEndDatetime()->format('Y-m-d\TH:i:s'),
-                'color' => 'green'
+                'color' => $timeslot->isAvailable() ? '#28a745' : '#dc3545',
+                'extendedProps' => [
+                    'resource' => $timeslot->getResource()->getName(),
+                    'isAvailable' => $timeslot->isAvailable()
+                ]
             ];
         }
 

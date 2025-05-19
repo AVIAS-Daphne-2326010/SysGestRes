@@ -19,6 +19,7 @@
             flex: 1;
         }
     </style>
+    {% block stylesheets %}{% endblock %}
 </head>
 
 <body>
@@ -32,5 +33,7 @@
     </main>
 
     {% include 'partials/_footer.html.twig' with { resourceTypes: resourceTypes|default([]) } %}
+
+    {% block javascripts %}{% endblock %}
 </body>
 </html>
