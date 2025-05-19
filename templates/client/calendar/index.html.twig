@@ -4,30 +4,11 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <!-- FullCalendar CSS from CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/main.min.css" rel="stylesheet">
-    
     <style>
         #calendar {
             max-width: 1100px;
             margin: 40px auto;
             height: 700px;
-        }
-        
-        .fc-event {
-            cursor: pointer;
-            padding: 3px;
-            font-size: 0.85em;
-        }
-        
-        .fc-event-available {
-            border-color: #28a745;
-            background-color: #28a745;
-        }
-        
-        .fc-event-reserved {
-            border-color: #dc3545;
-            background-color: #dc3545;
         }
     </style>
 {% endblock %}
@@ -39,74 +20,42 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <!-- FullCalendar JS from CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/main.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/locales/fr.global.min.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Initialisation du calendrier...');
-            
+        document.addEventListener('DOMContentLoaded', function () {
             const calendarEl = document.getElementById('calendar');
-            if (!calendarEl) {
-                console.error('Element #calendar non trouvé');
+
+            if (typeof FullCalendar === 'undefined') {
+                console.error('❌ FullCalendar non chargé');
+                calendarEl.innerHTML = '<p>Erreur : FullCalendar ne s\'est pas chargé.</p>';
                 return;
             }
 
-            try {
-                // Vérifiez que FullCalendar est bien chargé
-                if (typeof FullCalendar === 'undefined' && typeof FullCalendar !== 'object') {
-                    throw new Error('FullCalendar non chargé');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'fr',
+                timeZone: 'Europe/Paris',
+                firstDay: 1,
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: '/api/timeslots',
+                eventClick: function(info) {
+                    const event = info.event;
+                    const props = event.extendedProps;
+                    alert(
+                        `Ressource: ${props.resource ?? 'Inconnu'}\n` +
+                        `Statut: ${props.isAvailable ? 'Disponible' : 'Réservé'}\n` +
+                        `Début: ${event.start?.toLocaleString()}\n` +
+                        `Fin: ${event.end?.toLocaleString()}`
+                    );
                 }
-                
-                const calendar = new FullCalendar.Calendar(calendarEl, {
-                    initialView: 'dayGridMonth',
-                    locale: 'fr',
-                    timeZone: 'Europe/Paris',
-                    firstDay: 1,
-                    headerToolbar: {
-                        left: 'prev,next today',
-                        center: 'title',
-                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                    },
-                    buttonText: {
-                        today: "Aujourd'hui",
-                        month: 'Mois',
-                        week: 'Semaine',
-                        day: 'Jour'
-                    },
-                    events: '/api/timeslots',
-                    eventClick: function(info) {
-                        const event = info.event;
-                        const resource = event.extendedProps.resource || 'Non spécifié';
-                        const status = event.extendedProps.isAvailable ? 'Disponible' : 'Réservé';
-                        
-                        alert(
-                            `Ressource: ${resource}\n` +
-                            `Statut: ${status}\n` +
-                            `Début: ${event.start?.toLocaleString() || 'Non défini'}\n` +
-                            `Fin: ${event.end?.toLocaleString() || 'Non défini'}`
-                        );
-                    },
-                    loading: function(isLoading) {
-                        if (isLoading) {
-                            calendarEl.innerHTML = '<p>Chargement en cours...</p>';
-                        }
-                    }
-                });
-                
-                calendar.render();
-                console.log('Calendrier initialisé avec succès');
-                
-            } catch (error) {
-                console.error('Erreur FullCalendar:', error);
-                calendarEl.innerHTML = `
-                    <div class="alert alert-danger">
-                        Erreur lors du chargement du calendrier. Rechargez la page.
-                        <br>Détails: ${error.message}
-                    </div>
-                `;
-            }
+            });
+
+            calendar.render();
+            console.log('✅ Calendrier initialisé');
         });
     </script>
 {% endblock %}
