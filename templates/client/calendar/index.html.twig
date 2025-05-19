@@ -1,8 +1,44 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mon calendrier{% endblock %}
+{% block title %}Calendrier Client{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/main.min.css" rel="stylesheet" />
+
+    <style>
+    #calendar {
+        max-width: 900px;
+        margin: 40px auto;
+        height: 600px;
+    }
+    </style>
+
+{% endblock %}
 
 {% block body %}
-    <h1>Mon calendrier (à venir)</h1>
-    <p>Ici apparaîtra le calendrier interactif avec les créneaux du client.</p>
+    <h1>Mon calendrier de réservations</h1>
+    <div id="calendar"></div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/main.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const calendarEl = document.getElementById('calendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'fr',
+                timeZone: 'local',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: '/api/timeslots' 
+            });
+            calendar.render();
+        });
+    </script>
 {% endblock %}

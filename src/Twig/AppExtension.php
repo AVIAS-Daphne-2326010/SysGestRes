@@ -35,15 +35,13 @@ class AppExtension extends AbstractExtension
     {
         if (!$phone) return '';
 
-        // Supprime tous les caractères non numériques
         $digits = preg_replace('/\D/', '', $phone);
 
-        // Si le numéro a 10 chiffres (standard FR), ajoute les espaces
         if (strlen($digits) === 10) {
             return implode(' ', str_split($digits, 2));
         }
 
-        return $phone; // retour brut si non conforme
+        return $phone; 
     }
 
     public function getResourceTypes(): array

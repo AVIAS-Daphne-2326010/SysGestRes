@@ -26,7 +26,6 @@ class ClientTimeslotController extends AbstractController
             throw $this->createAccessDeniedException('Utilisateur non connecté.');
         }
 
-        // Vérifier que la ressource appartient bien au client connecté
         $client = $em->getRepository(Client::class)->findOneBy(['userAccount' => $user]);
         if (!$client || $resource->getClient()->getId() !== $client->getId()) {
             throw $this->createAccessDeniedException('Accès refusé à cette ressource.');
@@ -64,7 +63,6 @@ class ClientTimeslotController extends AbstractController
             $em->persist($timeslot);
             $em->flush();
 
-            // Log création
             $log = new BookingHistory();
             $log->setStatus('Création de créneau')
                 ->setChangedAt(new \DateTime())
@@ -111,7 +109,6 @@ class ClientTimeslotController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
 
-            // Log modification
             $log = new BookingHistory();
             $log->setStatus('Modification de créneau')
                 ->setChangedAt(new \DateTime())
@@ -142,29 +139,30 @@ class ClientTimeslotController extends AbstractController
         #[MapEntity(id: 'timeslot_id')] Timeslot $timeslot,
         EntityManagerInterface $em
     ): Response {
-        $user = $this->getUser();
-        if (!$user instanceof UserAccount) {
-            throw $this->createAccessDeniedException('Utilisateur non connecté.');
-        }
-
-        $client = $em->getRepository(Client::class)->findOneBy(['userAccount' => $user]);
-        if (!$client || $resource->getClient()->getId() !== $client->getId()) {
-            throw $this->createAccessDeniedException('Accès refusé à ce créneau.');
-        }
-
         if ($this->isCsrfTokenValid('delete' . $timeslot->getId(), $request->request->get('_token'))) {
-            // Log suppression
+            /** @var UserAccount $user */
+            $user = $this->getUser();
+
+            // 1. D'abord logger la suppression (sans référence au timeslot)
             $log = new BookingHistory();
             $log->setStatus('Suppression de créneau')
                 ->setChangedAt(new \DateTime())
                 ->setChangedBy($user->getUsername())
                 ->setUserAccount($user)
-                ->setResource($resource)
-                ->setTimeslot($timeslot);
-
+                ->setResource($resource);
+                // Ne pas setTimeslot() ici
+            
             $em->persist($log);
-            $em->flush();
+            
+            // 2. Supprimer tous les logs existants qui référencent ce créneau
+            $logs = $em->getRepository(BookingHistory::class)->findBy(['timeslot' => $timeslot]);
+            foreach ($logs as $log) {
+                $em->remove($log);
+            }
+            
+            $em->flush(); // Exécute les suppressions et l'insertion du nouveau log
 
+            // 3. Maintenant supprimer le créneau
             $em->remove($timeslot);
             $em->flush();
 
@@ -175,4 +173,5 @@ class ClientTimeslotController extends AbstractController
 
         return $this->redirectToRoute('client_timeslot_index', ['resource' => $resource->getId()]);
     }
+
 }

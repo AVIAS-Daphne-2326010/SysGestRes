@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier créneau - {{ resource.name }}{% endblock %}
+{% block title %}Nouveau créneau - {{ resource.name }}{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -51,7 +51,7 @@
 
 {% block body %}
 <div class="container mt-4">
-    <h1 class="mb-4">Modifier le créneau #{{ timeslot.id }}</h1>
+    <h1 class="mb-4">Ajouter un créneau pour {{ resource.name }}</h1>
 
     {{ form_start(form) }}
         <div class="row mb-3">
@@ -84,22 +84,13 @@
         </div>
 
         <div class="d-flex gap-2 mt-4">
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save me-1"></i> Mettre à jour
+            <button type="submit" class="btn btn-success">
+                <i class="fas fa-save me-1"></i> Enregistrer
             </button>
-            <a href="{{ path('admin_timeslot_index', {resource: resource.id}) }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left me-1"></i> Retour
+            <a href="{{ path('client_timeslot_index', {resource: resource.id}) }}" class="btn btn-secondary">
+                <i class="fas fa-times me-1"></i> Annuler
             </a>
         </div>
-
-        {% for field in form %}
-            {% if field is not same as(form.start_datetime)
-                and field is not same as(form.end_datetime)
-                and field is not same as(form.is_available) %}
-                {{ form_row(field) }}
-            {% endif %}
-        {% endfor %}
-
-    {{ form_end(form, {'render_rest': false}) }}
+    {{ form_end(form) }}
 </div>
 {% endblock %}

@@ -1,0 +1,146 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créneaux - {{ resource.name }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1 class="my-4">Créneaux pour la ressource : {{ resource.name }}</h1>
+
+    <div class="mb-4">
+        <a href="{{ path('client_timeslot_new', { 'resource': resource.id }) }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> + Ajouter un créneau
+        </a>
+    </div>
+
+    {% if timeslots is empty %}
+        <div class="alert alert-info">
+            Aucun créneau disponible pour cette ressource.
+        </div>
+    {% else %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="timeslots-table">
+                <thead class="thead-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Début</th>
+                        <th>Fin</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for timeslot in timeslots %}
+                        <tr id="timeslot-{{ timeslot.id }}">
+                            <td>{{ timeslot.id }}</td>
+                            <td>{{ timeslot.startDatetime|date('d/m/Y H:i') }}</td>
+                            <td>{{ timeslot.endDatetime|date('d/m/Y H:i') }}</td>
+                            <td>
+                                {% if timeslot.isAvailable %}
+                                    <span class="badge bg-success">Disponible</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Indisponible</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="{{ path('client_timeslot_edit', {
+                                        'resource': resource.id,
+                                        'timeslot_id': timeslot.id
+                                    }) }}" class="btn btn-warning me-2" title="Modifier">
+                                        <i class="fas fa-edit"></i> <span class="d-none d-md-inline">Modifier</span>
+                                    </a>
+
+                                    <form method="post" action="{{ path('client_timeslot_delete', {
+                                        'resource': resource.id,
+                                        'timeslot_id': timeslot.id
+                                    }) }}" class="d-inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ timeslot.id) }}">
+                                        <button type="submit" class="btn btn-danger delete-timeslot" 
+                                            data-timeslot-id="{{ timeslot.id }}" 
+                                            data-resource-id="{{ resource.id }}"
+                                            title="Supprimer">
+                                            <i class="fas fa-trash-alt"></i> <span class="d-none d-md-inline">Supprimer</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+    <div class="mb-4">
+        <a href="{{ path('client_resources') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour aux ressources
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.delete-timeslot').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const timeslotId = this.getAttribute('data-timeslot-id');
+                    const resourceId = this.getAttribute('data-resource-id');
+                    const form = this.closest('form');
+
+                    Swal.fire({
+                        title: 'Êtes-vous sûr ?',
+                        text: "Cette action est irréversible !",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Oui, supprimer !',
+                        cancelButtonText: 'Annuler'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(form.action, {
+                                method: 'POST',
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: new URLSearchParams(new FormData(form))
+                            })
+                            .then(response => {
+                                if (response.ok) {
+                                    Swal.fire(
+                                        'Supprimé !',
+                                        'Le créneau a été supprimé.',
+                                        'success'
+                                    );
+                                    document.querySelector(`#timeslot-${timeslotId}`).remove();
+                                } else {
+                                    Swal.fire(
+                                        'Erreur !',
+                                        'La suppression a échoué.',
+                                        'error'
+                                    );
+                                }
+                            })
+                            .catch(() => {
+                                Swal.fire(
+                                    'Erreur !',
+                                    'Une erreur est survenue.',
+                                    'error'
+                                );
+                            });
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+{% endblock %}

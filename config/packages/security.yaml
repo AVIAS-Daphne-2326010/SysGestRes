@@ -45,6 +45,7 @@ security:
         - { path: ^/user, roles: ROLE_USER }
         - { path: ^/client, roles: ROLE_CLIENT }
         - { path: ^/dashboard, roles: ROLE_USER}
+        - { path: ^/api/bookings, roles: [ROLE_USER, ROLE_CLIENT] }
 
 when@test:
     security:
