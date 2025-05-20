@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier Réservation{% endblock %}
+
+{% block body %}
+<h1 class="mb-4">Modifier le commentaire</h1>
+
+{{ form_start(form) }}
+    {{ form_row(form.comment) }}
+    <div class="d-flex gap-2 mt-3">
+        <button class="btn btn-primary">Enregistrer</button>
+        <a href="{{ path('client_bookings') }}" class="btn btn-secondary">Annuler</a>
+    </div>
+{{ form_end(form) }}
+{% endblock %}

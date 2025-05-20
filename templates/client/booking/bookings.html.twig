@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Réservations{% endblock %}
+
+{% block body %}
+<h1 class="mb-4">Réservations sur mes ressources</h1>
+
+{% if bookings is empty %}
+    <p>Aucune réservation trouvée.</p>
+{% else %}
+    <div class="d-flex flex-column gap-3">
+        {% for booking in bookings %}
+            <div class="card shadow-sm p-3">
+                <div class="row align-items-center">
+                    <div class="col-md">
+                        <strong>ID :</strong> {{ booking.id }}
+                    </div>
+                    <div class="col-md">
+                        <strong>Utilisateur :</strong> {{ booking.userAccount.firstName }} {{ booking.userAccount.lastName }}
+                    </div>
+                    <div class="col-md">
+                        <strong>Créneau :</strong> {{ booking.timeslot.startDatetime|date('d/m/Y') }}
+                    </div>
+                    <div class="col-md">
+                        <strong>Ressource :</strong> {{ booking.timeslot.resource.name }}
+                    </div>
+                    <div class="col-md">
+                        <strong>Début / Fin :</strong>
+                        {{ booking.timeslot.startDatetime|date('H:i') }} - {{ booking.timeslot.endDatetime|date('H:i') }}
+                    </div>
+                    <div class="col-md">
+                        <strong>Commentaire :</strong> {{ booking.comment ?: '—' }}
+                    </div>
+                    <div class="col-md">
+                        <strong>Statut :</strong>
+                        {% if booking.status == 'cancelled' %}
+                            <span class="badge bg-secondary">Annulée</span>
+                        {% else %}
+                            <span class="badge bg-success">Confirmée</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-auto d-flex gap-2">
+                        <a href="{{ path('booking_edit', { id: booking.id }) }}" class="btn btn-sm btn-outline-primary">Modifier</a>
+                        <form method="post" action="{{ path('booking_delete', { id: booking.id }) }}" onsubmit="return confirm('Confirmer la suppression ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ booking.id) }}">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}
