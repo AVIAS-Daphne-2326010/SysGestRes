@@ -40,12 +40,39 @@
                                 {% endif %}
                             </p>
                         </div>
-                        <!-- Partie droite : bouton -->
-                        <div>
+
+                        <!-- Partie droite : boutons côte à côte -->
+                        <div class="d-flex gap-2 align-items-center">
                             {% if booking.status != 'cancelled' %}
-                                <form method="post" action="{{ path('user_booking_cancel', {id: booking.id}) }}" onsubmit="return confirm('Annuler cette réservation ?');">
+                                <form method="post" action="{{ path('user_booking_cancel', {id: booking.id}) }}" onsubmit="return confirm('Annuler cette réservation ?');" style="margin-bottom: 0;">
                                     <button type="submit" class="btn btn-outline-danger btn-sm">Annuler</button>
                                 </form>
+
+                                <!-- Bouton pour ouvrir la modal -->
+                                <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editCommentModal-{{ booking.id }}">
+                                    Modifier le commentaire
+                                </button>
+
+                                <!-- Modal Bootstrap -->
+                                <div class="modal fade" id="editCommentModal-{{ booking.id }}" tabindex="-1" aria-labelledby="editCommentModalLabel-{{ booking.id }}" aria-hidden="true">
+                                  <div class="modal-dialog">
+                                    <div class="modal-content">
+                                      <form method="post" action="{{ path('user_booking_edit_comment', {id: booking.id}) }}">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="editCommentModalLabel-{{ booking.id }}">Modifier le commentaire</h5>
+                                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                          <textarea name="comment" rows="4" class="form-control" required>{{ booking.comment }}</textarea>
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                          <button type="submit" class="btn btn-success">Enregistrer</button>
+                                        </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
                             {% else %}
                                 <span class="text-muted small">Déjà annulée</span>
                             {% endif %}

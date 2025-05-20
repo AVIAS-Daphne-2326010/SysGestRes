@@ -144,4 +144,31 @@ class UserController extends AbstractController
         $this->addFlash('success', 'Réservation annulée.');
         return $this->redirectToRoute('user_bookings');
     }
+
+    #[Route('/user/booking/{id}/edit-comment', name: 'user_booking_edit_comment', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function editBookingComment(int $id, Request $request, EntityManagerInterface $entityManager): RedirectResponse
+    {
+        /** @var UserAccount $user */
+        $user = $this->getUser();
+        $booking = $entityManager->getRepository(Booking::class)->find($id);
+
+        if (!$booking || $booking->getUserAccount() !== $user) {
+            $this->addFlash('danger', 'Réservation introuvable ou non autorisée.');
+            return $this->redirectToRoute('user_bookings');
+        }
+
+        $newComment = $request->request->get('comment', '');
+
+        if (empty(trim($newComment))) {
+            $this->addFlash('danger', 'Le commentaire ne peut pas être vide.');
+            return $this->redirectToRoute('user_bookings');
+        }
+
+        $booking->setComment($newComment);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Commentaire modifié avec succès.');
+        return $this->redirectToRoute('user_bookings');
+    }
 }
