@@ -40,12 +40,14 @@
                         {% endif %}
                     </div>
                     <div class="col-md-auto d-flex gap-2">
-                        <a href="{{ path('booking_edit', { id: booking.id }) }}" class="btn btn-sm btn-outline-primary">Modifier</a>
-                        <form method="post" action="{{ path('booking_delete', { id: booking.id }) }}" onsubmit="return confirm('Confirmer la suppression ?');">
-                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ booking.id) }}">
-                            <input type="hidden" name="_method" value="DELETE">
-                            <button class="btn btn-sm btn-outline-danger">Supprimer</button>
-                        </form>
+                        {% if booking.status != 'cancelled' %}
+                            <a href="{{ path('booking_edit', { id: booking.id }) }}" class="btn btn-sm btn-outline-primary">Modifier</a>
+                            <form method="post" action="{{ path('booking_delete', { id: booking.id }) }}" onsubmit="return confirm('Confirmer la suppression ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ booking.id) }}">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                            </form>
+                        {% endif %}
                     </div>
                 </div>
             </div>
