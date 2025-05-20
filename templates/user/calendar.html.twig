@@ -1,6 +1,41 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+{% endblock %}
+
 {% block body %}
+<div class="container">
     <h1>Mon Calendrier</h1>
-    <p>Visualisez les créneaux disponibles pour effectuer une réservation.</p>
+    <p>Visualisez vos réservations passées ou à venir.</p>
+
+    <div id="calendar" style="max-width: 100%; margin: 0 auto;"></div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const calendarEl = document.getElementById('calendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'fr',
+                height: 'auto',
+                contentHeight: 'auto',
+                aspectRatio: 1.35,
+                events: [
+                    {% for booking in bookings %}
+                        {
+                            title: "{{ booking.timeslot.resource.name|e('js') }}",
+                            start: "{{ booking.timeslot.startDatetime|date('Y-m-d\\TH:i:s') }}",
+                            end: "{{ booking.timeslot.endDatetime|date('Y-m-d\\TH:i:s') }}",
+                            color: "{{ booking.status == 'cancelled' ? '#d3d3d3' : '#5bc0de' }}"
+                        }{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ]
+            });
+            calendar.render();
+        });
+    </script>
 {% endblock %}

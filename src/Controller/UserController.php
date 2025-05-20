@@ -5,12 +5,15 @@ namespace App\Controller;
 use App\Entity\UserAccount;
 use App\Entity\Resource;
 use App\Form\UserAccountType;
+use App\Entity\Booking;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class UserController extends AbstractController
 {
@@ -86,16 +89,59 @@ class UserController extends AbstractController
         ]);
     }
 
-
     #[Route('/user/calendar', name: 'user_calendar')]
-    public function calendar(): Response
+    public function calendar(EntityManagerInterface $entityManager): Response
     {
-        return $this->render('user/calendar.html.twig');
+        /** @var UserAccount $user */
+        $user = $this->getUser();
+
+        $bookings = $entityManager->getRepository(Booking::class)->findBy(
+            ['userAccount' => $user],
+            ['createdAt' => 'DESC']
+        );
+
+        return $this->render('user/calendar.html.twig', [
+            'bookings' => $bookings,
+        ]);
     }
 
     #[Route('/user/bookings', name: 'user_bookings')]
-    public function bookings(): Response
+    #[IsGranted('ROLE_USER')]
+    public function bookings(EntityManagerInterface $entityManager): Response
     {
-        return $this->render('user/bookings.html.twig');
+        /** @var UserAccount $user */
+        $user = $this->getUser();
+
+        $bookings = $entityManager->getRepository(Booking::class)->findBy(
+            ['userAccount' => $user],
+            ['createdAt' => 'DESC']
+        );
+
+        return $this->render('user/booking/bookings.html.twig', [
+            'bookings' => $bookings,
+        ]);
+    }
+
+    #[Route('/user/booking/{id}/cancel', name: 'user_booking_cancel', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function cancelBooking(int $id, EntityManagerInterface $entityManager): RedirectResponse
+    {
+        /** @var UserAccount $user */
+        $user = $this->getUser();
+        $booking = $entityManager->getRepository(Booking::class)->find($id);
+
+        if (!$booking || $booking->getUserAccount() !== $user) {
+            $this->addFlash('danger', 'Réservation introuvable ou non autorisée.');
+            return $this->redirectToRoute('user_bookings');
+        }
+
+        $booking->setStatus('cancelled');
+        $booking->setCancelledAt(new \DateTime());
+        $booking->getTimeslot()->setIsAvailable(true);
+
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Réservation annulée.');
+        return $this->redirectToRoute('user_bookings');
     }
 }

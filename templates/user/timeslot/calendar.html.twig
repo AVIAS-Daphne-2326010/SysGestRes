@@ -34,6 +34,8 @@
                 return;
             }
 
+            const csrfToken = '{{ csrf_token("create_booking") }}';
+
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 locale: 'fr',
@@ -46,7 +48,7 @@
                 },
                 events: {
                     url: '/api/timeslots',
-                    method: 'GET',  
+                    method: 'GET',
                     extraParams: {
                         resourceId: {{ resource.id|e('js') }}
                     },
@@ -57,12 +59,40 @@
                 eventClick: function(info) {
                     const event = info.event;
                     const props = event.extendedProps;
-                    alert(
-                        `Ressource: ${props.resource ?? 'Inconnu'}\n` +
-                        `Statut: ${props.isAvailable ? 'Disponible' : 'Réservé'}\n` +
-                        `Début: ${event.start?.toLocaleString()}\n` +
-                        `Fin: ${event.end?.toLocaleString()}`
-                    );
+
+                    if (!props.isAvailable) {
+                        alert('Ce créneau est déjà réservé.');
+                        return;
+                    }
+
+                    if (confirm(`Voulez-vous réserver ce créneau ?\nDébut: ${event.start.toLocaleString()}\nFin: ${event.end.toLocaleString()}`)) {
+                        fetch('/api/bookings', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            body: new URLSearchParams({
+                                timeslotId: event.id
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert(data.message);
+                                // Mise à jour visuelle du créneau
+                                event.setProp('title', 'Réservé');
+                                event.setProp('color', '#dc3545');
+                                event.setExtendedProp('isAvailable', false);
+                            } else {
+                                alert('Erreur: ' + (data.error || 'Impossible de créer la réservation.'));
+                            }
+                        })
+                        .catch(() => {
+                            alert('Erreur réseau lors de la réservation.');
+                        });
+                    }
                 }
             });
 
