@@ -4,16 +4,18 @@ namespace App\Controller\Api;
 
 use App\Entity\Booking;
 use App\Entity\Timeslot;
+use App\Entity\UserAccount;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/bookings')]
 class BookingApiController extends AbstractController
 {
+    // Liste des réservations sous forme d'événements pour FullCalendar
     #[Route('', name: 'api_bookings_list', methods: ['GET'])]
     public function list(EntityManagerInterface $entityManager): JsonResponse
     {
@@ -37,8 +39,10 @@ class BookingApiController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function create(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
+        /** @var UserAccount $user */
         $user = $this->getUser();
         $timeslotId = $request->request->get('timeslotId');
+        $comment = $request->request->get('comment'); // ← Ajout ici
 
         if (!$timeslotId) {
             return new JsonResponse(['error' => 'ID du créneau manquant'], 400);
@@ -60,6 +64,7 @@ class BookingApiController extends AbstractController
         $booking->setTimeslot($timeslot);
         $booking->setCreatedAt(new \DateTime());
         $booking->setStatus('confirmed');
+        $booking->setComment($comment); // ← Et ici
 
         // Mettre le créneau en indisponible
         $timeslot->setIsAvailable(false);
@@ -73,4 +78,5 @@ class BookingApiController extends AbstractController
             'bookingId' => $booking->getId(),
         ]);
     }
+
 }

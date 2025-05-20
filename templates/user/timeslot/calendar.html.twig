@@ -19,6 +19,30 @@
         <h2>Créneaux pour la ressource : {{ resource.name }}</h2>
         <div id="calendar"></div>
     </div>
+
+    <!-- Modal de réservation -->
+    <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <form id="bookingForm" class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="bookingModalLabel">Confirmer la réservation</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+          </div>
+          <div class="modal-body">
+            <p><strong>Début :</strong> <span id="startTime"></span></p>
+            <p><strong>Fin :</strong> <span id="endTime"></span></p>
+            <div class="mb-3">
+              <label for="comment" class="form-label">Commentaire (optionnel)</label>
+              <textarea id="comment" name="comment" class="form-control" rows="3" placeholder="Ajouter un commentaire..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" class="btn btn-primary">Réserver</button>
+          </div>
+        </form>
+      </div>
+    </div>
 {% endblock %}
 
 {% block javascripts %}
@@ -65,38 +89,56 @@
                         return;
                     }
 
-                    if (confirm(`Voulez-vous réserver ce créneau ?\nDébut: ${event.start.toLocaleString()}\nFin: ${event.end.toLocaleString()}`)) {
-                        fetch('/api/bookings', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'X-CSRF-TOKEN': csrfToken
-                            },
-                            body: new URLSearchParams({
-                                timeslotId: event.id
-                            })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                alert(data.message);
-                                // Mise à jour visuelle du créneau
-                                event.setProp('title', 'Réservé');
-                                event.setProp('color', '#dc3545');
-                                event.setExtendedProp('isAvailable', false);
-                            } else {
-                                alert('Erreur: ' + (data.error || 'Impossible de créer la réservation.'));
-                            }
-                        })
-                        .catch(() => {
-                            alert('Erreur réseau lors de la réservation.');
-                        });
-                    }
+                    // Remplir les infos dans la modale
+                    document.getElementById('startTime').textContent = event.start.toLocaleString();
+                    document.getElementById('endTime').textContent = event.end.toLocaleString();
+                    document.getElementById('bookingForm').dataset.timeslotId = event.id;
+
+                    // Réinitialiser le commentaire
+                    document.getElementById('comment').value = '';
+
+                    // Afficher la modale Bootstrap
+                    const bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
+                    bookingModal.show();
                 }
             });
 
             calendar.render();
+
+            // Gestion de la soumission du formulaire de réservation
+            document.getElementById('bookingForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const timeslotId = this.dataset.timeslotId;
+                const comment = document.getElementById('comment').value;
+
+                fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: new URLSearchParams({
+                        timeslotId: timeslotId,
+                        comment: comment
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        calendar.refetchEvents(); // Recharge les créneaux pour afficher la mise à jour
+                    } else {
+                        alert('Erreur: ' + (data.error || 'Impossible de créer la réservation.'));
+                    }
+                    bootstrap.Modal.getInstance(document.getElementById('bookingModal')).hide();
+                })
+                .catch(() => {
+                    alert('Erreur réseau lors de la réservation.');
+                });
+            });
+
             console.log('✅ Calendrier initialisé pour la ressource {{ resource.name }}');
         });
     </script>

@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Mon Site{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
         html, body {
             height: 100%;
@@ -18,7 +23,9 @@
             flex: 1;
         }
     </style>
+
     {% block stylesheets %}
+        <!-- FullCalendar CSS -->
         <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.css" rel="stylesheet">
     {% endblock %}
 </head>
@@ -30,13 +37,18 @@
         {% for message in app.flashes('error') %}
             <div class="alert alert-danger">{{ message }}</div>
         {% endfor %}
+        
         {% block body %}{% endblock %}
     </main>
 
     {% include 'partials/_footer.html.twig' with { resourceTypes: resourceTypes|default([]) } %}
 
     {% block javascripts %}
+        <!-- FullCalendar JS -->
         <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
+
+        <!-- Bootstrap Bundle JS (avec Popper) -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     {% endblock %}
 </body>
 </html>

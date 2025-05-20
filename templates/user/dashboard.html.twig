@@ -6,7 +6,7 @@
 
     {% if nextBooking %}
         <p>Votre prochaine réservation :
-            {{ nextBooking.timeslot.resource.address }}
+            {{ nextBooking.timeslot.resource.location }}
             -
             {{ nextBooking.timeslot.startDatetime|date('d/m/Y H:i') }}
         </p>

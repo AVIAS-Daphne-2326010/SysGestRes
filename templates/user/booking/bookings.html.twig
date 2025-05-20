@@ -26,6 +26,11 @@
                             <p class="mb-1"><strong>Nom de la ressource :</strong><br>{{ booking.timeslot.resource.name }}</p>
                             <p class="mb-1"><strong>Organisation :</strong><br>{{ booking.timeslot.resource.client.organizationName }}</p>
                             <p class="mb-1"><strong>Adresse :</strong><br>{{ booking.timeslot.resource.location }}</p>
+
+                            {% if booking.comment is not empty %}
+                                <p class="mb-1"><strong>Commentaire :</strong><br>{{ booking.comment }}</p>
+                            {% endif %}
+
                             <p class="mb-0">
                                 <strong>Statut :</strong>
                                 {% if booking.status == 'cancelled' %}
