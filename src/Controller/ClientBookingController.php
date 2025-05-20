@@ -80,11 +80,17 @@ class ClientBookingController extends AbstractController
         }
 
         if ($this->isCsrfTokenValid('delete' . $booking->getId(), $request->request->get('_token'))) {
+            // Rendre le créneau disponible avant suppression
+            $timeslot = $booking->getTimeslot();
+            $timeslot->setIsAvailable(true);
+
             $em->remove($booking);
             $em->flush();
-            $this->addFlash('success', 'Réservation supprimée.');
+
+            $this->addFlash('success', 'Réservation supprimée et créneau libéré.');
         }
 
         return $this->redirectToRoute('client_bookings');
     }
+
 }
