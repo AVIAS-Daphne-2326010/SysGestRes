@@ -1,0 +1,32 @@
+{# templates/user/ressource/show.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Ressources : {{ type }}{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Ressources de type "{{ type }}"</h1>
+
+        {% if resources is empty %}
+            <p>Aucune ressource disponible pour ce type.</p>
+        {% else %}
+            <div class="row">
+                {% for resource in resources %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ resource.name }}</h5>
+                                <p class="card-text"><strong>Description :</strong> {{ resource.description }}</p>
+                                <p class="card-text"><strong>Lieu :</strong> {{ resource.location }}</p>
+                                <p class="card-text"><strong>Capacité :</strong> {{ resource.capacity }}</p>
+                                <a href="{{ path('user_resource_calendar', { id: resource.id }) }}" class="btn btn-primary mt-2">Voir les créneaux disponibles</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <a href="{{ path('user_resources') }}" class="btn btn-secondary mt-4">← Retour aux types</a>
+    </div>
+{% endblock %}

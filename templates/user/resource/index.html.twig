@@ -1,0 +1,30 @@
+{# templates/user/resource/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Type de Ressources{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Les types de ressources</h1>
+        <p>Voici les types de ressources disponibles :</p>
+
+        {% if types is empty %}
+            <p>Aucun type de ressource disponible.</p>
+        {% else %}
+            <div class="row">
+                {% for type in types %}
+                    <div class="col-md-4 mb-4">
+                        <a href="{{ path('user_resources_by_type', {type: type}) }}" class="text-decoration-none text-dark">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title text-capitalize">{{ type }}</h5>
+                                    <p class="card-text">Voir les ressources de type <strong>{{ type }}</strong>.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

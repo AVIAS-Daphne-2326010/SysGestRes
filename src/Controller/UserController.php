@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\UserAccount;
+use App\Entity\Resource;
 use App\Form\UserAccountType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,7 +30,6 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Si un mot de passe est soumis, le mettre à jour
             $plainPassword = $form->get('password')->getData();
             if (!empty($plainPassword)) {
                 $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
@@ -49,10 +49,43 @@ class UserController extends AbstractController
     }
 
     #[Route('/user/resources', name: 'user_resources')]
-    public function resources(): Response
+    public function resources(EntityManagerInterface $entityManager): Response
     {
-        return $this->render('user/resources.html.twig');
+        // Requête DQL pour obtenir les types distincts
+        $types = $entityManager->createQuery(
+            'SELECT DISTINCT r.type FROM App\Entity\Resource r'
+        )->getSingleColumnResult();
+
+        return $this->render('user/resource/index.html.twig', [
+            'types' => $types,
+        ]);
     }
+
+    #[Route('/user/resources/{type}', name: 'user_resources_by_type')]
+    public function resourcesByType(string $type, EntityManagerInterface $entityManager): Response
+    {
+        $resources = $entityManager->getRepository(Resource::class)->findBy(['type' => $type]);
+
+        return $this->render('user/resource/show.html.twig', [
+            'type' => $type,
+            'resources' => $resources,
+        ]);
+    }
+
+    #[Route('/user/resource/{id}/calendar', name: 'user_resource_calendar')]
+    public function resourceCalendar(int $id, EntityManagerInterface $entityManager): Response
+    {
+        $resource = $entityManager->getRepository(Resource::class)->find($id);
+
+        if (!$resource) {
+            throw $this->createNotFoundException('Ressource non trouvée');
+        }
+
+        return $this->render('user/timeslot/calendar.html.twig', [
+            'resource' => $resource,
+        ]);
+    }
+
 
     #[Route('/user/calendar', name: 'user_calendar')]
     public function calendar(): Response

@@ -8,39 +8,53 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 #[Route('/api/timeslots')]
 class TimeslotApiController extends AbstractController
 {
     #[Route('', name: 'api_timeslots_list', methods: ['GET'])]
-    public function list(EntityManagerInterface $entityManager): JsonResponse
+    public function list(EntityManagerInterface $entityManager, Request $request): JsonResponse
     {
         $user = $this->getUser();
+        $resourceId = $request->query->get('resourceId');
 
-        $client = $entityManager->getRepository(Client::class)->findOneBy([
-            'userAccount' => $user
-        ]);
-
-        if (!$client) {
-            return $this->json(['error' => 'Client non trouvé'], 404);
+        $client = null;
+        if ($user) {
+            $client = $entityManager->getRepository(Client::class)->findOneBy([
+                'userAccount' => $user
+            ]);
         }
 
-        $resources = $client->getResources(); 
-        $resourceIds = [];
-
-        foreach ($resources as $resource) {
-            $resourceIds[] = $resource->getId();
+        if (!$client && !$resourceId) {
+            return $this->json(['error' => 'Client non trouvé et aucun resourceId fourni'], 404);
         }
 
-        if (empty($resourceIds)) {
-            return $this->json([]);
+        $qb = $entityManager->getRepository(Timeslot::class)->createQueryBuilder('t')
+            ->innerJoin('t.resource', 'r');
+
+        if ($resourceId) {
+            $qb->andWhere('r.id = :resourceId')
+               ->setParameter('resourceId', $resourceId);
+        } elseif ($client) {
+            $resources = $client->getResources();
+            $resourceIds = [];
+
+            foreach ($resources as $resource) {
+                $resourceIds[] = $resource->getId();
+            }
+
+            if (empty($resourceIds)) {
+                return $this->json([]);
+            }
+
+            $qb->andWhere('r.id IN (:resourceIds)')
+               ->setParameter('resourceIds', $resourceIds);
+        } else {
+            return $this->json(['error' => 'Aucune ressource accessible'], 403);
         }
 
-        $timeslots = $entityManager->getRepository(Timeslot::class)->createQueryBuilder('t')
-            ->where('t.resource IN (:resources)')
-            ->setParameter('resources', $resourceIds)
-            ->getQuery()
-            ->getResult();
+        $timeslots = $qb->getQuery()->getResult();
 
         $data = [];
 

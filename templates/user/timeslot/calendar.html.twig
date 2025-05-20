@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Calendrier - {{ resource.name }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet" />
+    <style>
+        #calendar {
+            max-width: 1100px;
+            margin: 40px auto;
+            height: 700px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h2>Créneaux pour la ressource : {{ resource.name }}</h2>
+        <div id="calendar"></div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const calendarEl = document.getElementById('calendar');
+
+            if (typeof FullCalendar === 'undefined') {
+                console.error('❌ FullCalendar non chargé');
+                calendarEl.innerHTML = '<p>Erreur : FullCalendar ne s\'est pas chargé.</p>';
+                return;
+            }
+
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'fr',
+                timeZone: 'Europe/Paris',
+                firstDay: 1,
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: {
+                    url: '/api/timeslots',
+                    method: 'GET',  
+                    extraParams: {
+                        resourceId: {{ resource.id|e('js') }}
+                    },
+                    failure: () => {
+                        alert('Erreur lors du chargement des créneaux.');
+                    }
+                },
+                eventClick: function(info) {
+                    const event = info.event;
+                    const props = event.extendedProps;
+                    alert(
+                        `Ressource: ${props.resource ?? 'Inconnu'}\n` +
+                        `Statut: ${props.isAvailable ? 'Disponible' : 'Réservé'}\n` +
+                        `Début: ${event.start?.toLocaleString()}\n` +
+                        `Fin: ${event.end?.toLocaleString()}`
+                    );
+                }
+            });
+
+            calendar.render();
+            console.log('✅ Calendrier initialisé pour la ressource {{ resource.name }}');
+        });
+    </script>
+{% endblock %}
