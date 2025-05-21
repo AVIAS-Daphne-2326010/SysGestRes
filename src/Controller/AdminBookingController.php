@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Booking;
+use App\Entity\BookingHistory;
+use App\Entity\UserAccount;
 use App\Form\BookingType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -61,6 +63,19 @@ class AdminBookingController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
 
+            /** @var UserAccount $user */
+            $user = $this->getUser();
+
+            $log = new BookingHistory();
+            $log->setStatus('Modification de réservation')
+                ->setChangedAt(new \DateTime())
+                ->setChangedBy($user->getUsername())
+                ->setUserAccount($user)
+                ->setBooking($booking);
+
+            $em->persist($log);
+            $em->flush();
+
             $this->addFlash('success', 'Réservation modifiée avec succès.');
             return $this->redirectToRoute('admin_bookings');
         }
@@ -95,6 +110,17 @@ class AdminBookingController extends AbstractController
             // Libérer le créneau
             $booking->getTimeslot()?->setIsAvailable(true);
 
+            /** @var UserAccount $user */
+            $user = $this->getUser();
+
+            $log = new BookingHistory();
+            $log->setStatus('Annulation de réservation')
+                ->setChangedAt(new \DateTime())
+                ->setChangedBy($user->getUsername())
+                ->setUserAccount($user)
+                ->setBooking($booking);
+
+            $em->persist($log);
             $em->flush();
 
             $this->addFlash('success', 'Réservation annulée et créneau libéré.');
