@@ -1,33 +1,223 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    <style>
+        .logs-columns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .logs-column {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        table.log-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        table.log-table th,
+        table.log-table td {
+            border: 1px solid #ddd;
+            padding: 6px 10px;
+            text-align: left;
+        }
+
+        table.log-table th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+
+        .log-actions form {
+            display: inline;
+        }
+
+        /* Pagination stylée et centrée */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .pagination ul {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            gap: 8px;
+        }
+
+        .pagination ul li {
+            display: inline-block;
+        }
+
+        .pagination ul li a,
+        .pagination ul li span {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 6px;
+            background-color: #d4ecff;
+            color: #000;
+            text-decoration: none;
+            font-weight: 600;
+            min-width: 32px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .pagination ul li a:hover {
+            background-color: #b7dcf9;
+            color: #000;
+            border-color: #000;
+        }
+
+        .pagination ul li.active span {
+            background-color: #a8d4f7;
+            color: #000;
+            border-color: #000;
+            cursor: default;
+        }
+
+        .pagination ul li.disabled span {
+            background-color: #e2f3ff;
+            color: #666;
+            border-color: #aaa;
+            cursor: not-allowed;
+        }
+
+        /* Bouton lien "Voir" */
+        .btn-view {
+            background-color: transparent;
+            color: #000;
+            border: 2px solid #000;
+            border-radius: 4px;
+            padding: 5px 10px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .btn-view:hover {
+            background-color: #000;
+            color: #fff;
+        }
+
+        /* Bouton "Supprimer" */
+        .btn-delete {
+            background-color: #000;
+            color: #fff;
+            border: 2px solid #000;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-delete:hover {
+            background-color: #333;
+        }
+
+        @media (max-width: 1024px) {
+            .logs-columns {
+                flex-direction: column;
+            }
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
     <h1>Liste des logs</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Status</th>
-                <th>Date de modification</th>
-                <th>Modifié par</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for log in logs %}
-                <tr>
-                    <td>{{ log.id }}</td>
-                    <td>{{ log.status }}</td>
-                    <td>{{ log.changedAt|date('d/m/Y H:i') }}</td>
-                    <td>{{ log.changedBy }}</td>
-                    <td>
-                        <a href="{{ path('admin_log_show', {'id': log.id}) }}">Voir</a>
-                        <form action="{{ path('admin_log_delete', {'id': log.id}) }}" method="POST" style="display:inline;">
-                            <input type="hidden" name="_token" value="{{ csrf_token('delete_log_' ~ log.id) }}">
-                            <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce log ?')">Supprimer</button>
-                        </form>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+    <form method="get" class="mb-3">
+        <label for="changedBy">Utilisateur :</label>
+        <input type="text" id="changedBy" name="changedBy" value="{{ changedBy }}" placeholder="Nom ou email">
+
+        <label for="changedAt">Date :</label>
+        <input type="date" id="changedAt" name="changedAt" value="{{ changedAt }}">
+
+        <button type="submit">Filtrer</button>
+        <a href="{{ path('admin_logs') }}">Réinitialiser</a>
+    </form>
+
+    {% if pagination.items is empty %}
+        <p>Aucun log trouvé.</p>
+    {% else %}
+        {% set items = pagination.items %}
+        {% set colSize = 10 %}
+        {% set firstColumnLogs = items[:colSize] %}
+        {% set secondColumnLogs = items[colSize:colSize*2] %}
+
+        <div class="logs-columns">
+            <div class="logs-column">
+                <table class="log-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Par</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in firstColumnLogs %}
+                            <tr>
+                                <td>{{ log.id }}</td>
+                                <td>{{ log.status }}</td>
+                                <td>{{ log.changedAt|date('d/m/Y H:i') }}</td>
+                                <td>{{ log.changedBy }}</td>
+                                <td class="log-actions">
+                                    <a href="{{ path('admin_log_show', {'id': log.id}) }}" class="btn-view">Voir</a>
+                                    <form action="{{ path('admin_log_delete', {'id': log.id}) }}" method="POST" onsubmit="return confirm('Supprimer ce log ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete_log_' ~ log.id) }}">
+                                        <button type="submit" class="btn-delete">Supprimer</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="logs-column">
+                <table class="log-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Par</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in secondColumnLogs %}
+                            <tr>
+                                <td>{{ log.id }}</td>
+                                <td>{{ log.status }}</td>
+                                <td>{{ log.changedAt|date('d/m/Y H:i') }}</td>
+                                <td>{{ log.changedBy }}</td>
+                                <td class="log-actions">
+                                    <a href="{{ path('admin_log_show', {'id': log.id}) }}" class="btn-view">Voir</a>
+                                    <form action="{{ path('admin_log_delete', {'id': log.id}) }}" method="POST" onsubmit="return confirm('Supprimer ce log ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete_log_' ~ log.id) }}">
+                                        <button type="submit" class="btn-delete">Supprimer</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="pagination">
+            {{ knp_pagination_render(pagination) }}
+        </div>
+    {% endif %}
 {% endblock %}

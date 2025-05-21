@@ -8,25 +8,54 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]
 #[Route('/admin/logs')]
 class AdminLogController extends AbstractController
 {
-    // Afficher la liste des logs
     #[Route('/', name: 'admin_logs', methods: ['GET'])]
-    public function index(EntityManagerInterface $em): Response
+    public function index(Request $request, EntityManagerInterface $em, PaginatorInterface $paginator): Response
     {
-        // Récupérer tous les logs de l'historique des réservations
-        $logs = $em->getRepository(BookingHistory::class)->findAll();
+        $qb = $em->getRepository(BookingHistory::class)->createQueryBuilder('l');
+
+        $changedBy = $request->query->get('changedBy');
+        $changedAt = $request->query->get('changedAt');
+
+        if ($changedBy) {
+            $qb->andWhere('l.changedBy LIKE :changedBy')
+               ->setParameter('changedBy', '%' . $changedBy . '%');
+        }
+
+        if ($changedAt) {
+            $date = \DateTime::createFromFormat('Y-m-d', $changedAt);
+            if ($date) {
+                $startOfDay = (clone $date)->setTime(0, 0, 0);
+                $endOfDay = (clone $date)->setTime(23, 59, 59);
+                $qb->andWhere('l.changedAt BETWEEN :start AND :end')
+                   ->setParameter('start', $startOfDay)
+                   ->setParameter('end', $endOfDay);
+            }
+        }
+        $qb->orderBy('l.changedAt', 'DESC');
+
+        $pagination = $paginator->paginate(
+            $qb,
+            $request->query->getInt('page', 1),
+            20,
+            [
+                'template' => 'pagination.html.twig', // <-- Utilisation de ton template personnalisé
+            ]
+        );
 
         return $this->render('admin/logs/index.html.twig', [
-            'logs' => $logs,
+            'pagination' => $pagination,
+            'changedBy' => $changedBy,
+            'changedAt' => $changedAt,
         ]);
     }
 
-    // Afficher les détails d'un log spécifique
     #[Route('/{id}', name: 'admin_log_show', methods: ['GET'])]
     public function show(int $id, EntityManagerInterface $em): Response
     {
@@ -41,7 +70,6 @@ class AdminLogController extends AbstractController
         ]);
     }
 
-    // Supprimer un log spécifique (si nécessaire)
     #[Route('/{id}/delete', name: 'admin_log_delete', methods: ['POST'])]
     public function delete(int $id, Request $request, EntityManagerInterface $em): Response
     {
@@ -57,6 +85,7 @@ class AdminLogController extends AbstractController
 
             $this->addFlash('success', 'Log supprimé avec succès');
         }
+
         return $this->redirectToRoute('admin_logs');
     }
 }
