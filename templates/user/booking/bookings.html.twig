@@ -17,65 +17,68 @@
         <div class="d-flex flex-column gap-3">
             {% for booking in bookings %}
                 <div class="card shadow-sm border {% if booking.status == 'cancelled' %}border-secondary{% else %}border-primary{% endif %}">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <!-- Partie gauche : infos -->
-                        <div>
-                            <p class="mb-1"><strong>Date & Heure :</strong><br>
-                                {{ booking.timeslot.startDatetime|date('d/m/Y H:i') }} → {{ booking.timeslot.endDatetime|date('d/m/Y H:i') }}
-                            </p>
-                            <p class="mb-1"><strong>Nom de la ressource :</strong><br>{{ booking.timeslot.resource.name }}</p>
-                            <p class="mb-1"><strong>Organisation :</strong><br>{{ booking.timeslot.resource.client.organizationName }}</p>
-                            <p class="mb-1"><strong>Adresse :</strong><br>{{ booking.timeslot.resource.location }}</p>
-
-                            {% if booking.comment is not empty %}
-                                <p class="mb-1"><strong>Commentaire :</strong><br>{{ booking.comment }}</p>
-                            {% endif %}
-
-                            <p class="mb-0">
-                                <strong>Statut :</strong>
-                                {% if booking.status == 'cancelled' %}
-                                    <span class="badge bg-secondary">Annulée</span>
-                                {% else %}
-                                    <span class="badge bg-info text-dark">Confirmée</span>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <!-- Informations réparties en colonnes -->
+                            <div class="col-md-3">
+                                <p class="mb-1"><strong>Date & Heure :</strong><br>
+                                    {{ booking.timeslot.startDatetime|date('d/m/Y H:i') }} → {{ booking.timeslot.endDatetime|date('d/m/Y H:i') }}
+                                </p>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="mb-1"><strong>Ressource :</strong><br>{{ booking.timeslot.resource.name }}</p>
+                                <p class="mb-1"><strong>Organisation :</strong><br>{{ booking.timeslot.resource.client.organizationName }}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="mb-1"><strong>Adresse :</strong><br>{{ booking.timeslot.resource.location }}</p>
+                                {% if booking.comment is not empty %}
+                                    <p class="mb-1"><strong>Commentaire :</strong><br>{{ booking.comment }}</p>
                                 {% endif %}
-                            </p>
+                            </div>
+                            <div class="col-md-2">
+                                <p class="mb-1"><strong>Statut :</strong><br>
+                                    {% if booking.status == 'cancelled' %}
+                                        <span class="badge bg-secondary">Annulée</span>
+                                    {% else %}
+                                        <span class="badge bg-info text-dark">Confirmée</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            <!-- Boutons d'action à droite -->
+                            <div class="col-md-1 d-flex flex-column align-items-end gap-1">
+                                {% if booking.status != 'cancelled' %}
+                                    <form method="post" action="{{ path('user_booking_cancel', {id: booking.id}) }}" onsubmit="return confirm('Annuler cette réservation ?');">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">Annuler</button>
+                                    </form>
+                                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editCommentModal-{{ booking.id }}">
+                                        Modifier
+                                    </button>
+                                {% else %}
+                                    <span class="text-muted small text-end">Déjà annulée</span>
+                                {% endif %}
+                            </div>
                         </div>
+                    </div>
+                </div>
 
-                        <!-- Partie droite : boutons côte à côte -->
-                        <div class="d-flex gap-2 align-items-center">
-                            {% if booking.status != 'cancelled' %}
-                                <form method="post" action="{{ path('user_booking_cancel', {id: booking.id}) }}" onsubmit="return confirm('Annuler cette réservation ?');" style="margin-bottom: 0;">
-                                    <button type="submit" class="btn btn-outline-danger btn-sm">Annuler</button>
-                                </form>
-
-                                <!-- Bouton pour ouvrir la modal -->
-                                <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editCommentModal-{{ booking.id }}">
-                                    Modifier le commentaire
-                                </button>
-
-                                <!-- Modal Bootstrap -->
-                                <div class="modal fade" id="editCommentModal-{{ booking.id }}" tabindex="-1" aria-labelledby="editCommentModalLabel-{{ booking.id }}" aria-hidden="true">
-                                  <div class="modal-dialog">
-                                    <div class="modal-content">
-                                      <form method="post" action="{{ path('user_booking_edit_comment', {id: booking.id}) }}">
-                                        <div class="modal-header">
-                                          <h5 class="modal-title" id="editCommentModalLabel-{{ booking.id }}">Modifier le commentaire</h5>
-                                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                          <textarea name="comment" rows="4" class="form-control" required>{{ booking.comment }}</textarea>
-                                        </div>
-                                        <div class="modal-footer">
-                                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                          <button type="submit" class="btn btn-success">Enregistrer</button>
-                                        </div>
-                                      </form>
-                                    </div>
-                                  </div>
+                <!-- Modal -->
+                <div class="modal fade" id="editCommentModal-{{ booking.id }}" tabindex="-1" aria-labelledby="editCommentModalLabel-{{ booking.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form method="post" action="{{ path('user_booking_edit_comment', {id: booking.id}) }}">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editCommentModalLabel-{{ booking.id }}">Modifier le commentaire</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                                 </div>
-                            {% else %}
-                                <span class="text-muted small">Déjà annulée</span>
-                            {% endif %}
+                                <div class="modal-body">
+                                    <textarea name="comment" rows="4" class="form-control" required>{{ booking.comment }}</textarea>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                    <button type="submit" class="btn btn-success">Enregistrer</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>

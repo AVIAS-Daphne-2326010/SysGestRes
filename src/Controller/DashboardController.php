@@ -46,23 +46,27 @@ class DashboardController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        $nextBooking = $em->createQuery(
-            'SELECT b FROM App\Entity\Booking b 
-             JOIN b.timeslot t 
-             WHERE b.userAccount = :user AND t.startDatetime > :now 
-             ORDER BY t.startDatetime ASC'
+        $client = $user->getClient();
+
+        // Récupérer les 3 prochaines réservations non annulées (même passées)
+        $bookings = $em->createQuery(
+            'SELECT b, t, r, u
+            FROM App\Entity\Booking b
+            JOIN b.timeslot t
+            JOIN t.resource r
+            JOIN b.userAccount u
+            WHERE r.client = :client
+            AND b.cancelledAt IS NULL
+            ORDER BY t.startDatetime ASC'
         )
-        ->setParameter('user', $user)
-        ->setParameter('now', new \DateTime())
-        ->setMaxResults(1)
-        ->getOneOrNullResult();
+        ->setParameter('client', $client)
+        ->setMaxResults(3)
+        ->getResult();
 
-        $organization = $user->getClient()?->getOrganizationName(); // relation avec Client
-
-        return $this->render('client/dashboard.html.twig', [  // Correct path to client dashboard
+        return $this->render('client/dashboard.html.twig', [
             'prenom' => $user->getFirstName(),
-            'organization' => $organization,
-            'nextBooking' => $nextBooking
+            'organization' => $client?->getOrganizationName(),
+            'bookings' => $bookings
         ]);
     }
 

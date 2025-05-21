@@ -3,15 +3,30 @@
 {% block title %}Tableau de bord{% endblock %}
 
 {% block body %}
-    <h1>Bonjour {{ prenom }} - {{ organization }}</h1>
+    <h1>Bonjour {{ prenom }}{% if organization %} - {{ organization }}{% endif %}</h1>
 
-    {% if nextBooking %}
-        <p>
-            Votre prochaine réservation :
-            {{ nextBooking.timeslot.resource.address }} - 
-            {{ nextBooking.timeslot.startDatetime|date('d/m/Y H:i') }} |
-            Réservé par {{ nextBooking.userAccount.firstName }}
-        </p>
+    {% if bookings is not empty %}
+        <h2>Prochaines réservations sur vos ressources</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Ressource</th>
+                    <th>Lieu</th>
+                    <th>Date & Heure</th>
+                    <th>Réservé par</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.timeslot.resource.name }}</td>
+                        <td>{{ booking.timeslot.resource.location }}</td>
+                        <td>{{ booking.timeslot.startDatetime|date('d/m/Y H:i') }}</td>
+                        <td>{{ booking.userAccount.firstName }} {{ booking.userAccount.lastName }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     {% else %}
         <p>Vous n’avez pas de réservation à venir.</p>
     {% endif %}
