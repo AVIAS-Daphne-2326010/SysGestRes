@@ -17,6 +17,20 @@
         <p><strong>Action :</strong> Modification de la ressource "{{ log.resource.name }}"</p>
     {% elseif log.status == 'Modification utilisateur' %}
         <p><strong>Action :</strong> Modification de l'utilisateur "{{ log.userAccount.lastName }} {{ log.userAccount.firstName }}"</p>
+    {% elseif log.status == 'Modification de réservation' %}
+        <p><strong>Action :</strong> La réservation n°{{ log.booking.id }} a été modifiée.</p>
+        <ul>
+            <li><strong>Créneau :</strong> {{ log.booking.timeslot.startDatetime|date('d/m/Y H:i') }} - {{ log.booking.timeslot.endDatetime|date('H:i') }}</li>
+            <li><strong>Ressource :</strong> {{ log.booking.timeslot.resource.name }}</li>
+            <li><strong>Commentaire :</strong> {{ log.booking.comment }}</li>
+            <li><strong>Statut :</strong> {{ log.booking.status }}</li>
+        </ul>
+    {% elseif log.status == 'Annulation de réservation' %}
+        <p><strong>Action :</strong> La réservation n°{{ log.booking.id }} a été annulée.</p>
+        <ul>
+            <li><strong>Date d’annulation :</strong> {{ log.booking.cancelledAt|date('d/m/Y H:i') }}</li>
+            <li><strong>Ressource :</strong> {{ log.booking.timeslot.resource.name }}</li>
+        </ul>
     {% else %}
         <p><strong>Action :</strong> {{ log.status }}</p>
     {% endif %}
