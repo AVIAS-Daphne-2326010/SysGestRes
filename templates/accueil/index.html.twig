@@ -1,9 +1,0 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Accueil{% endblock %}
-
-{% block body %}
-    <h1>Bienvenue {{ app.user.nom }} !</h1>
-    <p>Tu es connecté en tant que {{ app.user.email }}</p>
-    <a href="{{ path('logout') }}">Se déconnecter</a>
-{% endblock %}

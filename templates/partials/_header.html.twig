@@ -1,43 +1,217 @@
-{# templates/partials/_header.html.twig #}
-<header style="background: #f8f9fa; padding: 10px 20px;">
-    <nav style="display: flex; justify-content: space-between; align-items: center;">
+<style>
+    .navbar {
+        background: #ffffff;
+        border: 1px solid black;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 5px 25px;
+        font-size: 18px;
+        position: relative;
+        z-index: 1000;
+    }
+
+    .navbar-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .navbar-logo img {
+        height: 60px;
+        margin-right: 10px;
+    }
+
+    .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .nav-left a,
+    .mobile-menu a {
+        text-decoration: none;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-left: auto;
+    }
+
+    .nav-right a.button {
+        padding: 6px 12px;
+        color: white;
+        text-decoration: none;
+        border-radius: 0;
+    }
+
+    .logout-btn,
+    .register-btn,
+    .login-btn {
+        background-color: rgb(0, 0, 0);
+        color: white;
+        border-radius: 0;
+    }
+
+    .burger {
+        display: none;
+        flex-direction: column;
+        cursor: pointer;
+        gap: 5px;
+        margin-left: 20px;
+    }
+
+    .burger span {
+        height: 3px;
+        width: 25px;
+        background: #333;
+    }
+
+    .mobile-menu {
+        display: none;
+        flex-direction: column;
+        gap: 10px;
+        padding-top: 10px;
+        background-color: white;
+        padding: 10px;
+    }
+
+    .mobile-menu.active {
+        display: flex;
+    }
+
+    .mobile-menu a {
+        padding: 5px 10px;
+        color: #333;
+        text-decoration: none;
+    }
+
+    .mobile-menu .logout-btn,
+    .mobile-menu .register-btn,
+    .mobile-menu .login-btn {
+        border-radius: 0;
+    }
+
+    /* ✅ Spécifique : rendre DECONNEXION blanche dans le menu mobile */
+    .mobile-menu .logout-btn {
+        color: white !important;
+        background-color: black;
+    }
+
+    @media (max-width: 1180px) {
+        .nav-left,
+        .nav-right {
+            display: none;
+        }
+
+        .burger {
+            display: flex;
+        }
+
+        .mobile-menu {
+            width: 100%;
+        }
+
+        .navbar-container {
+            justify-content: space-between;
+        }
+    }
+</style>
+
+<header class="navbar">
+    <div class="navbar-container">
+        <a href="{{ path('homepage') }}" class="navbar-logo">
+            <img src="{{ asset('images/logo.png') }}" alt="Logo">
+        </a>
+
         <div class="nav-left">
-            <a href="{{ path('homepage') }}">Accueil</a>
-
             {% if is_granted('ROLE_ADMIN') %}
-                <a href="{{ path('admin_dashboard') }}">Dashboard</a>
-                <a href="{{ path('admin_resources') }}">Ressources</a>
-                <a href="{{ path('admin_bookings') }}">Réservations</a>
-                <a href="{{ path('admin_users') }}">Utilisateurs</a>
-                <a href="{{ path('admin_logs') }}">Logs</a>
-
+                <a href="{{ path('admin_dashboard') }}">DASHBOARD</a>
+                <a href="{{ path('admin_resources') }}">RESSOURCES</a>
+                <a href="{{ path('admin_bookings') }}">RESERVATIONS</a>
+                <a href="{{ path('admin_users') }}">UTILISATEURS</a>
+                <a href="{{ path('admin_logs') }}">LOGS</a>
             {% elseif is_granted('ROLE_CLIENT') %}
-                <a href="{{ path('client_dashboard') }}">Dashboard</a>
-                <a href="{{ path('client_resources') }}">Ressources</a>
-                <a href="{{ path('client_calendar') }}">Calendrier</a>
-                <a href="{{ path('client_bookings') }}">Réservations</a>
-
+                <a href="{{ path('client_dashboard') }}">DASHBOARD</a>
+                <a href="{{ path('client_resources') }}">RESSOURCES</a>
+                <a href="{{ path('client_calendar') }}">CALENDRIER</a>
+                <a href="{{ path('client_bookings') }}">RESERVATIONS</a>
             {% elseif is_granted('ROLE_USER') %}
-                <a href="{{ path('user_resources') }}">Ressources</a>
-                <a href="{{ path('user_calendar') }}">Calendrier</a>
-                <a href="{{ path('user_bookings') }}">Réservations</a>
-
+                <a href="{{ path('user_resources') }}">RESSOURCES</a>
+                <a href="{{ path('user_calendar') }}">CALENDRIER</a>
+                <a href="{{ path('user_bookings') }}">RESERVATIONS</a>
             {% else %}
-                <a href="#resources">Ressources</a>
-                <a href="#features">Fonctionnalités</a>
+                <a href="#resources">RESSOURCES</a>
+                <a href="#features">FONCTIONNALITES</a>
             {% endif %}
         </div>
 
         <div class="nav-right">
             {% if app.user %}
-                <a href="{{ path('app_logout') }}">Déconnexion</a>
                 <a href="{{ path('user_profile') }}">
-                    <img src="{{ asset('images/profile-icon.png') }}" alt="Profil" style="height: 24px; vertical-align: middle;">
+                    <img src="{{ asset('images/profile-icon.png') }}" alt="Profil" style="height: 35px; border-radius: 50%;">
                 </a>
+                <a href="{{ path('app_logout') }}" class="button logout-btn">DECONNEXION</a>
             {% else %}
-                <a href="{{ path('app_register') }}" style="margin-right: 10px;">Inscription</a>
-                <a href="{{ path('app_login') }}">Connexion</a>
+                <a href="{{ path('app_register') }}" class="button register-btn">INSCRIPTION</a>
+                <a href="{{ path('app_login') }}" class="button login-btn">CONNEXION</a>
             {% endif %}
         </div>
-    </nav>
+
+        <div class="burger" id="burger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <div class="mobile-menu" id="mobileMenu">
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('admin_dashboard') }}">DASHBOARD</a>
+            <a href="{{ path('admin_resources') }}">RESSOURCES</a>
+            <a href="{{ path('admin_bookings') }}">RESERVATIONS</a>
+            <a href="{{ path('admin_users') }}">UTILISATEURS</a>
+            <a href="{{ path('admin_logs') }}">LOGS</a>
+        {% elseif is_granted('ROLE_CLIENT') %}
+            <a href="{{ path('client_dashboard') }}">DASHBOARD</a>
+            <a href="{{ path('client_resources') }}">RESSOURCES</a>
+            <a href="{{ path('client_calendar') }}">CALENDRIER</a>
+            <a href="{{ path('client_bookings') }}">RESERVATIONS</a>
+        {% elseif is_granted('ROLE_USER') %}
+            <a href="{{ path('user_resources') }}">RESSOURCES</a>
+            <a href="{{ path('user_calendar') }}">CALENDRIER</a>
+            <a href="{{ path('user_bookings') }}">RESERVATIONS</a>
+        {% else %}
+            <a href="#resources">RESSOURCES</a>
+            <a href="#features">FONCTIONNALITES</a>
+        {% endif %}
+
+        {% if app.user %}
+            <a href="{{ path('user_profile') }}">MON PROFIL</a>
+            <a href="{{ path('app_logout') }}" class="logout-btn">DECONNEXION</a>
+        {% else %}
+            <a href="{{ path('app_register') }}" class="register-btn">INSCRIPTION</a>
+            <a href="{{ path('app_login') }}" class="login-btn">CONNEXION</a>
+        {% endif %}
+    </div>
 </header>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const burger = document.getElementById('burger');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        burger.addEventListener('click', function () {
+            mobileMenu.classList.toggle('active');
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!burger.contains(e.target) && !mobileMenu.contains(e.target)) {
+                mobileMenu.classList.remove('active');
+            }
+        });
+    });
+</script>
