@@ -28,7 +28,7 @@
         }
 
         table.log-table th {
-            background-color: #f5f5f5;
+            background-color: #d4ecff;
             font-weight: bold;
         }
 
@@ -36,7 +36,6 @@
             display: inline;
         }
 
-        /* Pagination stylée et centrée */
         .pagination {
             display: flex;
             justify-content: center;
@@ -89,40 +88,6 @@
             cursor: not-allowed;
         }
 
-        /* Bouton lien "Voir" */
-        .btn-view {
-            background-color: transparent;
-            color: #000;
-            border: 2px solid #000;
-            border-radius: 4px;
-            padding: 5px 10px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .btn-view:hover {
-            background-color: #000;
-            color: #fff;
-        }
-
-        /* Bouton "Supprimer" */
-        .btn-delete {
-            background-color: #000;
-            color: #fff;
-            border: 2px solid #000;
-            border-radius: 4px;
-            padding: 5px 10px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-delete:hover {
-            background-color: #333;
-        }
-
-        /* Formulaire de filtre sur toute la largeur */
         .filter-form {
             display: flex;
             gap: 20px;
@@ -144,20 +109,23 @@
             font-size: 14px;
         }
 
-        .filter-group button,
-        .filter-group a {
-            margin-top: auto;
+        .page-container {
+            margin: 15px;
+        }
+
+        .btn-filter,
+        .btn-reset {
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
             white-space: nowrap;
         }
 
-        /* Bouton Filtrer = comme Supprimer */
         .btn-filter {
             background-color: #000;
             color: #fff;
-            border: 2px solid #000;
-            border-radius: 4px;
-            padding: 5px 10px;
-            font-weight: bold;
+            border: none;
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
@@ -166,15 +134,11 @@
             background-color: #333;
         }
 
-        /* Bouton Réinitialiser = comme Voir */
         .btn-reset {
             background-color: transparent;
             color: #000;
-            border: 2px solid #000;
-            border-radius: 4px;
-            padding: 5px 10px;
+            border: 1px solid #000;
             text-decoration: none;
-            font-weight: bold;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
@@ -183,8 +147,39 @@
             color: #fff;
         }
 
-        .page-container {
-            margin: 15px;
+        /* Bouton lien "Voir" */
+        .btn-view {
+            background-color: transparent;
+            color: #000;
+            border: 1px solid #000;
+            padding: 5px 10px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .btn-view:hover {
+            background-color: #000;
+            color: #fff;
+        }
+
+        /* Bouton "Supprimer" */
+        .btn-delete {
+            background-color: #000;
+            color: #fff;
+            padding: 5px 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-delete:hover {
+            background-color: #333;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 10px;
         }
 
         @media (max-width: 1024px) {
@@ -208,9 +203,12 @@
                 <label for="changedAt">Date :</label>
                 <input type="date" id="changedAt" name="changedAt" value="{{ changedAt }}">
             </div>
-            <div class="filter-buttons">
-                <button type="submit" class="btn-filter">Filtrer</button>
-                <a href="{{ path('admin_logs') }}" class="btn-reset">Réinitialiser</a>
+            <div class="filter-group">
+                <label>&nbsp;</label>
+                <div class="button-row">
+                    <button type="submit" class="btn-filter">Filtrer</button>
+                    <a href="{{ path('admin_logs') }}" class="btn-reset">Réinitialiser</a>
+                </div>
             </div>
         </form>
 
