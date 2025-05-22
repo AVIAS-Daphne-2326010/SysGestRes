@@ -1,34 +1,198 @@
-{# templates/home/index.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}Page d'accueil{% endblock %}
 
 {% block body %}
-    <h1>Réservez facilement, gérez efficacement – votre espace, vos horaires, votre tranquillité...</h1>
-    
-    <section id="resources">
-        <h2>Types de ressources disponibles</h2>
-        <ul>
-            {% for type in resourceTypes %}
-                <li>{{ type.type }}</li>
-            {% else %}
-                <li>Aucune ressource disponible</li>
-            {% endfor %}
-        </ul>
-    </section>
+    <style>
+        .homepage h1 {
+            font-size: 3rem;
+            font-weight: 350;
+            text-align: left;
+            margin: 3rem auto;
+            color: black;
+            letter-spacing: 3px;
+        }
 
-    <section id="features">
-        <h2>Fonctionnalités</h2>
-        <p>Des créneaux personnalisables</p>
-        <p>Sécurité et Confidentialité</p>
-        <p>Des réservations en temps réel</p>
-        <p>Un accès administrateur et client dédiés</p>
-    </section>
+        .homepage section {
+            margin: 0rem auto;
+            max-width: 1000px;
+            padding: 0 0 3rem 0;
+            background-color: #f5f9fc;
+            box-shadow: 0 0 5px rgba(0,0,0,0.05);
+        }
 
-    <h2> Comment ça marche ? </h2>
-    <section>1. Créer un compte</section>
-    <section>2. Configurer vos ressources et vos horaires</section>
-    <section>3. Vos clients réservent en toute simplicité</section>
+        .homepage h2 {
+            font-size: 1.5rem;
+            color: black;
+            margin-bottom: 2rem;
+            text-align: center;
+            letter-spacing: 2px;
+        }
 
-    <p>Inscrivez-vous gratuitement et testez notre outil de réservation en ligne !</p>
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2.5rem;
+            justify-content: center;
+            align-items: flex-start; 
+            padding: 3rem 0;
+        }
+
+        .resource-card {
+            background-color:#99ceff;
+            color: white;
+            font-weight: bold;
+            font-size: large;
+            border-radius: 15px;
+            padding: 1rem;
+            width: 180px;
+            height: 100px;
+            text-align: center;
+            box-shadow: 10px 10px #d4ecff;
+            transition: transform 0.3s;
+            display: flex;               
+            justify-content: center;   
+            align-items: center; 
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .homepage .steps {
+            text-align: center;
+            font-weight: 500;
+            line-height: 1.8;
+        }
+
+        .homepage p {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 1.1rem;
+        }
+
+        #features {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        #features p {
+            position: relative;
+            text-align: left;
+            margin: 0.5rem 0;
+            flex: 1;
+            font-size: 1.5rem;  
+            line-height: 1.6; 
+            right: 200px;
+        }
+
+        #features img {
+            max-width: 500px;
+            position: relative;
+            left: 200px;
+        }
+
+        @media (max-width: 1180px) {
+            #features {
+                flex-direction: column;
+            }
+
+            #features img {
+                display: none;
+            }
+        }
+
+        .hero {
+            background: #d4ecff;
+            padding: 5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero-buttons {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-buttons a {
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .btn-black {
+            background-color: #000;
+            color: #fff;
+        }
+
+        .btn-black:hover {
+            background-color: #333;
+        }
+
+        .btn-white {
+            background-color: #fff;
+            color: #000;
+        }
+
+        .btn-white:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+
+    <div class="homepage">
+        <div class="hero">
+            <h1>Réservez facilement, gérez efficacement – <br> votre espace, vos horaires, votre tranquillité...</h1>
+            <div class="hero-buttons">
+                <a href="#features" class="btn-black">Comment ça marche ?</a>
+                <a href="#resources" class="btn-white">Réserver maintenant</a>
+            </div>
+        </div>
+
+        <!-- Séparateur visuel -->
+        <div style="text-align: center; margin: 3rem 0 0 0;">
+            <img src="{{ asset('images/separator.png') }}" alt="Séparateur" style="max-width: 200px;">
+        </div>
+
+        <section id="resources">
+            <h2>Nos ressources</h2>
+            <div class="card-container">
+                {% for type in resourceTypes %}
+                    <div class="resource-card">
+                        {{ type.type }}
+                    </div>
+                {% else %}
+                    <p>Aucune ressource disponible</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="features">
+            <div>
+                <h2>Nos fonctionnalités</h2>
+                <p>Des créneaux personnalisables</p>
+                <p>Sécurité et Confidentialité</p>
+                <p>Des réservations en temps réel</p>
+                <p>Un accès administrateur et client dédiés</p>
+            </div>
+            <img src="{{ asset('images/features-decor.png') }}" alt="Image décorative fonctionnalités">
+        </section>
+
+        <section id="how-it-works">
+            <h2>Comment ça marche ?</h2>
+            <div class="steps">
+                <div>1. Créer un compte</div>
+                <div>2. Configurer vos ressources et vos horaires</div>
+                <div>3. Vos clients réservent en toute simplicité</div>
+            </div>
+        </section>
+
+        <p>Inscrivez-vous gratuitement et testez notre outil de réservation en ligne !</p>
+    </div>
 {% endblock %}
