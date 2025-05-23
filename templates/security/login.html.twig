@@ -1,23 +1,100 @@
-{# templates/security/login.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}Connexion{% endblock %}
 
+{% block stylesheets %}
+    <style>
+        h1 {
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        p {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-link {
+            color: rgb(0, 0, 0);
+        }
+
+        form {
+            max-width: 400px;
+            margin: 2rem auto;
+        }
+
+        .form-fields {
+            padding: 20px;
+            background-color: #d4ecff;
+        }
+
+        .form-fields div {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 480;
+            color: black;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+
+        input:focus {
+            border-color: rgb(147, 148, 149);
+            background-color: #fff;
+            outline: none;
+        }
+
+        .button-container {
+            margin: 3rem;
+            text-align: center;
+        }
+
+        button {
+            padding: 1rem 3rem;
+            background-color: black;
+            color: white;
+            font-size: 15px;
+            border: none;
+            border-radius: 0; 
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #333;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
-    <h1>Se connecter</h1>
+    <h1>Connexion</h1>
     <p style="margin-top: 1rem;">
-        Vous n'avez pas de compte ? <a href="{{ path('app_register') }}">Inscrivez-vous</a>
+        Vous n'avez pas de compte ? <a href="{{ path('app_register') }}" class="login-link">Inscrivez-vous</a>
     </p>
 
     <form action="{{ path('app_login') }}" method="post">
-        <div>
-            <label for="email">Email</label>
-            <input type="email" id="email" name="_username" required autofocus />
+        <div class="form-fields">
+            <div>
+                <label for="email">EMAIL</label>
+                <input type="email" id="email" name="_username" required autofocus />
+            </div>
+            <div>
+                <label for="password">MOT DE PASSE</label>
+                <input type="password" id="password" name="_password" required />
+            </div>
         </div>
-        <div>
-            <label for="password">Mot de passe</label>
-            <input type="password" id="password" name="_password" required />
+        <div class="button-container">
+            <button type="submit">Se connecter</button>
         </div>
-        <button type="submit">Se connecter</button>
     </form>
 {% endblock %}
