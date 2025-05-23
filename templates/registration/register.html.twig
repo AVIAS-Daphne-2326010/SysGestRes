@@ -1,37 +1,138 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Inscription{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        .register-container {
+            margin-top: 50px;
+        }
+
+        /* Suppression du contour et des bordures arrondies */
+        .register-card {
+            background: #d4ecff;
+            border: none;
+            border-radius: 0;
+            box-shadow: none; /* Si tu ne veux même pas d'ombre */
+        }
+
+        .register-card h2 {
+            color: #333;
+            font-weight: bold;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .btn-primary {
+            background-color: rgb(0, 0, 0);
+            font-weight: 500;
+            padding: 10px 20px;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: rgb(0, 0, 0);
+        }
+
+        .form-check-label {
+            color: #555;
+        }
+
+        .text-danger {
+            font-size: 0.9rem;
+        }
+
+        .login-link {
+            color: rgb(0, 0, 0);
+        }
+
+        .login-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
-    {% for flash_error in app.flashes('verify_email_error') %}
-        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
-    {% endfor %}
-
-    <h1>Inscription</h1>
-    <p style="margin-top: 1rem;">
-        Déjà enregistré ? <a href="{{ path('app_login') }}">Connectez-vous</a>
-    </p>
-
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.firstName) }}
-        {{ form_row(registrationForm.lastName) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.phone) }}
-        {{ form_row(registrationForm.plainPassword) }}
-        {{ form_row(registrationForm.organizationName) }}
-        {{ form_row(registrationForm.address) }}
-        {{ form_row(registrationForm.agreeTerms) }}
-
-        <button type="submit" class="btn btn-primary">S'inscrire</button>
-    
-    {% if not registrationForm.vars.valid %}
-        <ul class="text-danger">
-            {% for error in registrationForm.vars.errors %}
-                <li>{{ error.message }}</li>
+<div class="container register-container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            {% for flash_error in app.flashes('verify_email_error') %}
+                <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
             {% endfor %}
-        </ul>
-    {% endif %}
 
+            <h2 class="text-center mb-4">Créer un nouveau compte</h2>
+            <p class="text-center mb-4">
+                Déjà enregistré ? <a href="{{ path('app_login') }}" class="login-link">Connectez-vous</a>
+            </p>
 
-    {{ form_end(registrationForm) }}
+            <div class="register-card p-4">
+                {{ form_start(registrationForm) }}
+
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.firstName) }}
+                        {{ form_widget(registrationForm.firstName, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.firstName) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.lastName) }}
+                        {{ form_widget(registrationForm.lastName, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.lastName) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.email) }}
+                        {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.email) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.phone) }}
+                        {{ form_widget(registrationForm.phone, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.phone) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.plainPassword) }}
+                        {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.plainPassword) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.organizationName) }}
+                        {{ form_widget(registrationForm.organizationName, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.organizationName) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.address) }}
+                        {{ form_widget(registrationForm.address, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.address) }}
+                    </div>
+
+                    <div class="form-check mb-3">
+                        {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
+                        {{ form_label(registrationForm.agreeTerms, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                        {{ form_errors(registrationForm.agreeTerms) }}
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">S'inscrire</button>
+                    </div>
+
+                    {% if not registrationForm.vars.valid %}
+                        <ul class="text-danger mt-3">
+                            {% for error in registrationForm.vars.errors %}
+                                <li>{{ error.message }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {{ form_end(registrationForm) }}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
