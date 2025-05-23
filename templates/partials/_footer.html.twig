@@ -100,15 +100,25 @@
     <div class="footer-container">
         <div class="footer-section">
             <h4>Types de ressources</h4>
-            {% set types = resource_types() %}
             <ul>
-                {% for type in types %}
-                    <li><a href="{{ path('user_resources_by_type', { type: type.type }) }}">{{ type.type }}</a></li>
+                {% for type in resource_types() %}
+                    {% if app.user %}
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li><a href="{{ path('admin_resources', { type: type.type }) }}">{{ type.type }}</a></li>
+                        {% elseif is_granted('ROLE_CLIENT') %}
+                            <li><a href="{{ path('client_resources', { type: type.type }) }}">{{ type.type }}</a></li>
+                        {% else %}
+                            <li><a href="{{ path('user_resources_by_type', { type: type.type }) }}">{{ type.type }}</a></li>
+                        {% endif %}
+                    {% else %}
+                        <li><a href="{{ path('app_login') }}">{{ type.type }}</a></li>
+                    {% endif %}
                 {% else %}
                     <li>Aucune ressource</li>
                 {% endfor %}
             </ul>
         </div>
+
 
         <div class="footer-section">
             <h4>Navigation</h4>
