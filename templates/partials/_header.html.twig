@@ -95,7 +95,6 @@
         border-radius: 0;
     }
 
-    /* ✅ Spécifique : rendre DECONNEXION blanche dans le menu mobile */
     .mobile-menu .logout-btn {
         color: white !important;
         background-color: black;
@@ -144,8 +143,8 @@
                 <a href="{{ path('user_calendar') }}">CALENDRIER</a>
                 <a href="{{ path('user_bookings') }}">RESERVATIONS</a>
             {% else %}
-                <a href="#resources">RESSOURCES</a>
-                <a href="#features">FONCTIONNALITES</a>
+                <a href="{{ path('homepage') }}#resources">RESSOURCES</a>
+                <a href="{{ path('homepage') }}#how-it-works">FONCTIONNALITES</a>
             {% endif %}
         </div>
 

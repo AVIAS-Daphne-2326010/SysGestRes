@@ -20,43 +20,50 @@ class RegistrationFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('firstName', TextType::class)
-            ->add('lastName', TextType::class)
-            ->add('email')
+            ->add('firstName', TextType::class, [
+                'label' => 'NOM',
+            ])
+            ->add('lastName', TextType::class, [
+                'label' => 'PRÉNOM',
+            ])
+            ->add('email', TextType::class, [ 
+                'label' => 'EMAIL',    
+            ])
             ->add('phone', TelType::class, [
+                'label' => 'TÉLÉPHONE',
                 'required' => false,
             ])
             ->add('plainPassword', PasswordType::class, [
-                'label' => 'Password',
+                'label' => 'MOT DE PASSE',
                 'mapped' => false,
                 'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Please enter a password',
+                        'message' => 'Veuillez entrer un mot de passe',
                     ]),
                     new Length([
                         'min' => 6,
-                        'minMessage' => 'Your password should be at least {{ limit }} characters',
+                        'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères',
                         'max' => 4096,
                     ]),
                 ],
             ])
-
             ->add('organizationName', TextType::class, [
                 'required' => false,
                 'mapped' => false,
-                'label' => 'Nom de votre organisation (si client)'
+                'label' => 'ORGANISATION (si client)'
             ])
             ->add('address', TextareaType::class, [
                 'required' => false,
                 'mapped' => false,
-                'label' => 'Adresse de votre organisation'
+                'label' => 'ADRESSE DE L\'ORGANISATION'
             ])
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped' => false,
+                'label' => 'J\'accepte les conditions générales',
                 'constraints' => [
                     new IsTrue([
-                        'message' => 'You should agree to our terms.',
+                        'message' => 'Vous devez accepter nos conditions.',
                     ]),
                 ],
             ]);

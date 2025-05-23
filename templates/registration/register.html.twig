@@ -8,12 +8,11 @@
             margin-top: 50px;
         }
 
-        /* Suppression du contour et des bordures arrondies */
         .register-card {
             background: #d4ecff;
             border: none;
             border-radius: 0;
-            box-shadow: none; /* Si tu ne veux même pas d'ombre */
+            box-shadow: none;
         }
 
         .register-card h2 {
@@ -71,40 +70,43 @@
             <div class="register-card p-4">
                 {{ form_start(registrationForm) }}
 
-                    <div class="mb-3">
-                        {{ form_label(registrationForm.firstName) }}
-                        {{ form_widget(registrationForm.firstName, {'attr': {'class': 'form-control'}}) }}
-                        {{ form_errors(registrationForm.firstName) }}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form_label(registrationForm.firstName) }}
+                            {{ form_widget(registrationForm.firstName, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(registrationForm.firstName) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_label(registrationForm.lastName) }}
+                            {{ form_widget(registrationForm.lastName, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(registrationForm.lastName) }}
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        {{ form_label(registrationForm.lastName) }}
-                        {{ form_widget(registrationForm.lastName, {'attr': {'class': 'form-control'}}) }}
-                        {{ form_errors(registrationForm.lastName) }}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form_label(registrationForm.email) }}
+                            {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(registrationForm.email) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_label(registrationForm.phone) }}
+                            {{ form_widget(registrationForm.phone, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(registrationForm.phone) }}
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        {{ form_label(registrationForm.email) }}
-                        {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
-                        {{ form_errors(registrationForm.email) }}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form_label(registrationForm.phone) }}
-                        {{ form_widget(registrationForm.phone, {'attr': {'class': 'form-control'}}) }}
-                        {{ form_errors(registrationForm.phone) }}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form_label(registrationForm.plainPassword) }}
-                        {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control'}}) }}
-                        {{ form_errors(registrationForm.plainPassword) }}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form_label(registrationForm.organizationName) }}
-                        {{ form_widget(registrationForm.organizationName, {'attr': {'class': 'form-control'}}) }}
-                        {{ form_errors(registrationForm.organizationName) }}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form_label(registrationForm.plainPassword) }}
+                            {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(registrationForm.plainPassword) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_label(registrationForm.organizationName) }}
+                            {{ form_widget(registrationForm.organizationName, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(registrationForm.organizationName) }}
+                        </div>
                     </div>
 
                     <div class="mb-3">
@@ -118,6 +120,7 @@
                         {{ form_label(registrationForm.agreeTerms, null, {'label_attr': {'class': 'form-check-label'}}) }}
                         {{ form_errors(registrationForm.agreeTerms) }}
                     </div>
+
 
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary">S'inscrire</button>
