@@ -21,15 +21,17 @@
         }
 
         .form-label {
-            font-weight: 500;
-            color: #555;
+            font-weight: 480;
+            color: black;
         }
 
         .btn-primary {
             background-color: rgb(0, 0, 0);
             font-weight: 500;
-            padding: 10px 20px;
+            padding: 1rem 3rem;
             border: none;
+            border-radius: 0;
+            margin: 2rem 0 5rem 0;
         }
 
         .btn-primary:hover {
@@ -51,6 +53,21 @@
         .login-link:hover {
             text-decoration: underline;
         }
+
+        .form-control {
+            border-radius: 0;
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #f8f9fa;
+            color: #333;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-control:focus {
+            border-color:rgb(147, 148, 149);
+            background-color: #fff;
+        }
     </style>
 {% endblock %}
 
@@ -62,7 +79,7 @@
                 <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
             {% endfor %}
 
-            <h2 class="text-center mb-4">Créer un nouveau compte</h2>
+            <h1 class="text-center mb-4">Créer un nouveau compte</h1>
             <p class="text-center mb-4">
                 Déjà enregistré ? <a href="{{ path('app_login') }}" class="login-link">Connectez-vous</a>
             </p>
@@ -120,9 +137,8 @@
                         {{ form_label(registrationForm.agreeTerms, null, {'label_attr': {'class': 'form-check-label'}}) }}
                         {{ form_errors(registrationForm.agreeTerms) }}
                     </div>
-
-
-                    <div class="d-grid">
+            </div>
+                    <div class="text-center mt-4">
                         <button type="submit" class="btn btn-primary">S'inscrire</button>
                     </div>
 
@@ -134,7 +150,7 @@
                         </ul>
                     {% endif %}
                 {{ form_end(registrationForm) }}
-            </div>
+
         </div>
     </div>
 </div>
