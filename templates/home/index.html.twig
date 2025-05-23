@@ -8,7 +8,7 @@
             font-size: 3rem;
             font-weight: 350;
             text-align: left;
-            margin: 3rem auto;
+            margin: 5rem auto;
             color: black;
             letter-spacing: 3px;
         }
@@ -17,12 +17,11 @@
             margin: 0rem auto;
             max-width: 1000px;
             padding: 0 0 3rem 0;
-            background-color: #f5f9fc;
             box-shadow: 0 0 5px rgba(0,0,0,0.05);
         }
 
         .homepage h2 {
-            font-size: 1.5rem;
+            font-size: 2rem;
             color: black;
             margin-bottom: 2rem;
             text-align: center;
@@ -46,7 +45,7 @@
             border-radius: 15px;
             padding: 1rem;
             width: 180px;
-            height: 100px;
+            height: 120px;
             text-align: center;
             box-shadow: 10px 10px #d4ecff;
             transition: transform 0.3s;
@@ -76,6 +75,7 @@
             justify-content: space-between;
             align-items: center;
             gap: 2rem;
+            flex-wrap: wrap;
         }
 
         #features p {
@@ -86,6 +86,21 @@
             font-size: 1.5rem;  
             line-height: 1.6; 
             right: 200px;
+            z-index: 1;
+            right: 0;
+            letter-spacing: 2px;
+        }
+
+        #features p::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 105%;
+            height: 1.5em; 
+            background-color: #d4ecff; 
+            z-index: -1;
+            border-radius: 2px; 
         }
 
         #features img {
@@ -96,27 +111,29 @@
 
         @media (max-width: 1180px) {
             #features {
-                flex-direction: column;
+                flex-direction: row;
+                justify-content: space-around;
             }
 
             #features img {
-                display: none;
+                max-width: 350px;
+                left: 10px;
             }
         }
 
         .hero {
             background: #d4ecff;
-            padding: 5rem;
+            padding: 6rem 6rem 3rem 6rem;
             text-align: center;
             margin-bottom: 3rem;
         }
 
         .hero-buttons {
-            margin-top: 2rem;
             display: flex;
             justify-content: center;
             gap: 1rem;
             flex-wrap: wrap;
+            padding: 2rem 2rem 4rem 2rem;
         }
 
         .hero-buttons a {
@@ -144,13 +161,78 @@
         .btn-white:hover {
             background-color: #f0f0f0;
         }
+
+        .separator-with-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 3rem 0;
+        }
+
+        .separator-with-logo .line {
+            flex: 1;
+            height: 1.5px;
+            max-width: 180px;
+            background-color: black;
+        }
+
+        .separator-with-logo .logo {
+            height: 50px;
+            width: auto;
+        }
+
+        .steps {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 3rem;
+        }
+
+        .step-card {
+            background-color: #d4ecff;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            width: 300px;
+            height: 180px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .step-number {
+            display: inline-block;
+            background-color: white;
+            color: #99ceff;
+            font-weight: bold;
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            border-radius: 50%;
+        }
+
+        .step-card p {
+            font-weight: normal;
+            letter-spacing: 1px;
+        }
+
+        .center-button {
+            text-align: center;
+            margin-top: 1rem;
+        }
     </style>
 
     <div class="homepage">
         <div class="hero">
             <h1>Réservez facilement, gérez efficacement – <br> votre espace, vos horaires, votre tranquillité...</h1>
             <div class="hero-buttons">
-                <a href="#features" class="btn-black">Comment ça marche ?</a>
+                <a href="#how-it-works" class="btn-black">Comment ça marche ?</a>
                 <a href="#resources" class="btn-white">Réserver maintenant</a>
             </div>
         </div>
@@ -164,9 +246,25 @@
             <h2>Nos ressources</h2>
             <div class="card-container">
                 {% for type in resourceTypes %}
-                    <div class="resource-card">
-                        {{ type.type }}
-                    </div>
+                    {% if app.user %}
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('admin_resources', { type: type.type }) }}" class="resource-card">
+                                {{ type.type }}
+                            </a>
+                        {% elseif is_granted('ROLE_CLIENT') %}
+                            <a href="{{ path('client_resources', { type: type.type }) }}" class="resource-card">
+                                {{ type.type }}
+                            </a>
+                        {% else %}
+                            <a href="{{ path('user_resources_by_type', { type: type.type }) }}" class="resource-card">
+                                {{ type.type }}
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{{ path('app_login') }}" class="resource-card">
+                            {{ type.type }}
+                        </a>
+                    {% endif %}
                 {% else %}
                     <p>Aucune ressource disponible</p>
                 {% endfor %}
@@ -184,15 +282,37 @@
             <img src="{{ asset('images/features-decor.png') }}" alt="Image décorative fonctionnalités">
         </section>
 
+        <div class="separator-with-logo">
+            <span class="line"></span>
+            <img src="{{ asset('images/logo2.png') }}" alt="Logo" class="logo">
+            <span class="line"></span>
+        </div>
+
         <section id="how-it-works">
             <h2>Comment ça marche ?</h2>
             <div class="steps">
-                <div>1. Créer un compte</div>
-                <div>2. Configurer vos ressources et vos horaires</div>
-                <div>3. Vos clients réservent en toute simplicité</div>
+                <div class="step-card">
+                    <span class="step-number">1</span>
+                    <p>Créer un compte</p>
+                </div>
+                <div class="step-card">
+                    <span class="step-number">2</span>
+                    <p>Configurer vos ressources et vos horaires</p>
+                </div>
+                <div class="step-card">
+                    <span class="step-number">3</span>
+                    <p>Vos clients réservent en toute simplicité</p>
+                </div>
             </div>
         </section>
 
         <p>Inscrivez-vous gratuitement et testez notre outil de réservation en ligne !</p>
+        <div class="hero-buttons">
+            {% if app.user %}
+                <a href="{{ path('homepage') }}" class="btn-black">Commencez maintenant</a>
+            {% else %}
+                <a href="{{ path('app_register') }}" class="btn-black">Commencez maintenant</a>
+            {% endif %}
+        </div>
     </div>
 {% endblock %}

@@ -4,8 +4,7 @@
     footer {
         background-color: #d4ecff;
         color: black;
-        padding: 3rem 1rem;
-        margin-top: 3rem;
+        padding: 4rem 1rem 2rem;
         font-family: Arial, sans-serif;
     }
 
@@ -28,6 +27,7 @@
         color: black;
         border-bottom: 2px solid black;
         padding-bottom: 0.5rem;
+        letter-spacing: 1px;
     }
 
     .footer-section ul {
@@ -43,11 +43,12 @@
     .footer-section ul li a {
         color: black;
         text-decoration: none;
+        font-size: 0.95rem;
         transition: color 0.3s ease;
     }
 
     .footer-section ul li a:hover {
-        color: black;
+        color: #fff;
         text-decoration: underline;
     }
 
@@ -60,7 +61,7 @@
     .social-icons {
         display: flex;
         gap: 1rem;
-        margin-top: 0.5rem;
+        margin-top: 1rem;
     }
 
     .social-icons a {
@@ -70,14 +71,16 @@
     }
 
     .social-icons a:hover {
-        color:rgb(255, 255, 255);
+        color: #fff;
     }
 
     .footer-bottom {
         text-align: center;
         margin-top: 3rem;
         font-size: 0.9rem;
-        color: #555;
+        color: #444;
+        border-top: 1px solid #bbb;
+        padding-top: 1rem;
     }
 
     @media (max-width: 768px) {
@@ -96,11 +99,11 @@
 <footer>
     <div class="footer-container">
         <div class="footer-section">
-            <h4>TYPES DE RESSOURCES</h4>
+            <h4>Types de ressources</h4>
             {% set types = resource_types() %}
             <ul>
                 {% for type in types %}
-                    <li><a href="#">{{ type.type }}</a></li>
+                    <li><a href="{{ path('user_resources_by_type', { type: type.type }) }}">{{ type.type }}</a></li>
                 {% else %}
                     <li>Aucune ressource</li>
                 {% endfor %}
@@ -108,33 +111,28 @@
         </div>
 
         <div class="footer-section">
-            <h4>NAVIGATION</h4>
+            <h4>Navigation</h4>
             <ul>
-                <li><a href="#">FAQ</a></li>
-                <li><a href="#">Conditions d’utilisation</a></li>
-                <li><a href="#">Politique de confidentialité</a></li>
-                <li><a href="#">Contact</a></li>
+                <li><a href="{{ path('homepage') }}">Accueil</a></li>
+                <li><a href="#how-it-works">Fonctionnement</a></li>
+                <li><a href="#resources">Ressources</a></li>
+                <li><a href="{{ path('app_login') }}">Connexion</a></li>
+                <li><a href="{{ path('app_register') }}">Inscription</a></li>
             </ul>
         </div>
 
         <div class="footer-section">
-            <h4>A PROPOS</h4>
-            <p>Notre plateforme permet aux organisations de gérer facilement leurs ressources et aux utilisateurs de réserver en toute confiance.</p>
-        </div>
-
-        <div class="footer-section">
-            <h4>SUIVEZ-NOUS</h4>
+            <h4>À propos</h4>
+            <p>Notre outil de réservation vous aide à gérer efficacement vos espaces et créneaux horaires en toute simplicité.</p>
             <div class="social-icons">
-                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
             </div>
         </div>
     </div>
 
     <div class="footer-bottom">
-        &copy; {{ "now"|date("Y") }} - Tous droits réservés
+        &copy; {{ "now"|date("Y") }} Looping Reservation. Tous droits réservés.
     </div>
 </footer>
