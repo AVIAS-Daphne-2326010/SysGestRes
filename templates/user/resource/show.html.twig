@@ -1,11 +1,107 @@
-{# templates/user/ressource/show.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}Ressources : {{ type }}{% endblock %}
 
+{% block stylesheets %}
+<style>
+    h1 {
+        margin: 5rem 0 3rem 0;
+    }
+
+    .card {
+        border-radius: 0; 
+        background-color: #d4ecff;
+        border: 1.5px solid;
+    }
+
+    .card-title {
+        font-weight: 600;
+    }
+
+    .card-text strong {
+        color: black;
+    }
+
+    .card-body {
+        text-align: left;
+        padding: 1.5rem;
+    }
+
+    .btn-primary {
+        background-color: black;
+        border: 2px solid black;
+        color: white;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 0;
+    }
+
+    .btn-primary:hover {
+        background-color: black;
+        color: white;
+        border-color: black;
+    }
+
+    .btn-secondary {
+        padding: 0.5rem 1rem;
+    }
+
+    p {
+        color: black;
+        margin: 3px;
+    }
+
+    .container {
+        max-width: 1500px;
+        justify-content: center;
+    }
+
+    .col-md-4 {
+        text-align: center;
+    }   
+
+    .row {
+        padding: 1rem 0 5rem 0;
+        gap: 2rem;
+    }
+
+    .btn-primary:active {
+        background-color: black !important;
+        color: white !important;
+        border-color: black !important;
+    }
+
+    .btn-secondary {
+        background-color: white;    
+        color: black;           
+        border: 1px solid black;      
+        font-weight: 600;         
+        border-radius: 0;
+        margin: 3rem 0 5rem 0;            
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .btn-secondary:hover {
+        background-color: black;      
+        color: white;                
+        border-color: black;
+        text-decoration: none;
+    }
+</style>
+{% endblock %}
+
 {% block body %}
-    <div class="container mt-4">
+    <div class="container">
         <h1>Ressources de type "{{ type }}"</h1>
+
+        <form method="get" class="mb-4">
+            <div class="d-flex gap-2" style="justify-content: space-around;">
+                <input type="text" name="q" value="{{ app.request.query.get('q') }}" class="form-control" placeholder="Rechercher par nom ou description" style="max-width: 35%;">
+                <input type="text" name="location" value="{{ app.request.query.get('location') }}" class="form-control" placeholder="Filtrer par lieu" style="max-width: 25%;">
+                <input type="number" name="capacity" value="{{ app.request.query.get('capacity') }}" class="form-control" placeholder="Capacité minimum" style="max-width: 20%;">
+                <button type="submit" class="btn btn-primary" style="min-width: 100px;">Filtrer</button>
+            </div>
+        </form>
 
         {% if resources is empty %}
             <p>Aucune ressource disponible pour ce type.</p>
@@ -13,15 +109,16 @@
             <div class="row">
                 {% for resource in resources %}
                     <div class="col-md-4 mb-4">
-                        <div class="card shadow-sm h-100">
+                        <div class="card shadow-sm">
                             <div class="card-body">
                                 <h5 class="card-title">{{ resource.name }}</h5>
+                                <p class="card-text"><strong>Organisation :</strong> {{ resource.client.organizationName }}</p>
                                 <p class="card-text"><strong>Description :</strong> {{ resource.description }}</p>
                                 <p class="card-text"><strong>Lieu :</strong> {{ resource.location }}</p>
                                 <p class="card-text"><strong>Capacité :</strong> {{ resource.capacity }}</p>
-                                <a href="{{ path('user_resource_calendar', { id: resource.id }) }}" class="btn btn-primary mt-2">Voir les créneaux disponibles</a>
                             </div>
                         </div>
+                        <a href="{{ path('user_resource_calendar', { id: resource.id }) }}" class="btn btn-primary mt-2">Voir les créneaux disponibles</a>
                     </div>
                 {% endfor %}
             </div>

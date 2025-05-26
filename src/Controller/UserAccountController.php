@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\UserAccount;
 use App\Form\UserAccountType;
+use App\Entity\Resource;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -82,4 +83,45 @@ class UserAccountController extends AbstractController
 
         return $this->redirectToRoute('user_account_index');
     }
+
+    #[Route('/ressources/{type}', name: 'user_resources_by_type', methods: ['GET'])]
+    public function showByType(string $type, EntityManagerInterface $entityManager, Request $request): Response
+    {
+        $q = trim($request->query->get('q', ''));
+        $location = trim($request->query->get('location', ''));
+        $capacity = $request->query->get('capacity');
+
+        $qb = $entityManager->createQueryBuilder()
+            ->select('r', 'c')
+            ->from(Resource::class, 'r')
+            ->leftJoin('r.client', 'c')
+            ->where('r.type = :type')
+            ->setParameter('type', $type);
+
+        if ($q !== '') {
+            $qb->andWhere('r.name LIKE :q OR r.description LIKE :q')
+            ->setParameter('q', '%' . $q . '%');
+        }
+
+        if ($location !== '') {
+            $qb->andWhere('r.location LIKE :location')
+            ->setParameter('location', '%' . $location . '%');
+        }
+
+        if (is_numeric($capacity) && (int)$capacity > 0) {
+            $qb->andWhere('r.capacity >= :capacity')
+            ->setParameter('capacity', (int)$capacity);
+        }
+
+        $resources = $qb->getQuery()->getResult();
+
+        return $this->render('user/ressource/show.html.twig', [
+            'resources' => $resources,
+            'type' => $type,
+            'q' => $q, // J'ai changé 'search_query' en 'q'
+            'location' => $location, // J'ai changé 'search_location' en 'location'
+            'capacity' => $capacity, // J'ai changé 'search_capacity' en 'capacity'
+        ]);
+    }
+
 }
