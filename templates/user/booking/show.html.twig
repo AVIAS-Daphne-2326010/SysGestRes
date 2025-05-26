@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détail de la réservation{% endblock %}
+
+{% block body %}
+    <h1>Détail de la réservation</h1>
+
+    <p><strong>Ressource :</strong> {{ booking.timeslot.resource.name }}</p>
+    <p><strong>Lieu :</strong> {{ booking.timeslot.resource.location }}</p>
+    <p><strong>Début :</strong> {{ booking.timeslot.startDatetime|date('d/m/Y H:i') }}</p>
+    <p><strong>Fin :</strong> {{ booking.timeslot.endDatetime|date('d/m/Y H:i') }}</p>
+    <p><strong>Statut :</strong> {{ booking.status }}</p>
+    <p><strong>Commentaire :</strong> {{ booking.comment }}</p>
+
+    <a href="{{ path('user_dashboard') }}">Retour au tableau de bord</a>
+{% endblock %}

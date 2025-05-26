@@ -1,16 +1,134 @@
-{# templates/user/dashboard.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block body %}
-    <h1>Bonjour {{ prenom }}</h1>
+{% block title %}Dashboard{% endblock %}
 
-    {% if nextBooking %}
+{% block stylesheets %}
+<style>
+.dashboard-container {
+    max-width: 800px;
+    padding: 60px 20px;
+    margin: 8vw auto;
+}
+
+h1 {
+    font-size: 3.5rem;
+    margin-bottom: 2rem;
+}
+
+p {
+    font-size: 1.1rem;
+    color: #333;
+    font-style: italic;
+    margin-bottom: 2rem;
+}
+
+.dashboard-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.dashboard-buttons a,
+.dashboard-buttons button {
+    padding: 0.8rem 1.4rem;
+    font-size: 1rem;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.dashboard-buttons a {
+    background-color: #000;
+    color: white;
+}
+
+.dashboard-buttons a:hover {
+    background-color: #333;
+}
+
+.dashboard-buttons .btn-white {
+    background-color: white !important;
+    color: black !important;
+    border: 1px solid black !important;
+}
+
+.dashboard-buttons .btn-white:hover {
+    background-color: #f0f0f0 !important;
+}
+
+.dashboard-buttons .btn-black {
+    background-color: #000;
+    color: white;
+    border: none;
+}
+
+.dashboard-buttons .btn-black:hover {
+    background-color: #333;
+}
+
+#booking-details {
+    margin-top: 3rem;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    display: none;
+    background-color: #fafafa;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    <h1>Bonjour,<br> {{ prenom|default('Utilisateur') }} !</h1>
+
+    {% if nextBooking and nextBooking.timeslot is defined and nextBooking.timeslot.resource is defined %}
         <p>Votre prochaine réservation :
-            {{ nextBooking.timeslot.resource.location }}
-            -
-            {{ nextBooking.timeslot.startDatetime|date('d/m/Y H:i') }}
+            <strong>
+                {{ nextBooking.timeslot.resource.client.organizationName|default('') }}
+                –
+                {{ nextBooking.timeslot.resource.location|default('') }}
+                –
+                {{ nextBooking.timeslot.startDatetime|date('d/m/Y H:i') }}
+            </strong>
         </p>
+
+        <div class="dashboard-buttons">
+            <button id="show-booking-btn" class="btn-black">Voir la réservation</button>
+            <form method="post" action="{{ path('user_booking_cancel', { id: nextBooking.id }) }}" style="display:inline;">
+                <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ nextBooking.id) }}">
+                <button type="submit" class="btn-white">Annuler la réservation</button>
+            </form>
+        </div>
+
+        <div id="booking-details">
+            <h2>Détail de la réservation</h2>
+            <p><strong>Ressource :</strong> {{ nextBooking.timeslot.resource.name }}</p>
+            <p><strong>Lieu :</strong> {{ nextBooking.timeslot.resource.location }}</p>
+            <p><strong>Début :</strong> {{ nextBooking.timeslot.startDatetime|date('d/m/Y H:i') }}</p>
+            <p><strong>Fin :</strong> {{ nextBooking.timeslot.endDatetime|date('d/m/Y H:i') }}</p>
+            <p><strong>Statut :</strong> {{ nextBooking.status }}</p>
+            <p><strong>Commentaire :</strong> {{ nextBooking.comment }}</p>
+        </div>
+
     {% else %}
         <p>Vous n’avez pas de réservation à venir.</p>
+
+        <div class="dashboard-buttons">
+            <a href="{{ path('user_resources') }}">Réserver</a>
+        </div>
     {% endif %}
+</div>
+
+<script>
+document.getElementById('show-booking-btn')?.addEventListener('click', function() {
+    const details = document.getElementById('booking-details');
+    if(details.style.display === 'none' || details.style.display === '') {
+        details.style.display = 'block';
+        this.textContent = 'Cacher la réservation';
+    } else {
+        details.style.display = 'none';
+        this.textContent = 'Voir la réservation';
+    }
+});
+</script>
 {% endblock %}

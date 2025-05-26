@@ -171,4 +171,50 @@ class UserController extends AbstractController
         $this->addFlash('success', 'Commentaire modifié avec succès.');
         return $this->redirectToRoute('user_bookings');
     }
+
+    #[Route('/user/booking/{id}', name: 'user_booking_show')]
+    #[IsGranted('ROLE_USER')]
+    public function showBooking(int $id, EntityManagerInterface $entityManager): Response
+    {
+        /** @var UserAccount $user */
+        $user = $this->getUser();
+        $booking = $entityManager->getRepository(Booking::class)->find($id);
+
+        if (!$booking || $booking->getUserAccount() !== $user) {
+            throw $this->createNotFoundException('Réservation introuvable ou non autorisée.');
+        }
+
+        return $this->render('user/booking/show.html.twig', [
+            'booking' => $booking,
+        ]);
+    }
+
+    #[Route('/user/dashboard', name: 'user_dashboard')]
+    public function dashboard(EntityManagerInterface $entityManager): Response
+    {
+        /** @var UserAccount $user */
+        $user = $this->getUser();
+        $now = new \DateTimeImmutable();
+
+        $query = $entityManager->createQuery(
+            'SELECT b
+             FROM App\Entity\Booking b
+             JOIN b.timeslot t
+             WHERE b.userAccount = :user
+               AND b.status = :status
+               AND t.startDatetime > :now
+             ORDER BY t.startDatetime ASC'
+        )
+        ->setParameter('user', $user)
+        ->setParameter('status', 'confirmed')
+        ->setParameter('now', $now)
+        ->setMaxResults(1);
+
+        $nextBooking = $query->getOneOrNullResult();
+
+        return $this->render('user/dashboard.html.twig', [
+            'prenom' => $user->getFirstName(),
+            'nextBooking' => $nextBooking,
+        ]);
+    }
 }

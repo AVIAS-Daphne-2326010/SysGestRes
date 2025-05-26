@@ -139,6 +139,7 @@
                 <a href="{{ path('client_calendar') }}">CALENDRIER</a>
                 <a href="{{ path('client_bookings') }}">RESERVATIONS</a>
             {% elseif is_granted('ROLE_USER') %}
+                <a href="{{ path('user_dashboard') }}">DASHBOARD</a>
                 <a href="{{ path('user_resources') }}">RESSOURCES</a>
                 <a href="{{ path('user_calendar') }}">CALENDRIER</a>
                 <a href="{{ path('user_bookings') }}">RESERVATIONS</a>
