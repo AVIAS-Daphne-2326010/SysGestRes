@@ -3,45 +3,164 @@
 {% block title %}Calendrier - {{ resource.name }}{% endblock %}
 
 {% block stylesheets %}
-    {{ parent() }}
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
     <style>
-        #calendar {
-            max-width: 1100px;
-            margin: 40px auto;
-            height: 700px;
+        .fc-daygrid-day-number {
+            color: black;
+            text-decoration: none;
+        }
+
+        .fc-col-header-cell {
+            background-color: white !important;
+        }
+
+        .fc-col-header-cell .fc-col-header-cell-cushion {
+            color: black;
+            font-weight: 700;
+            font-size: 1.5rem;
+            text-decoration: none;
+            display: block;
+            padding: 0.5rem;
+            background: #d4ecff;
+        }
+
+        .fc-daygrid-day {
+            border: 1px solid #ccc;
+        }
+
+        .fc-event {
+            border: none;
+            border-radius: 4px;
+            padding: 2px;
+            font-size: 0.85rem;
+        }
+
+        .fc-toolbar-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            margin: 0.5rem 0;
+            background-color: #99ceff;
+            padding: 0.5rem 25rem;
+        }
+
+        .fc-button {
+            background-color: #027bdb;
+            border: none;
+            color: white;
+            padding: 0.4rem 0.75rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .fc-button:hover {
+            background-color: #025fa3;
+        }
+
+        .fc-button:disabled {
+            background-color: #ccc;
+            cursor: default;
+        }
+
+        .btn-custom-primary {
+            border-radius: 0;
+            font-size: 1.15rem;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            color: white;
+            background-color: black;
+            border: 1.5px solid black;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .btn-custom-primary:hover {
+            background-color: #333;
+            border-color: #333;
+            color: white;
+        }
+
+        .btn-custom-danger {
+            border-radius: 0;
+            font-size: 1.15rem;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            color: black;
+            background-color: white;
+            border: 1.5px solid black;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .btn-custom-danger:hover {
+            background-color: white;
+            color: black;
+            border-color: black;
+        }
+
+        .modal-content {
+            border-radius: 0;
+            background-color: #d4ecff;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+        }
+
+        .modal-footer {
+            background-color: #d4ecff;
+            padding: 1rem 1.5rem;
+            justify-content: space-between;
+        }
+
+        .modal-footer .btn {
+            border-radius: 0;
+        }
+
+        .form-control {
+            border-radius: 0;
+        }
+
+        .creneau {
+            background-color: white;
+            color:black;
+            border: 1.5px solid;
+            padding:1rem 3rem 0 1rem;
+            margin-bottom: 1rem;
         }
     </style>
 {% endblock %}
 
 {% block body %}
     <div class="container mt-4">
-        <h2>Créneaux pour la ressource : {{ resource.name }}</h2>
-        <div id="calendar"></div>
+        <h1 style="margin-top: 5rem;">Créneaux pour la ressource : {{ resource.name }}</h1>
+        <div id="calendar" style="max-width: 100%; padding: 3rem 0 6rem 0;"></div>
     </div>
 
     <!-- Modal de réservation -->
     <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <form id="bookingForm" class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="bookingModalLabel">Confirmer la réservation</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-          </div>
-          <div class="modal-body">
-            <p><strong>Début :</strong> <span id="startTime"></span></p>
-            <p><strong>Fin :</strong> <span id="endTime"></span></p>
-            <div class="mb-3">
-              <label for="comment" class="form-label">Commentaire (optionnel)</label>
-              <textarea id="comment" name="comment" class="form-control" rows="3" placeholder="Ajouter un commentaire..."></textarea>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-            <button type="submit" class="btn btn-primary">Réserver</button>
-          </div>
-        </form>
-      </div>
+        <div class="modal-dialog">
+            <form id="bookingForm" method="post" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bookingModalLabel">Créer une réservation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="creneau">
+                        <p><strong>Créneau horaire</strong></p>
+                        <p class="mb-1"><strong>Début :</strong> <span id="startTime"></span></p>
+                        <p class="mb-3"><strong>Fin :</strong> <span id="endTime"></span></p>
+                    </div>
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">Commentaire (optionnel)</label>
+                        <textarea id="comment" name="comment" rows="4" class="form-control" placeholder="Ajouter un commentaire..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-custom-danger" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-custom-primary">Réserver</button>
+                </div>
+            </form>
+        </div>
     </div>
 {% endblock %}
 
@@ -63,6 +182,9 @@
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 locale: 'fr',
+                height: 'auto',
+                contentHeight: 'auto',
+                aspectRatio: 1.35,
                 timeZone: 'Europe/Paris',
                 firstDay: 1,
                 headerToolbar: {
