@@ -1,42 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Mon Site{% endblock %}</title>
     
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Font Awesome (sans integrity) -->
+    <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- FullCalendar CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.css" rel="stylesheet">
 
     <style>
         html, body {
             height: 100%;
             margin: 0;
         }
-
         body {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
-
         main {
             flex: 1;
         }
     </style>
 
-    {% block stylesheets %}
-        <!-- FullCalendar CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.css" rel="stylesheet">
-    {% endblock %}
+    {% block stylesheets %}{% endblock %}
 </head>
 
 <body>
     {% include 'partials/_header.html.twig' %}
 
-    <main>
+    <main class="container my-4">
         {% for message in app.flashes('error') %}
             <div class="alert alert-danger">{{ message }}</div>
         {% endfor %}
@@ -47,10 +45,10 @@
     {% include 'partials/_footer.html.twig' with { resourceTypes: resourceTypes|default([]) } %}
 
     {% block javascripts %}
-        <!-- FullCalendar JS -->
+        <!-- FullCalendar JS CDN -->
         <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
 
-        <!-- Bootstrap Bundle JS (avec Popper) -->
+        <!-- Bootstrap Bundle JS CDN (avec Popper) -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     {% endblock %}
 </body>
