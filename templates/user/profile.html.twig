@@ -2,49 +2,115 @@
 
 {% block title %}Profil{% endblock %}
 
+{% block stylesheets %}
+    <style>
+        h1 {
+            margin-top: 5rem;
+        }
+
+        p {
+            font-size: 1.15rem;
+        }
+
+        .form-control {
+            border-radius: 0;
+        }
+
+        .form-label {
+            font-weight: 500;
+        }
+
+        .btn-custom-primary {
+            border-radius: 0;
+            font-size: 1.15rem;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            color: white;
+            background-color: black;
+        }
+
+        .btn-custom-primary:hover {
+            background-color: white;
+            color: black;
+            border-color: black;
+        }
+
+        .alert {
+            font-size: 1rem;
+            margin-top: 1rem;
+            border-radius: 0;
+        }
+
+        .container {
+            padding-bottom: 4rem;
+        }
+
+        .card {
+            border-radius: 0;
+            background-color: #d4ecff;
+            padding: 2rem;
+            border: 0;
+        }
+
+        .form-group label {
+            font-weight: 500;
+        }
+
+        #client-fields {
+            margin-top: 1rem;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
-    <h1>Mon profil</h1>
-    <p>Bienvenue sur votre page profil, {{ app.user.firstName }} !</p>
+    <div class="container mt-4">
+        <h1>Mon profil</h1>
+        <p>Bienvenue sur votre page profil, {{ app.user.firstName }} !</p>
 
-    {% for label, messages in app.flashes %}
-        {% for message in messages %}
-            <div class="alert alert-{{ label }}">{{ message }}</div>
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }}">{{ message }}</div>
+            {% endfor %}
         {% endfor %}
-    {% endfor %}
 
-    {{ form_start(form, { attr: { class: 'user-profile-form' } }) }}
-        <div class="form-group mb-3">
-            {{ form_row(form.email) }}
-        </div>
-        <div class="form-group mb-3">
-            {{ form_row(form.firstName) }}
-        </div>
-        <div class="form-group mb-3">
-            {{ form_row(form.lastName) }}
-        </div>
-        <div class="form-group mb-3">
-            {{ form_row(form.phone) }}
-        </div>
-        <div class="form-group mb-3">
-            <label>Rôle</label>
-            <input type="text" class="form-control" value="{{ app.user.role.name }}" readonly>
-        </div>
-        <div id="client-fields" class="client-fields" style="display: none;">
-            <div class="form-group mb-3">
-                {{ form_row(form.client.organizationName) }}
-            </div>
-            <div class="form-group mb-3">
-                {{ form_row(form.client.address) }}
-            </div>
-        </div>
-        <div class="form-group mb-3">
-            {{ form_row(form.password) }}
-        </div>
+        <div class="card mt-4">
+            {{ form_start(form, { attr: { class: 'user-profile-form' } }) }}
+                <div class="form-group mb-3">
+                    {{ form_row(form.email) }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form_row(form.firstName) }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form_row(form.lastName) }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form_row(form.phone) }}
+                </div>
+                <div class="form-group mb-3">
+                    <label class="form-label">Rôle</label>
+                    <input type="text" class="form-control" value="{{ app.user.role.name }}" readonly>
+                </div>
+                <div id="client-fields" class="client-fields" style="display: none;">
+                    <div class="form-group mb-3">
+                        {{ form_row(form.client.organizationName) }}
+                    </div>
+                    <div class="form-group mb-3">
+                        {{ form_row(form.client.address) }}
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    {{ form_row(form.password) }}
+                </div>
 
-        {{ form_row(form._token) }}
+                {{ form_row(form._token) }}
 
-        <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
-    {{ form_end(form, { render_rest: false }) }}
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-custom-primary">Enregistrer les modifications</button>
+                </div>
+            {{ form_end(form, { render_rest: false }) }}
+        </div>
+    </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -55,12 +121,7 @@
 
             function toggleClientFields() {
                 const selectedText = roleField.options[roleField.selectedIndex].text.toLowerCase();
-
-                if (selectedText === 'client') {
-                    clientFields.style.display = 'block';
-                } else {
-                    clientFields.style.display = 'none';
-                }
+                clientFields.style.display = selectedText === 'client' ? 'block' : 'none';
             }
 
             toggleClientFields();
