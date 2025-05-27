@@ -1,88 +1,185 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    <style>
+        h1 {
+            margin-top: 5rem;
+        }
+
+        p {
+            font-size: 1.15rem;
+        }
+
+        .card {
+            border-radius: 0;
+            background-color: #d4ecff;
+        }
+
+        .card .card-body {
+            padding: 1.5rem;
+            border: 1.5px solid;
+        }
+
+        .btn-custom-primary {
+            border-radius: 0;
+            font-size: 1.15rem;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            color: white;
+            background-color: black;
+            border: 1.5px solid black;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .btn-custom-primary:hover {
+            background-color: #333;
+            border-color: #333;
+            color: white;
+        }
+
+        .btn-custom-danger {
+            border-radius: 0;
+            font-size: 1.15rem;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            color: black;
+            background-color: white;
+            border: 1.5px solid black;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .btn-custom-danger:hover {
+            background-color: white;
+            color: black;
+            border-color: black;
+        }
+
+        .badge {
+            font-size: 0.95rem;
+            padding: 0.4em 0.6em;
+            border-radius: 1rem;
+        }
+
+        .alert {
+            font-size: 1rem;
+            margin-top: 1rem;
+            border-radius: 0;
+        }
+
+        .form-control {
+            border-radius: 0;
+        }
+
+        .mt-4 {
+            padding-bottom: 4rem;
+        }
+
+        .actions-container {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+            gap: 0.5rem;
+        }
+
+        .modal-content {
+            border-radius: 0;
+            background-color: #d4ecff;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+        }
+
+        .modal-footer {
+            background-color: #d4ecff;
+            padding: 1rem 1.5rem;
+            justify-content: space-between;
+        }
+
+        .modal-footer .btn {
+            border-radius: 0;
+        }
+
+    </style>
+{% endblock %}
+
 {% block body %}
-    <h1>Mes Réservations</h1>
-    <p>Consultez ici vos réservations en cours ou passées.</p>
+    <div class="container mt-4">
+        <h1>Mes Réservations</h1>
+        <p>Consultez ici vos réservations en cours ou passées.</p>
 
-    {% for message in app.flashes('success') %}
-        <div class="alert alert-success">{{ message }}</div>
-    {% endfor %}
-    {% for message in app.flashes('danger') %}
-        <div class="alert alert-danger">{{ message }}</div>
-    {% endfor %}
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+        {% for message in app.flashes('danger') %}
+            <div class="alert alert-danger">{{ message }}</div>
+        {% endfor %}
 
-    {% if bookings is empty %}
-        <p>Aucune réservation trouvée.</p>
-    {% else %}
-        <div class="d-flex flex-column gap-3">
-            {% for booking in bookings %}
-                <div class="card shadow-sm border {% if booking.status == 'cancelled' %}border-secondary{% else %}border-primary{% endif %}">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <!-- Informations réparties en colonnes -->
-                            <div class="col-md-3">
-                                <p class="mb-1"><strong>Date & Heure :</strong><br>
-                                    {{ booking.timeslot.startDatetime|date('d/m/Y H:i') }} → {{ booking.timeslot.endDatetime|date('d/m/Y H:i') }}
-                                </p>
-                            </div>
-                            <div class="col-md-3">
-                                <p class="mb-1"><strong>Ressource :</strong><br>{{ booking.timeslot.resource.name }}</p>
-                                <p class="mb-1"><strong>Organisation :</strong><br>{{ booking.timeslot.resource.client.organizationName }}</p>
-                            </div>
-                            <div class="col-md-3">
-                                <p class="mb-1"><strong>Adresse :</strong><br>{{ booking.timeslot.resource.location }}</p>
-                                {% if booking.comment is not empty %}
-                                    <p class="mb-1"><strong>Commentaire :</strong><br>{{ booking.comment }}</p>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-2">
-                                <p class="mb-1"><strong>Statut :</strong><br>
-                                    {% if booking.status == 'cancelled' %}
-                                        <span class="badge bg-secondary">Annulée</span>
-                                    {% else %}
-                                        <span class="badge bg-info text-dark">Confirmée</span>
+        {% if bookings is empty %}
+            <p>Aucune réservation trouvée.</p>
+        {% else %}
+            <div class="d-flex flex-column gap-3">
+                {% for booking in bookings %}
+                    <div class="card shadow-sm border">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <p class="mb-1"><strong>Date & Heure : </strong>
+                                        {{ booking.timeslot.startDatetime|date('d/m/Y H:i') }} → {{ booking.timeslot.endDatetime|date('d/m/Y H:i') }}
+                                    </p>
+                                    <p class="mb-1"><strong>Ressource : </strong>{{ booking.timeslot.resource.name }}</p>
+                                    <p class="mb-1"><strong>Adresse : </strong>{{ booking.timeslot.resource.location }}</p>
+                                    <p class="mb-1"><strong>Organisation : </strong>{{ booking.timeslot.resource.client.organizationName }}</p>
+                                    {% if booking.comment is not empty %}
+                                        <p class="mb-1"><strong>Commentaire : </strong>{{ booking.comment }}</p>
                                     {% endif %}
-                                </p>
-                            </div>
-
-                            <!-- Boutons d'action à droite -->
-                            <div class="col-md-1 d-flex flex-column align-items-end gap-1">
-                                {% if booking.status != 'cancelled' %}
-                                    <form method="post" action="{{ path('user_booking_cancel', {id: booking.id}) }}" onsubmit="return confirm('Annuler cette réservation ?');">
-                                        <button type="submit" class="btn btn-outline-danger btn-sm">Annuler</button>
-                                    </form>
-                                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editCommentModal-{{ booking.id }}">
-                                        Modifier
-                                    </button>
-                                {% else %}
-                                    <span class="text-muted small text-end">Déjà annulée</span>
-                                {% endif %}
+                                    <p class="mb-1"><strong>Statut : </strong>
+                                        {% if booking.status == 'cancelled' %}
+                                            <span class="badge bg-secondary">Annulée</span>
+                                        {% else %}
+                                            <span class="badge bg-info text-dark">Confirmée</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="col-md-4 d-flex justify-content-end align-items-center">
+                                    <div class="actions-container">
+                                        {% if booking.status != 'cancelled' %}
+                                            <form method="post" action="{{ path('user_booking_cancel', {id: booking.id}) }}" onsubmit="return confirm('Annuler cette réservation ?');">
+                                                <button type="submit" class="btn btn-custom-danger btn-sm">Annuler</button>
+                                            </form>
+                                            <button type="button" class="btn btn-custom-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editCommentModal-{{ booking.id }}">
+                                                Modifier
+                                            </button>
+                                        {% else %}
+                                            <span class="text-muted small text-end">Déjà annulée</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Modal -->
-                <div class="modal fade" id="editCommentModal-{{ booking.id }}" tabindex="-1" aria-labelledby="editCommentModalLabel-{{ booking.id }}" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <form method="post" action="{{ path('user_booking_edit_comment', {id: booking.id}) }}">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="editCommentModalLabel-{{ booking.id }}">Modifier le commentaire</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <textarea name="comment" rows="4" class="form-control" required>{{ booking.comment }}</textarea>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                    <button type="submit" class="btn btn-success">Enregistrer</button>
-                                </div>
-                            </form>
+                    <div class="modal fade" id="editCommentModal-{{ booking.id }}" tabindex="-1" aria-labelledby="editCommentModalLabel-{{ booking.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="post" action="{{ path('user_booking_edit_comment', {id: booking.id}) }}">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editCommentModalLabel-{{ booking.id }}">Modifier le commentaire</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <textarea name="comment" rows="4" class="form-control" required>{{ booking.comment }}</textarea>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-custom-danger" data-bs-dismiss="modal">Annuler</button>
+                                        <button type="submit" class="btn btn-custom-primary">Enregistrer</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}
