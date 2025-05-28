@@ -1,51 +1,120 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        h1 { 
+            margin-top: 5rem; 
+            margin-bottom: 2rem;
+        }
+
+        .card { 
+            border-radius: 0; 
+            background-color: #d4ecff; 
+        }
+        .card .card-body { 
+            padding: 1.5rem; 
+            border: 1.5px solid; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center; /* Centrage vertical */
+            gap: 1.5rem;
+        }
+
+        /* Conteneur des infos (à gauche) */
+        .card-info {
+            flex-grow: 1;
+        }
+
+        /* Conteneur des boutons d’action */
+        .actions-container {
+            display: flex; 
+            flex-direction: row; 
+            gap: 0.5rem; 
+            margin-top: 0; 
+            min-width: 150px;
+        }
+
+        .btn-custom-primary, .btn-custom-danger {
+            border-radius: 0; 
+            font-size: 1.1rem; 
+            font-weight: 500;
+            padding: 0.4rem 0.8rem; 
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+        .btn-custom-primary {
+            color: white; 
+            background-color: black; 
+            border: 1.5px solid black;
+        }
+        .btn-custom-primary:hover {
+            background-color: #333; 
+            border-color: #333;
+        }
+        .btn-custom-danger {
+            color: black; 
+            background-color: white; 
+            border: 1.5px solid black;
+        }
+        .btn-custom-danger:hover {
+            background-color: white; 
+            color: black; 
+            border-color: #333;
+        }
+
+        /* Largeur du bouton ajouter ressource identique à une carte */
+        .btn-add-resource {
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
-    <h1>Gestion des ressources</h1>
+    <div class="container mt-4">
+        <h1>Gestion des ressources</h1>
 
-    <a href="{{ path('admin_resource_new') }}" class="btn btn-primary" style="margin-bottom: 15px;">
-        + Ajouter une ressource
-    </a>
+        <a href="{{ path('admin_resource_new') }}" class="btn btn-custom-danger btn-add-resource">
+            + Ajouter une ressource
+        </a>
 
-    {% if resources is empty %}
-        <p>Aucune ressource n'a encore été créée.</p>
-    {% else %}
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nom</th>
-                    <th>Client</th>
-                    <th>Organisation</th>
-                    <th>Type</th>
-                    <th>Localisation</th>
-                    <th>Capacité</th>
-                    <th>Créé le</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
+        {% if resources is empty %}
+            <p>Aucune ressource n'a encore été créée.</p>
+        {% else %}
+            <div class="d-flex flex-column gap-3">
                 {% for resource in resources %}
-                    <tr>
-                        <td>{{ resource.id }}</td>
-                        <td>{{ resource.name }}</td>
-                        <td>{{ resource.client.userAccount.firstName }} {{ resource.client.userAccount.lastName }}</td>
-                        <td>{{ resource.client.organizationName }}</td>
-                        <td>{{ resource.type }}</td>
-                        <td>{{ resource.location }}</td>
-                        <td>{{ resource.capacity }}</td>
-                        <td>{{ resource.createdAt|date('d/m/Y H:i') }}</td>
-                        <td>
-                            <a href="{{ path('admin_timeslot_index', {'resource': resource.id}) }}">Créneaux</a>
-                            <a href="{{ path('admin_resource_edit', {'id': resource.id}) }}">Modifier</a>
-                            <form action="{{ path('admin_resource_delete', {'id': resource.id}) }}" method="POST" style="display:inline;">
-                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ resource.id) }}">
-                                <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette ressource ?')">Supprimer</button>
-                            </form>
-                        </td>
-                    </tr>
+                    <div class="card shadow-sm border">
+                        <div class="card-body">
+                            <div class="card-info">
+                                <h4 class="card-title">{{ resource.name }}</h4>
+                                <p><strong>Client :</strong> {{ resource.client.userAccount.firstName }} {{ resource.client.userAccount.lastName }}</p>
+                                <p><strong>Organisation :</strong> {{ resource.client.organizationName }}</p>
+                                <p><strong>Type :</strong> {{ resource.type }}</p>
+                                <p><strong>Localisation :</strong> {{ resource.location }}</p>
+                                <p><strong>Capacité :</strong> {{ resource.capacity }}</p>
+                                <p><strong>Créée le :</strong> {{ resource.createdAt|date('d/m/Y H:i') }}</p>
+                            </div>
+
+                            <div class="actions-container">
+                                <a href="{{ path('admin_timeslot_index', {'resource': resource.id}) }}" 
+                                   class="btn-custom-danger" 
+                                   style="background-color:#d4ecff; text-decoration:none;">
+                                    Créneaux
+                                </a>
+                                <a href="{{ path('admin_resource_edit', {'id': resource.id}) }}" 
+                                   class="btn btn-custom-primary btn-sm">
+                                    Modifier
+                                </a>
+                                <form action="{{ path('admin_resource_delete', {'id': resource.id}) }}" method="POST" style="display:inline;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ resource.id) }}">
+                                    <button type="submit" class="btn btn-custom-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette ressource ?')">Supprimer</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}
