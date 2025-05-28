@@ -1,57 +1,71 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
+    {{ parent() }}
     <style>
-        h1 {
-            margin-top: 5rem;
+        h1 { 
+            margin-top: 5rem; 
+            margin-bottom: 2rem;
         }
 
-        .card {
-            border-radius: 0;
-            background-color: #d4ecff;
+        .card { 
+            border-radius: 0; 
+            background-color: #d4ecff; 
+        }
+        .card .card-body { 
+            padding: 1.5rem; 
+            border: 1.5px solid; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center; /* ← Centrage vertical */
+            gap: 1.5rem;
         }
 
-        .card .card-body {
-            padding: 1.5rem;
-            border: 1.5px solid;
+        /* Conteneur des infos (à gauche) */
+        .card-info {
+            flex-grow: 1;
+        }
+
+        /* Conteneur des boutons d’action */
+        .actions-container {
+            display: flex; 
+            flex-direction: row; 
+            gap: 0.5rem; 
+            margin-top: 0; 
+            min-width: 150px;
         }
 
         .btn-custom-primary, .btn-custom-danger {
-            border-radius: 0;
-            font-size: 1.1rem;
+            border-radius: 0; 
+            font-size: 1.1rem; 
             font-weight: 500;
-            padding: 0.4rem 0.8rem;
+            padding: 0.4rem 0.8rem; 
             transition: 0.3s;
+            white-space: nowrap;
         }
-
         .btn-custom-primary {
-            color: white;
-            background-color: black;
+            color: white; 
+            background-color: black; 
             border: 1.5px solid black;
         }
-
         .btn-custom-primary:hover {
-            background-color: #333;
+            background-color: #333; 
             border-color: #333;
         }
-
         .btn-custom-danger {
-            color: black;
-            background-color: white;
+            color: black; 
+            background-color: white; 
             border: 1.5px solid black;
         }
-
         .btn-custom-danger:hover {
-            background-color: white;
-            color: black;
+            background-color: white; 
+            color: black; 
             border-color: #333;
         }
 
-        .actions-container {
-            display: flex;
-            flex-direction: row;
-            gap: 0.5rem;
-            margin-top: 1rem;
+        /* Largeur du bouton ajouter ressource identique à une carte */
+        .btn-add-resource {
+            width: 100%;
         }
     </style>
 {% endblock %}
@@ -60,9 +74,14 @@
     <div class="container mt-4">
         <h1>Mes ressources</h1>
 
-        <a href="{{ path('client_resource_new') }}" class="btn btn-custom-primary mb-4">
+        <!-- Bouton déclencheur du modal de création -->
+        <button class="btn btn-custom-danger btn-add-resource mb-4"
+                style="padding: 1rem;"
+                data-bs-toggle="modal"
+                data-bs-target="#createModal"
+                data-resource-url="{{ path('client_resource_new') }}">
             + Ajouter une ressource
-        </a>
+        </button>
 
         {% for message in app.flashes('success') %}
             <div class="alert alert-success">{{ message }}</div>
@@ -78,18 +97,28 @@
                 {% for resource in resources %}
                     <div class="card shadow-sm border">
                         <div class="card-body">
-                            <h4 class="card-title">{{ resource.name }}</h4>
-                            <p><strong>Type :</strong> {{ resource.type }}</p>
-                            <p><strong>Localisation :</strong> {{ resource.location }}</p>
-                            <p><strong>Capacité :</strong> {{ resource.capacity }}</p>
-                            <p><strong>Créée le :</strong> {{ resource.createdAt|date('d/m/Y H:i') }}</p>
+                            <div class="card-info">
+                                <h4 class="card-title">{{ resource.name }}</h4>
+                                <p><strong>Type :</strong> {{ resource.type }}</p>
+                                <p><strong>Localisation :</strong> {{ resource.location }}</p>
+                                <p><strong>Capacité :</strong> {{ resource.capacity }}</p>
+                                <p><strong>Créée le :</strong> {{ resource.createdAt|date('d/m/Y H:i') }}</p>
+                            </div>
 
                             <div class="actions-container">
-                                <a href="{{ path('client_timeslot_index', {'resource': resource.id}) }}" class="btn btn-outline-dark btn-sm">Voir les créneaux</a>
-                                <button class="btn btn-custom-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-resource-url="{{ path('client_resource_edit', {'id': resource.id}) }}">
+                                <a href="{{ path('client_timeslot_index', {'resource': resource.id}) }}" 
+                                   class="btn-custom-danger" 
+                                   style="background-color:#d4ecff; text-decoration:none;">
+                                    Voir les créneaux
+                                </a>
+                                <button class="btn btn-custom-primary btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editModal"
+                                        data-resource-url="{{ path('client_resource_edit', {'id': resource.id}) }}">
                                     Modifier
                                 </button>
-                                <form method="post" action="{{ path('client_resource_delete', {'id': resource.id}) }}" onsubmit="return confirm('Confirmer la suppression ?');">
+                                <form method="post" action="{{ path('client_resource_delete', {'id': resource.id}) }}" 
+                                      onsubmit="return confirm('Confirmer la suppression ?');">
                                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ resource.id) }}">
                                     <button type="submit" class="btn btn-custom-danger btn-sm">Supprimer</button>
                                 </form>
@@ -101,7 +130,7 @@
         {% endif %}
     </div>
 
-    <!-- Modal Bootstrap -->
+    <!-- Modal d'Édition -->
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -115,44 +144,61 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal de Création -->
+    <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalLabel">Ajouter une nouvelle ressource</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body" id="createModalBody">
+                    <div class="text-center">Chargement...</div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const editModal = document.getElementById('editModal');
-            const modalBody = document.getElementById('editModalBody');
+            const loadFormIntoModal = (modalId, modalBodyId) => {
+                const modal = document.getElementById(modalId);
+                const modalBody = document.getElementById(modalBodyId);
 
-            editModal.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                const url = button.getAttribute('data-resource-url');
+                modal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const url = button.getAttribute('data-resource-url');
 
-                // Charge le formulaire d'édition dans le modal
-                fetch(url)
-                    .then(response => response.text())
-                    .then(html => {
-                        // Extraire uniquement le contenu du formulaire
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        const form = doc.querySelector('form');
+                    fetch(url)
+                        .then(response => response.text())
+                        .then(html => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            const form = doc.querySelector('form');
 
-                        if (form) {
-                            modalBody.innerHTML = '';
-                            modalBody.appendChild(form);
-                        } else {
+                            if (form) {
+                                modalBody.innerHTML = '';
+                                modalBody.appendChild(form);
+                            } else {
+                                modalBody.innerHTML = '<div class="alert alert-danger">Erreur lors du chargement du formulaire.</div>';
+                            }
+                        })
+                        .catch(() => {
                             modalBody.innerHTML = '<div class="alert alert-danger">Erreur lors du chargement du formulaire.</div>';
-                        }
-                    })
-                    .catch(() => {
-                        modalBody.innerHTML = '<div class="alert alert-danger">Erreur lors du chargement du formulaire.</div>';
-                    });
-            });
+                        });
+                });
 
-            // Nettoyage du contenu à la fermeture du modal
-            editModal.addEventListener('hidden.bs.modal', function () {
-                modalBody.innerHTML = '<div class="text-center">Chargement...</div>';
-            });
+                modal.addEventListener('hidden.bs.modal', function () {
+                    modalBody.innerHTML = '<div class="text-center">Chargement...</div>';
+                });
+            };
+
+            loadFormIntoModal('editModal', 'editModalBody');
+            loadFormIntoModal('createModal', 'createModalBody');
         });
     </script>
 {% endblock %}
