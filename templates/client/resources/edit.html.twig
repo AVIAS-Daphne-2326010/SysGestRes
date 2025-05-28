@@ -5,7 +5,7 @@
 {% block body %}
     <h1>Modifier la ressource</h1>
 
-    {{ form_start(form) }}
+    {{ form_start(form, { 'action': path('client_resource_edit', { id: resource.id }) }) }}
         {{ form_row(form.name) }}
 
         {{ form_row(form.type) }}
@@ -19,9 +19,11 @@
         {{ form_row(form.capacity) }}
         {{ form_row(form.description) }}
 
-        <button class="btn btn-primary">Enregistrer</button>
+        <div class="d-flex justify-content-end gap-2 mt-3">
+            <button type="submit" class="btn btn-custom-primary">Enregistrer</button>
+            <button type="button" class="btn btn-custom-primary" style="color: black; background-color: white; border: 1.5px solid;" data-bs-dismiss="modal">Annuler</button>
+        </div>
     {{ form_end(form) }}
-
 
     <a href="{{ path('client_resources') }}" class="btn btn-secondary mt-3">Retour à la liste des ressources</a>
 {% endblock %}

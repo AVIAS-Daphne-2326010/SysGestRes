@@ -34,7 +34,7 @@
 <body>
     {% include 'partials/_header.html.twig' %}
 
-    <main class="container my-4">
+    <main class="container{% if app.request.attributes.get('_route') != 'homepage' %} my-4{% endif %}">
         {% for message in app.flashes('error') %}
             <div class="alert alert-danger">{{ message }}</div>
         {% endfor %}
