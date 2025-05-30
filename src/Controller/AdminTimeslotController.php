@@ -116,22 +116,29 @@ class AdminTimeslotController extends AbstractController
         EntityManagerInterface $em
     ): Response {
         if ($this->isCsrfTokenValid('delete' . $timeslot->getId(), $request->request->get('_token'))) {
-            // Log suppression
+            // Optionnel : supprimer les logs liés au timeslot avant suppression
+            $logs = $em->getRepository(BookingHistory::class)->findBy(['timeslot' => $timeslot]);
+            foreach ($logs as $log) {
+                $em->remove($log);
+            }
+
             /** @var UserAccount $user */
             $user = $this->getUser();
 
+            // Log suppression sans associer le timeslot (pour éviter FK)
             $log = new BookingHistory();
             $log->setStatus('Suppression de créneau')
                 ->setChangedAt(new \DateTime())
                 ->setChangedBy($user->getUsername())
                 ->setUserAccount($user)
-                ->setResource($resource) // Associe la ressource au log
-                ->setTimeslot($timeslot); // Associe le créneau au log
+                ->setResource($resource);
+                // Ne pas faire $log->setTimeslot($timeslot);
 
             $em->persist($log);
-            $em->flush();
 
+            // Supprimer le timeslot
             $em->remove($timeslot);
+
             $em->flush();
 
             $this->addFlash('success', 'Le créneau a bien été supprimé.');
@@ -141,4 +148,5 @@ class AdminTimeslotController extends AbstractController
 
         return $this->redirectToRoute('admin_timeslot_index', ['resource' => $resource->getId()]);
     }
+
 }

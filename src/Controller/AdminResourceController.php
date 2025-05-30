@@ -136,11 +136,4 @@ class AdminResourceController extends AbstractController
         return $this->redirectToRoute('admin_resources');
     }
 
-    #[Route('/{id}', name: 'admin_resource_show', methods: ['GET'])]
-    public function show(Resource $resource): Response
-    {
-        return $this->render('admin/resources/show.html.twig', [
-            'resource' => $resource,
-        ]);
-    }
 }

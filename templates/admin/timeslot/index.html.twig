@@ -5,140 +5,179 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        h1 {
+            margin-top: 5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            border-radius: 0;
+            background-color: #d4ecff;
+            margin: 1rem;
+        }
+
+        .card .card-body,
+        .card {
+            border: 1.5px solid;
+        }
+
+        .card .badge {
+            padding: 0.4rem 0.6rem;
+            font-size: 0.9rem;
+            border-radius: 0.25rem;
+            white-space: nowrap;
+        }
+
+        .bg-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .bg-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-custom-primary,
+        .btn-custom-danger {
+            border-radius: 0;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .btn-custom-primary {
+            color: white;
+            background-color: black;
+            border: 1.5px solid black;
+        }
+
+        .btn-custom-primary:hover {
+            background-color: #333;
+            border-color: #333;
+        }
+
+        .btn-custom-danger {
+            color: black;
+            background-color: white;
+            border: 1.5px solid black;
+        }
+
+        .btn-custom-danger:hover {
+            background-color: white;
+            color: black;
+            border-color: #333;
+        }
+
+        .timeslot-card {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            padding: 1rem;
+            border: 1px solid black;
+        }
+
+        .timeslot-info {
+            flex-grow: 1;
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .timeslot-info p {
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .timeslot-actions {
+            display: flex;
+            flex-direction: row;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .add-timeslot-btn {
+            margin: 1rem;
+            border-radius: 0;
+            background-color: none;
+            border: 1.5px solid black;
+            padding: 0.75rem 1rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-align: center;
+            text-decoration: none;
+            color: black;
+            display: block;
+            width: auto;
+            white-space: nowrap;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .add-timeslot-btn:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
 {% endblock %}
 
 {% block body %}
 <div class="container">
-    <h1 class="my-4">Créneaux pour la ressource : {{ resource.name }}</h1>
+    <h1 class="text-3xl font-bold">Créneaux pour la ressource : {{ resource.name }}</h1>
 
-    <div class="mb-4">
-        <a href="{{ path('admin_timeslot_new', { 'resource': resource.id }) }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> + Ajouter un créneau
-        </a>
-    </div>
+    <a href="{{ path('admin_timeslot_new', { 'resource': resource.id }) }}" class="add-timeslot-btn">
+        + Ajouter un créneau
+    </a>
 
     {% if timeslots is empty %}
-        <div class="alert alert-info">
+        <div class="alert alert-info" style="margin: 1rem;">
             Aucun créneau disponible pour cette ressource.
         </div>
     {% else %}
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover" id="timeslots-table">
-                <thead class="thead-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Début</th>
-                        <th>Fin</th>
-                        <th>Statut</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for timeslot in timeslots %}
-                        <tr id="timeslot-{{ timeslot.id }}">
-                            <td>{{ timeslot.id }}</td>
-                            <td>{{ timeslot.startDatetime|date('d/m/Y H:i') }}</td>
-                            <td>{{ timeslot.endDatetime|date('d/m/Y H:i') }}</td>
-                            <td>
-                                {% if timeslot.isAvailable %}
-                                    <span class="badge bg-success">Disponible</span>
-                                {% else %}
-                                    <span class="badge bg-danger">Indisponible</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <a href="{{ path('admin_timeslot_edit', {
-                                        'resource': resource.id,
-                                        'timeslot_id': timeslot.id
-                                    }) }}" class="btn btn-warning me-2" title="Modifier">
-                                        <i class="fas fa-edit"></i> <span class="d-none d-md-inline">Modifier</span>
-                                    </a>
-
-                                    <form method="post" action="{{ path('admin_timeslot_delete', {
-                                        'resource': resource.id,
-                                        'timeslot_id': timeslot.id
-                                    }) }}" class="d-inline">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ timeslot.id) }}">
-                                        <button type="submit" class="btn btn-danger" title="Supprimer">
-                                            <i class="fas fa-trash-alt"></i> <span class="d-none d-md-inline">Supprimer</span>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+        {% for timeslot in timeslots %}
+            <div class="card shadow-sm border" id="timeslot-{{ timeslot.id }}">
+                <div class="timeslot-card">
+                    <div class="timeslot-info">
+                        <h2 class="text-lg font-semibold inline-block mr-2">Créneau #{{ timeslot.id }}</h2>
+                        <p><strong>Début :</strong> {{ timeslot.startDatetime|date('d/m/Y H:i') }}</p>
+                        <p><strong>Fin :</strong> {{ timeslot.endDatetime|date('d/m/Y H:i') }}</p>
+                        <span class="badge {{ timeslot.isAvailable ? 'bg-success' : 'bg-danger' }}">
+                            {{ timeslot.isAvailable ? 'Disponible' : 'Indisponible' }}
+                        </span>
+                    </div>
+                    <div class="timeslot-actions">
+                        <a href="{{ path('admin_timeslot_edit', {
+                            'resource': resource.id,
+                            'timeslot_id': timeslot.id
+                        }) }}" class="btn btn-custom-primary">
+                            Modifier
+                        </a>
+                        <form method="post" action="{{ path('admin_timeslot_delete', {
+                            'resource': resource.id,
+                            'timeslot_id': timeslot.id
+                        }) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ timeslot.id) }}">
+                            <button type="submit" class="btn btn-custom-danger delete-timeslot"
+                                    data-timeslot-id="{{ timeslot.id }}"
+                                    data-resource-id="{{ resource.id }}">
+                                Supprimer
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
     {% endif %}
-    <div class="mb-4">
-        <a href="{{ path('admin_resources') }}" class="btn btn-secondary">
+
+    <div class="mt-6">
+        <a href="{{ path('admin_resources') }}" class="btn-custom-primary" style="text-decoration: none;">
             <i class="fas fa-arrow-left"></i> Retour aux ressources
         </a>
     </div>
 </div>
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Suppression AJAX
-            document.querySelectorAll('.delete-timeslot').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    const timeslotId = this.getAttribute('data-timeslot-id');
-                    const resourceId = this.getAttribute('data-resource-id');
-                    
-                    Swal.fire({
-                        title: 'Êtes-vous sûr ?',
-                        text: "Cette action est irréversible !",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
-                        confirmButtonText: 'Oui, supprimer !',
-                        cancelButtonText: 'Annuler'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            fetch(`/admin/resource/${resourceId}/timeslots/${timeslotId}/delete`, {
-                                method: 'POST',
-                                headers: {
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                    _token: document.querySelector(`#timeslot-${timeslotId} input[name="_token"]`).value
-                                })
-                            })
-                            .then(response => {
-                                if (response.ok) {
-                                    Swal.fire(
-                                        'Supprimé !',
-                                        'Le créneau a été supprimé.',
-                                        'success'
-                                    );
-                                    document.querySelector(`#timeslot-${timeslotId}`).remove();
-                                } else {
-                                    Swal.fire(
-                                        'Erreur !',
-                                        'La suppression a échoué.',
-                                        'error'
-                                    );
-                                }
-                            })
-                            .catch(error => {
-                                Swal.fire(
-                                    'Erreur !',
-                                    'Une erreur est survenue.',
-                                    'error'
-                                );
-                            });
-                        }
-                    });
-                });
-            });
-        });
-    </script>
 {% endblock %}
