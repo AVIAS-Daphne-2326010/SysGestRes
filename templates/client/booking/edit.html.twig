@@ -2,14 +2,54 @@
 
 {% block title %}Modifier Réservation{% endblock %}
 
-{% block body %}
-<h1 class="mb-4">Modifier le commentaire</h1>
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        h1 {
+            margin-top: 3rem;
+            text-align: center;
+        }
 
-{{ form_start(form) }}
-    {{ form_row(form.comment) }}
-    <div class="d-flex gap-2 mt-3">
-        <button class="btn btn-primary">Enregistrer</button>
-        <a href="{{ path('client_bookings') }}" class="btn btn-secondary">Annuler</a>
-    </div>
-{{ form_end(form) }}
+        .form-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-control {
+            border-radius: 0;
+        }
+
+        .btn-primary,
+        .btn-primary:hover {
+            border-radius: 0;
+            color: white;
+            background-color: black;
+            border: none;
+        }
+
+        .btn-secondary {
+            border-radius: 0;
+            color: black;
+            background-color: white;
+        }
+
+        .d-flex.gap-2.mt-3 {
+            margin-bottom: 3rem;
+            justify-content: flex-end;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="form-wrapper">
+    <h1 class="mb-4">Modifier le commentaire</h1>
+
+    {{ form_start(form) }}
+        {{ form_row(form.comment) }}
+        <div class="d-flex gap-2 mt-3">
+            <a href="{{ path('client_bookings') }}" class="btn btn-secondary">Annuler</a>
+            <button class="btn btn-primary">Enregistrer</button>
+        </div>
+    {{ form_end(form) }}
+</div>
 {% endblock %}

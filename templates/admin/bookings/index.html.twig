@@ -2,58 +2,148 @@
 
 {% block title %}Réservations (Admin){% endblock %}
 
-{% block body %}
-<h1 class="mb-4">Toutes les réservations</h1>
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        h1 {
+            margin-top: 3rem;
+        }
 
-{% if bookings is empty %}
-    <p>Aucune réservation trouvée.</p>
-{% else %}
-    <div class="d-flex flex-column gap-3">
-        {% for booking in bookings %}
-            <div class="card shadow-sm p-3">
-                <div class="row align-items-center">
-                    <div class="col-md">
-                        <strong>ID :</strong> {{ booking.id }}
-                    </div>
-                    <div class="col-md">
-                        <strong>Utilisateur :</strong>
-                        {{ booking.userAccount.firstName }} {{ booking.userAccount.lastName }}
-                        ({{ booking.userAccount.email }})
-                    </div>
-                    <div class="col-md">
-                        <strong>Créneau :</strong> {{ booking.timeslot.startDatetime|date('d/m/Y') }}
-                    </div>
-                    <div class="col-md">
-                        <strong>Ressource :</strong> {{ booking.timeslot.resource.name }}
-                    </div>
-                    <div class="col-md">
-                        <strong>Début / Fin :</strong>
-                        {{ booking.timeslot.startDatetime|date('H:i') }} - {{ booking.timeslot.endDatetime|date('H:i') }}
-                    </div>
-                    <div class="col-md">
-                        <strong>Commentaire :</strong> {{ booking.comment ?: '—' }}
-                    </div>
-                    <div class="col-md">
-                        <strong>Statut :</strong>
-                        {% if booking.status == 'cancelled' %}
-                            <span class="badge bg-secondary">Annulée</span>
-                        {% else %}
-                            <span class="badge bg-success">Confirmée</span>
-                        {% endif %}
-                    </div>
-                    <div class="col-md-auto d-flex gap-2">
-                        {% if booking.status != 'cancelled' %}
-                            <a href="{{ path('admin_booking_edit', { id: booking.id }) }}" class="btn btn-sm btn-outline-primary">Modifier</a>
-                            <form method="post" action="{{ path('admin_booking_delete', { id: booking.id }) }}" onsubmit="return confirm('Confirmer la suppression ?');">
-                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ booking.id) }}">
-                                <input type="hidden" name="_method" value="DELETE">
-                                <button class="btn btn-sm btn-outline-danger">Supprimer</button>
-                            </form>
-                        {% endif %}
+        p {
+            font-size: 1.15rem;
+        }
+
+        .card {
+            border-radius: 0;
+            background-color: #d4ecff;
+        }
+
+        .card .card-body {
+            padding: 1.5rem;
+            border: 1.5px solid;
+        }
+
+        .btn-custom-primary {
+            border-radius: 0;
+            font-size: 1.15rem;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            color: white;
+            background-color: black;
+            border: 1.5px solid black;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .btn-custom-primary:hover {
+            background-color: #333;
+            border-color: #333;
+            color: white;
+        }
+
+        .btn-custom-danger {
+            border-radius: 0;
+            font-size: 1.15rem;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            color: black;
+            background-color: white;
+            border: 1.5px solid black;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .btn-custom-danger:hover {
+            background-color: #f8d7da;
+            color: black;
+            border-color: black;
+        }
+
+        .badge {
+            font-size: 0.95rem;
+            padding: 0.4em 0.6em;
+            border-radius: 1rem;
+        }
+
+        .alert {
+            font-size: 1rem;
+            margin-top: 1rem;
+            border-radius: 0;
+        }
+
+        .mt-4 {
+            margin-top: 1.5rem !important;
+        }
+
+        .pb-4 {
+            padding-bottom: 4rem !important;
+        }
+
+        .actions-container {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+            gap: 0.5rem;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4 pb-4">
+    <h1 class="mb-4">Toutes les réservations</h1>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+    {% for message in app.flashes('danger') %}
+        <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
+
+    {% if bookings is empty %}
+        <p>Aucune réservation trouvée.</p>
+    {% else %}
+        <div class="d-flex flex-column gap-3">
+            {% for booking in bookings %}
+                <div class="card shadow-sm border">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md">
+                                <p class="mb-1"><strong>ID :</strong> {{ booking.id }}</p>
+                                <p class="mb-1"><strong>Utilisateur :</strong>
+                                    {{ booking.userAccount.firstName }} {{ booking.userAccount.lastName }}
+                                    ({{ booking.userAccount.email }})
+                                </p>
+                                <p class="mb-1"><strong>Créneau :</strong> {{ booking.timeslot.startDatetime|date('d/m/Y') }}</p>
+                                <p class="mb-1"><strong>Ressource :</strong> {{ booking.timeslot.resource.name }}</p>
+                                <p class="mb-1"><strong>Début / Fin :</strong>
+                                    {{ booking.timeslot.startDatetime|date('H:i') }} - {{ booking.timeslot.endDatetime|date('H:i') }}
+                                </p>
+                                <p class="mb-1"><strong>Commentaire :</strong> {{ booking.comment ?: '—' }}</p>
+                                <p class="mb-1"><strong>Statut :</strong>
+                                    {% if booking.status == 'cancelled' %}
+                                        <span class="badge bg-secondary">Annulée</span>
+                                    {% else %}
+                                        <span class="badge bg-info text-dark">Confirmée</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="col-md-auto d-flex gap-2 align-items-end">
+                                {% if booking.status != 'cancelled' %}
+                                    <div class="actions-container">
+                                        <a href="{{ path('admin_booking_edit', { id: booking.id }) }}" class="btn btn-custom-primary btn-sm">Modifier</a>
+                                        <form method="post" action="{{ path('admin_booking_delete', { id: booking.id }) }}" onsubmit="return confirm('Confirmer la suppression ?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ booking.id) }}">
+                                            <input type="hidden" name="_method" value="DELETE">
+                                            <button class="btn btn-custom-danger btn-sm">Supprimer</button>
+                                        </form>
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted small text-end">Déjà annulée</span>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% endfor %}
-    </div>
-{% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
 {% endblock %}
