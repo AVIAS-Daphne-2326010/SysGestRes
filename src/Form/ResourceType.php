@@ -26,7 +26,7 @@ class ResourceType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        // Récupère les types distincts depuis la base
+
         $types = $this->em->getRepository(Resource::class)
             ->createQueryBuilder('r')
             ->select('DISTINCT r.type')
@@ -43,7 +43,7 @@ class ResourceType extends AbstractType
             ->add('type', TextType::class, [
                 'required' => false,
                 'attr' => [
-                    'list' => 'resource_type_options', // lien avec le datalist dans le template
+                    'list' => 'resource_type_options', 
                 ],
                 'label' => 'Type de ressource',
             ])

@@ -42,7 +42,6 @@ class AdminUserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Le mot de passe est obligatoire pour la création
             $plainPassword = $form->get('password')->getData();
             $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
             $user->setPassword($hashedPassword);
@@ -50,7 +49,6 @@ class AdminUserController extends AbstractController
             $role = $form->get('role')->getData();
             $user->setRole($role);
 
-            // Persist et flush d'abord l'utilisateur pour obtenir un ID
             $em->persist($user);
             $em->flush();
 
@@ -60,7 +58,7 @@ class AdminUserController extends AbstractController
                     $clientData->setUserAccount($user);
                     $user->setClient($clientData);
                     $em->persist($clientData);
-                    $em->flush(); // Second flush pour le client
+                    $em->flush();
                 }
             }
 
@@ -95,7 +93,6 @@ class AdminUserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Gestion du mot de passe
             if ($newPassword = $form->get('password')->getData()) {
                 $user->setPassword($passwordHasher->hashPassword($user, $newPassword));
             } else {
@@ -105,23 +102,19 @@ class AdminUserController extends AbstractController
             $newRole = $form->get('role')->getData();
             $user->setRole($newRole);
 
-            // Gestion du client
             if ($newRole->getName() === 'ROLE_CLIENT') {
                 $clientData = $form->get('client')->getData();
                 if ($clientData) {
                     if ($currentClient) {
-                        // Mettre à jour le client existant
                         $currentClient->setOrganizationName($clientData->getOrganizationName());
                         $currentClient->setAddress($clientData->getAddress());
                     } else {
-                        // Créer un nouveau client
                         $clientData->setUserAccount($user);
                         $user->setClient($clientData);
                         $em->persist($clientData);
                     }
                 }
             } else {
-                // Si le rôle n'est plus client, vérifier s'il y a des ressources associées
                 if ($currentClient) {
                     $resources = $em->getRepository(Resource::class)->findBy(['client' => $currentClient]);
                     if (count($resources) > 0) {

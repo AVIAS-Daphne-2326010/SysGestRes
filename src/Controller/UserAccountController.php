@@ -118,9 +118,9 @@ class UserAccountController extends AbstractController
         return $this->render('user/ressource/show.html.twig', [
             'resources' => $resources,
             'type' => $type,
-            'q' => $q, // J'ai changé 'search_query' en 'q'
-            'location' => $location, // J'ai changé 'search_location' en 'location'
-            'capacity' => $capacity, // J'ai changé 'search_capacity' en 'capacity'
+            'q' => $q, 
+            'location' => $location,
+            'capacity' => $capacity,
         ]);
     }
 

@@ -211,15 +211,12 @@
                         return;
                     }
 
-                    // Remplir les infos dans la modale
                     document.getElementById('startTime').textContent = event.start.toLocaleString();
                     document.getElementById('endTime').textContent = event.end.toLocaleString();
                     document.getElementById('bookingForm').dataset.timeslotId = event.id;
 
-                    // Réinitialiser le commentaire
                     document.getElementById('comment').value = '';
 
-                    // Afficher la modale Bootstrap
                     const bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
                     bookingModal.show();
                 }
@@ -227,7 +224,6 @@
 
             calendar.render();
 
-            // Gestion de la soumission du formulaire de réservation
             document.getElementById('bookingForm').addEventListener('submit', function (e) {
                 e.preventDefault();
 
@@ -250,7 +246,7 @@
                 .then(data => {
                     if (data.success) {
                         alert(data.message);
-                        calendar.refetchEvents(); // Recharge les créneaux pour afficher la mise à jour
+                        calendar.refetchEvents(); 
                     } else {
                         alert('Erreur: ' + (data.error || 'Impossible de créer la réservation.'));
                     }

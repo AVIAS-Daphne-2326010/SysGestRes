@@ -36,7 +36,6 @@ class RegistrationController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                // Encodage du mot de passe
                 $user->setPassword(
                     $userPasswordHasher->hashPassword(
                         $user,
@@ -44,23 +43,21 @@ class RegistrationController extends AbstractController
                     )
                 );
 
-                // Vérification des champs pour déterminer le rôle
                 if ($form->get('organizationName')->getData() && $form->get('address')->getData()) {
-                    // Rôle client
+
                     $clientRole = $em->getRepository(Role::class)->findOneBy(['name' => 'client']);
                     if (!$clientRole) {
                         throw new \Exception("Le rôle 'client' n'existe pas dans la base de données.");
                     }
                     $user->setRole($clientRole);
 
-                    // Création du client
                     $client = new Client();
                     $client->setOrganizationName($form->get('organizationName')->getData())
                         ->setAddress($form->get('address')->getData())
                         ->setUserAccount($user);
                     $em->persist($client);
                 } else {
-                    // Rôle utilisateur standard
+
                     $userRole = $em->getRepository(Role::class)->findOneBy(['name' => 'user']);
                     if (!$userRole) {
                         throw new \Exception("Le rôle 'user' n'existe pas dans la base de données.");
@@ -108,24 +105,21 @@ class RegistrationController extends AbstractController
     public function updateUser(
         Request $request,
         EntityManagerInterface $em,
-        UserAccount $user // L'utilisateur que tu modifies
+        UserAccount $user
     ): Response {
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
     
         if ($form->isSubmitted() && $form->isValid()) {
-            // Vérification des champs pour déterminer le rôle
             if ($form->get('organizationName')->getData() && $form->get('address')->getData()) {
-                // Rôle client
+
                 $clientRole = $em->getRepository(Role::class)->findOneBy(['name' => 'client']);
                 if (!$clientRole) {
                     throw new \Exception("Le rôle 'client' n'existe pas dans la base de données.");
                 }
                 $user->setRole($clientRole);
     
-                // Vérifier si l'utilisateur a déjà un client associé
                 if (!$user->getClient()) {
-                    // Si non, créer un nouveau client
                     $client = new Client();
                     $client->setOrganizationName($form->get('organizationName')->getData())
                         ->setAddress($form->get('address')->getData())
@@ -133,7 +127,6 @@ class RegistrationController extends AbstractController
                     $em->persist($client);
                 }
             } else {
-                // Rôle utilisateur standard
                 $userRole = $em->getRepository(Role::class)->findOneBy(['name' => 'user']);
                 if (!$userRole) {
                     throw new \Exception("Le rôle 'user' n'existe pas dans la base de données.");
@@ -141,7 +134,6 @@ class RegistrationController extends AbstractController
                 $user->setRole($userRole);
             }
     
-            // Mettre à jour les autres informations de l'utilisateur
             $em->persist($user);
             $em->flush();
     

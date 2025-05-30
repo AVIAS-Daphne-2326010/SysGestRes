@@ -50,7 +50,6 @@ class ClientBookingController extends AbstractController
     #[Route('/booking/{id}/edit', name: 'booking_edit')]
     public function edit(Booking $booking, Request $request, EntityManagerInterface $em): Response
     {
-        // Vérification que la réservation n'est pas annulée
         if ($booking->getStatus() === 'cancelled') {
             $this->addFlash('warning', 'Impossible de modifier une réservation annulée.');
             return $this->redirectToRoute('client_bookings');
@@ -80,7 +79,6 @@ class ClientBookingController extends AbstractController
         }
 
         if ($this->isCsrfTokenValid('delete' . $booking->getId(), $request->request->get('_token'))) {
-            // Rendre le créneau disponible avant suppression
             $timeslot = $booking->getTimeslot();
             $timeslot->setIsAvailable(true);
 

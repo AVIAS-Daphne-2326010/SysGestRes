@@ -106,7 +106,6 @@ class AdminResourceController extends AbstractController
     public function delete(Request $request, Resource $resource, EntityManagerInterface $em): Response
     {
         if ($this->isCsrfTokenValid('delete' . $resource->getId(), $request->request->get('_token'))) {
-            // Supprimer les logs liés à cette ressource
             $logs = $em->getRepository(BookingHistory::class)->findBy(['resource' => $resource]);
             foreach ($logs as $log) {
                 $em->remove($log);
@@ -115,17 +114,15 @@ class AdminResourceController extends AbstractController
             /** @var UserAccount $user */
             $user = $this->getUser();
 
-            // Créer un log de suppression *sans* référence à la ressource (éviter la contrainte FK)
+
             $log = new BookingHistory();
             $log->setStatus('Suppression de ressource')
                 ->setChangedAt(new \DateTime())
                 ->setChangedBy($user->getUsername())
                 ->setUserAccount($user);
-                // ->setResource($resource); // Ne pas lier
 
             $em->persist($log);
 
-            // Supprimer la ressource
             $em->remove($resource);
 
             $em->flush();

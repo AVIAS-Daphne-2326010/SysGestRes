@@ -23,14 +23,14 @@ class TimeslotType extends AbstractType
                 'widget' => 'single_text',
             ])
             ->add('is_available', ChoiceType::class, [
-                'label' => false, // On désactive le label automatique
+                'label' => false, 
                 'choices' => [
                     'Disponible' => true,
                     'Indisponible' => false,
                 ],
                 'expanded' => true,
                 'multiple' => false,
-                'label_attr' => ['class' => 'd-none'], // Cache les labels automatiques
+                'label_attr' => ['class' => 'd-none'],
             ]);
     }
 

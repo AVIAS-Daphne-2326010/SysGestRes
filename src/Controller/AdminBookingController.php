@@ -103,11 +103,9 @@ class AdminBookingController extends AbstractController
         $submittedToken = $request->request->get('_token');
 
         if ($csrfTokenManager->isTokenValid(new CsrfToken('delete' . $booking->getId(), $submittedToken))) {
-            // Annuler la réservation au lieu de la supprimer
             $booking->setStatus('cancelled');
             $booking->setCancelledAt(new \DateTime());
 
-            // Libérer le créneau
             $booking->getTimeslot()?->setIsAvailable(true);
 
             /** @var UserAccount $user */

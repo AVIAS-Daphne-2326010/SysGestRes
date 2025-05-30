@@ -57,7 +57,6 @@ class UserAccountType extends AbstractType
                 'by_reference' => false,
             ]);
 
-        // 🔗 Lier le client à l'utilisateur si le formulaire contient un client
         $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
             $user = $event->getData();
             $client = $user->getClient();

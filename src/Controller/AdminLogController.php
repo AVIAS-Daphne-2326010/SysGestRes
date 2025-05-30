@@ -45,7 +45,7 @@ class AdminLogController extends AbstractController
             $request->query->getInt('page', 1),
             20,
             [
-                'template' => 'pagination.html.twig', // <-- Utilisation de ton template personnalisé
+                'template' => 'pagination.html.twig',
             ]
         );
 

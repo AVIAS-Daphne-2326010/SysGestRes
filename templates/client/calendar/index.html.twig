@@ -6,15 +6,11 @@
     {{ parent() }}
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
     <style>
-        /* Styles identiques au calendrier utilisateur */
-
-        /* Couleur des numéros des jours */
         .fc-daygrid-day-number {
             color: black;
             text-decoration: none;
         }
 
-        /* En-tête de jour (lundi, mardi, etc.) */
         .fc-col-header-cell {
             background-color: white !important;
         }
@@ -29,12 +25,10 @@
             background: #d4ecff;
         }
 
-        /* Cellules de jours */
         .fc-daygrid-day {
             border: 1px solid #ccc;
         }
 
-        /* Événements */
         .fc-event {
             border: none;
             border-radius: 4px;
@@ -42,7 +36,6 @@
             font-size: 0.85rem;
         }
 
-        /* Titre du mois */
         .fc-toolbar-title {
             font-size: 2rem;
             font-weight: bold;
@@ -52,7 +45,6 @@
             padding: 0.5rem 25rem;
         }
 
-        /* Boutons navigation */
         .fc-button {
             background-color: #027bdb;
             border: none;
@@ -72,7 +64,6 @@
             cursor: default;
         }
 
-        /* Spécifique au calendrier client */
         #calendar {
             max-width: 1100px;
             margin: 40px auto;
@@ -114,7 +105,7 @@
                     center: 'title',
                     right: 'prev,next'
                 },
-                events: '/api/timeslots', // adapte l'URL si besoin
+                events: '/api/timeslots',
                 eventClick: function(info) {
                     const event = info.event;
                     const props = event.extendedProps;

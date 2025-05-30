@@ -54,7 +54,6 @@ class UserController extends AbstractController
     #[Route('/user/resources', name: 'user_resources')]
     public function resources(EntityManagerInterface $entityManager): Response
     {
-        // Requête DQL pour obtenir les types distincts
         $types = $entityManager->createQuery(
             'SELECT DISTINCT r.type FROM App\Entity\Resource r'
         )->getSingleColumnResult();

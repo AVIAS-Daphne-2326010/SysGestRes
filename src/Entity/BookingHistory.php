@@ -25,7 +25,7 @@ class BookingHistory
     #[ORM\JoinColumn(name: "booking_id", referencedColumnName: "booking_id", nullable: true)] 
     private ?Booking $booking = null;
 
-    // Ajout de la relation Resource
+
     #[ORM\ManyToOne(targetEntity: Resource::class)]
     #[ORM\JoinColumn(name: "resource_id", referencedColumnName: "resource_id", nullable: true)] 
     private ?Resource $resource = null;

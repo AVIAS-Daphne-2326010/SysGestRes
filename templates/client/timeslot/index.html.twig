@@ -75,7 +75,7 @@
         .timeslot-card {
             display: flex;
             flex-direction: row;
-            flex-wrap: wrap; /* Permet le retour à la ligne si trop large */
+            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
             gap: 2rem;
@@ -85,16 +85,15 @@
 
         .timeslot-info {
             flex-grow: 1;
-            display: flex;           /* Affiche les enfants en ligne */
-            flex-wrap: nowrap;       /* Ne pas laisser les enfants se casser en plusieurs lignes */
+            display: flex;          
+            flex-wrap: nowrap;      
             align-items: center;
             gap: 1rem;
         }
 
-        /* Pour forcer les <p> à ne pas avoir de marge et s’aligner horizontalement */
         .timeslot-info p {
             margin: 0;
-            white-space: nowrap; /* Empêche le texte de se couper */
+            white-space: nowrap; 
         }
 
         .timeslot-actions {
@@ -104,7 +103,6 @@
             align-items: center;
         }
 
-        /* Bouton "Ajouter" qui ressemble à une carte */
         .add-timeslot-btn {
             margin: 1rem; 
             border-radius: 0;

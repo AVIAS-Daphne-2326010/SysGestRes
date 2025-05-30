@@ -15,7 +15,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/api/bookings')]
 class BookingApiController extends AbstractController
 {
-    // Liste des réservations sous forme d'événements pour FullCalendar
     #[Route('', name: 'api_bookings_list', methods: ['GET'])]
     public function list(EntityManagerInterface $entityManager): JsonResponse
     {
@@ -58,15 +57,13 @@ class BookingApiController extends AbstractController
             return new JsonResponse(['error' => 'Créneau déjà réservé'], 400);
         }
 
-        // Création de la réservation
         $booking = new Booking();
         $booking->setUserAccount($user);
         $booking->setTimeslot($timeslot);
         $booking->setCreatedAt(new \DateTime());
         $booking->setStatus('confirmed');
-        $booking->setComment($comment); // ← Et ici
+        $booking->setComment($comment); 
 
-        // Mettre le créneau en indisponible
         $timeslot->setIsAvailable(false);
 
         $entityManager->persist($booking);

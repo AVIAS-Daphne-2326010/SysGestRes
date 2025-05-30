@@ -10,7 +10,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class DashboardController extends AbstractController
 {
-    // Route pour le tableau de bord Admin
     #[Route('/admin/dashboard', name: 'admin_dashboard')]
     #[IsGranted('ROLE_ADMIN')]
     public function adminDashboard(EntityManagerInterface $em): Response
@@ -35,7 +34,6 @@ class DashboardController extends AbstractController
         ]);
     }
 
-    // Route pour le tableau de bord Client
     #[Route('/client/dashboard', name: 'client_dashboard')]
     public function clientDashboard(EntityManagerInterface $em): Response
     {
@@ -48,7 +46,6 @@ class DashboardController extends AbstractController
 
         $client = $user->getClient();
 
-        // Récupérer les 3 prochaines réservations non annulées (même passées)
         $bookings = $em->createQuery(
             'SELECT b, t, r, u
             FROM App\Entity\Booking b
@@ -70,7 +67,6 @@ class DashboardController extends AbstractController
         ]);
     }
 
-    // Route pour le tableau de bord Utilisateur (par défaut)
     #[Route('/user/dashboard', name: 'user_dashboard')]
     public function userDashboard(EntityManagerInterface $em): Response
     {
@@ -92,7 +88,7 @@ class DashboardController extends AbstractController
         ->setMaxResults(1)
         ->getOneOrNullResult();
 
-        return $this->render('user/dashboard.html.twig', [  // Correct path to user dashboard
+        return $this->render('user/dashboard.html.twig', [
             'prenom' => $user->getFirstName(),
             'nextBooking' => $nextBooking
         ]);

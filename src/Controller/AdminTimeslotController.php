@@ -42,7 +42,6 @@ class AdminTimeslotController extends AbstractController
             $em->persist($timeslot);
             $em->flush();
 
-            // Log creation
             /** @var UserAccount $user */
             $user = $this->getUser();
 
@@ -52,7 +51,7 @@ class AdminTimeslotController extends AbstractController
                 ->setChangedBy($user->getUsername())
                 ->setUserAccount($user)
                 ->setResource($resource)
-                ->setTimeslot($timeslot); // Associe le créneau au log
+                ->setTimeslot($timeslot); 
 
             $em->persist($log);
             $em->flush();
@@ -81,7 +80,6 @@ class AdminTimeslotController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
 
-            // Log modification
             /** @var UserAccount $user */
             $user = $this->getUser();
 
@@ -90,8 +88,8 @@ class AdminTimeslotController extends AbstractController
                 ->setChangedAt(new \DateTime())
                 ->setChangedBy($user->getUsername())
                 ->setUserAccount($user)
-                ->setResource($timeslot->getResource()) // Associe la ressource au log
-                ->setTimeslot($timeslot); // Associe le créneau au log
+                ->setResource($timeslot->getResource()) 
+                ->setTimeslot($timeslot); 
 
             $em->persist($log);
             $em->flush();
@@ -116,7 +114,6 @@ class AdminTimeslotController extends AbstractController
         EntityManagerInterface $em
     ): Response {
         if ($this->isCsrfTokenValid('delete' . $timeslot->getId(), $request->request->get('_token'))) {
-            // Optionnel : supprimer les logs liés au timeslot avant suppression
             $logs = $em->getRepository(BookingHistory::class)->findBy(['timeslot' => $timeslot]);
             foreach ($logs as $log) {
                 $em->remove($log);
@@ -125,18 +122,15 @@ class AdminTimeslotController extends AbstractController
             /** @var UserAccount $user */
             $user = $this->getUser();
 
-            // Log suppression sans associer le timeslot (pour éviter FK)
             $log = new BookingHistory();
             $log->setStatus('Suppression de créneau')
                 ->setChangedAt(new \DateTime())
                 ->setChangedBy($user->getUsername())
                 ->setUserAccount($user)
                 ->setResource($resource);
-                // Ne pas faire $log->setTimeslot($timeslot);
 
             $em->persist($log);
 
-            // Supprimer le timeslot
             $em->remove($timeslot);
 
             $em->flush();

@@ -79,7 +79,6 @@
                         {{ form_row(form.password) }}
                     </div>
 
-                    {# Champs imbriqués dans form.client #}
                     <div class="form-group mb-3">
                         {{ form_row(form.client.organizationName) }}
                     </div>
@@ -117,13 +116,11 @@
                 let valid = true;
 
                 if (isClient) {
-                    // Si rôle = Client → les deux champs doivent être remplis
                     if (!orgFilled || !addressFilled) {
                         valid = false;
                         warningDiv.textContent = '⚠️ Pour le rôle "Client", les champs "Nom de votre organisation" et "Adresse" sont obligatoires.';
                     }
                 } else {
-                    // Si rôle ≠ Client → les deux champs doivent être vides
                     if (orgFilled || addressFilled) {
                         valid = false;
                         warningDiv.textContent = '⚠️ Les champs "Nom de votre organisation" et "Adresse" doivent être vides pour un utilisateur ou un administrateur.';
@@ -143,7 +140,7 @@
             address.addEventListener('input', toggleSubmitButton);
             roleSelect.addEventListener('change', toggleSubmitButton);
 
-            toggleSubmitButton(); // check at load
+            toggleSubmitButton(); 
         });
     </script>
 {% endblock %}

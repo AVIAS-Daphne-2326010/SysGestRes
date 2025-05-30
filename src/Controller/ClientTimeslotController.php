@@ -143,26 +143,22 @@ class ClientTimeslotController extends AbstractController
             /** @var UserAccount $user */
             $user = $this->getUser();
 
-            // 1. D'abord logger la suppression (sans référence au timeslot)
             $log = new BookingHistory();
             $log->setStatus('Suppression de créneau')
                 ->setChangedAt(new \DateTime())
                 ->setChangedBy($user->getUsername())
                 ->setUserAccount($user)
                 ->setResource($resource);
-                // Ne pas setTimeslot() ici
             
             $em->persist($log);
             
-            // 2. Supprimer tous les logs existants qui référencent ce créneau
             $logs = $em->getRepository(BookingHistory::class)->findBy(['timeslot' => $timeslot]);
             foreach ($logs as $log) {
                 $em->remove($log);
             }
             
-            $em->flush(); // Exécute les suppressions et l'insertion du nouveau log
+            $em->flush(); 
 
-            // 3. Maintenant supprimer le créneau
             $em->remove($timeslot);
             $em->flush();
 
