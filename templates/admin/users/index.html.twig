@@ -1,48 +1,147 @@
 {% extends 'base.html.twig' %}
 
-{% block body %}
-    <h1>Gestion des utilisateurs</h1>
+{% block title %}Gestion des utilisateurs{% endblock %}
 
-    <a href="{{ path('admin_user_new') }}" class="btn btn-primary mb-3">
-        + Ajouter un utilisateur
-    </a>
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        h1 {
+            margin-top: 3rem;
+        }
+
+        .btn-add {
+            border-radius: 0;
+            padding: 1rem auto;
+            color: black;
+            background-color: white;
+            border: 1px solid black;
+            padding: 1rem;
+        }
+
+        .btn-custom-primary {
+            border-radius: 0;
+            font-size: 1.15rem;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            color: white;
+            background-color: black;
+            border: 1.5px solid black;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .btn-custom-primary:hover {
+            background-color: #333;
+            color: white;
+            border-color: #333;
+        }
+
+        .btn-custom-danger {
+            border-radius: 0;
+            font-size: 1.15rem;
+            padding: 0.4rem 0.8rem;
+            color: black;
+            background-color: white;
+            border: 1.5px solid black;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .btn-custom-danger:hover {
+            background-color: #f8d7da;
+            color: black;
+        }
+
+        .table th,
+        .table td {
+            vertical-align: middle;
+        }
+
+        .table-striped > tbody > tr:nth-of-type(odd) {
+            background-color: #f5faff;
+        }
+
+        .alert {
+            font-size: 1rem;
+            margin-top: 1rem;
+            border-radius: 0;
+        }
+
+        .container {
+            margin-bottom: 4rem;
+        }
+
+        .actions-container {
+            display: flex;
+            flex-direction: row;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .action-btn {
+            width: 110px;    /* largeur fixe */
+            text-align: center;
+        }
+
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1 class="mb-4">Gestion des utilisateurs</h1>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+    {% for message in app.flashes('danger') %}
+        <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
+
+    <div class="table-responsive mb-3">
+        <a href="{{ path('admin_user_new') }}" class="btn btn-add w-100 text-center">
+            + Ajouter un utilisateur
+        </a>
+    </div>
 
     {% if users is empty %}
         <p>Aucun utilisateur n’a encore été créé.</p>
     {% else %}
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Email</th>
-                    <th>Nom</th>
-                    <th>Prénom</th>
-                    <th>Téléphone</th>
-                    <th>Organisation</th>   
-                    <th>Rôle</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for user in users %}
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
                     <tr>
-                        <td>{{ user.id }}</td>
-                        <td>{{ user.email }}</td>
-                        <td>{{ user.lastName }}</td>
-                        <td>{{ user.firstName }}</td>
-                        <td>{{ user.phone|format_phone }}</td>
-                        <td>{{ user.client ? user.client.organizationName : '—' }}</td>
-                        <td>{{ user.role.name }}</td>
-                        <td>
-                            <a href="{{ path('admin_user_edit', {'id': user.id}) }}">Modifier</a>
-                            <form action="{{ path('admin_user_delete', {'id': user.id}) }}" method="POST" style="display:inline;">
-                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
-                                <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')">Supprimer</button>
-                            </form>
-                        </td>
+                        <th>ID</th>
+                        <th>Email</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Téléphone</th>
+                        <th>Organisation</th>   
+                        <th>Rôle</th>
+                        <th class="text-center">Actions</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.lastName }}</td>
+                            <td>{{ user.firstName }}</td>
+                            <td>{{ user.phone|format_phone }}</td>
+                            <td>{{ user.client ? user.client.organizationName : '—' }}</td>
+                            <td>{{ user.role.name }}</td>
+                            <td class="text-center">
+                                <div class="actions-container">
+                                    <a href="{{ path('admin_user_edit', {'id': user.id}) }}" class="btn btn-custom-primary btn-sm action-btn">Modifier</a>
+                                    <form action="{{ path('admin_user_delete', {'id': user.id}) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                        <button type="submit" class="btn btn-custom-danger btn-sm action-btn">Supprimer</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% endif %}
+</div>
 {% endblock %}

@@ -1,44 +1,103 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Nouvel Utilisateur{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        h1 {
+            margin-top: 5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            border-radius: 0;
+            background-color: #d4ecff;
+        }
+
+        .card .card-body {
+            padding: 1.5rem;
+            border: 1.5px solid;
+        }
+        
+        .btn-custom-primary {
+            border-radius: 0;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            color: white;
+            background-color: black;
+            border: 1.5px solid black;
+            transition: 0.3s;
+            margin-top: 1rem;
+        }
+
+        .btn-custom-primary:hover {
+            background-color: #333;
+            border-color: #333;
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-top: 1rem;
+            color: black;
+            text-decoration: underline;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
-    <h1>Créer un nouvel utilisateur</h1>
+    <div class="container mt-4">
+        <h1>Créer un nouvel utilisateur</h1>
 
-    {{ form_start(form, { attr: { class: 'user-new-form' } }) }}
-        <div class="form-group mb-3">
-            {{ form_row(form.email) }}
-        </div>
-        <div class="form-group mb-3">
-            {{ form_row(form.firstName) }}
-        </div>
-        <div class="form-group mb-3">
-            {{ form_row(form.lastName) }}
-        </div>
-        <div class="form-group mb-3">
-            {{ form_row(form.phone) }}
-        </div>
-        <div class="form-group mb-3">
-            {{ form_row(form.role) }}
-        </div>
-        <div class="form-group mb-3">
-            {{ form_row(form.password) }}
-        </div>
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger">{{ message }}</div>
+        {% endfor %}
 
-        {# Champs imbriqués dans form.client #}
-        <div class="form-group mb-3">
-            {{ form_row(form.client.organizationName) }}
-        </div>
-        <div class="form-group mb-3">
-            {{ form_row(form.client.address) }}
-        </div>
+        <div class="card shadow-sm">
+            <div class="card-body form-container">
+                {{ form_start(form, { attr: { class: 'user-new-form' } }) }}
 
-        <div id="org-warning" class="alert alert-warning" style="display: none;">
-            ⚠️ Les champs "Nom de votre organisation" et "Adresse" doivent être vides pour un utilisateur ou un administrateur.
+                    {{ form_errors(form) }}
+
+                    <div class="form-group mb-3">
+                        {{ form_row(form.email) }}
+                    </div>
+                    <div class="form-group mb-3">
+                        {{ form_row(form.firstName) }}
+                    </div>
+                    <div class="form-group mb-3">
+                        {{ form_row(form.lastName) }}
+                    </div>
+                    <div class="form-group mb-3">
+                        {{ form_row(form.phone) }}
+                    </div>
+                    <div class="form-group mb-3">
+                        {{ form_row(form.role) }}
+                    </div>
+                    <div class="form-group mb-3">
+                        {{ form_row(form.password) }}
+                    </div>
+
+                    {# Champs imbriqués dans form.client #}
+                    <div class="form-group mb-3">
+                        {{ form_row(form.client.organizationName) }}
+                    </div>
+                    <div class="form-group mb-3">
+                        {{ form_row(form.client.address) }}
+                    </div>
+
+                    <div id="org-warning" class="alert alert-warning" style="display: none;">
+                        ⚠️ Les champs "Nom de votre organisation" et "Adresse" doivent être vides pour un utilisateur ou un administrateur.
+                    </div>
+
+                    <button type="submit" class="btn-custom-primary">Créer l'utilisateur</button>
+                {{ form_end(form) }}
+
+                <a href="{{ path('admin_users') }}" class="btn-back">← Retour à la liste</a>
+            </div>
         </div>
-
-        <button type="submit" class="btn btn-success">Créer l'utilisateur</button>
-        <a href="{{ path('admin_users') }}" class="btn btn-secondary">Annuler</a>
-
-    {{ form_end(form) }}
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -87,6 +146,4 @@
             toggleSubmitButton(); // check at load
         });
     </script>
-
-
 {% endblock %}
