@@ -63,10 +63,10 @@
             border-color: #333;
         }
 
-        /* Largeur du bouton ajouter ressource identique à une carte */
         .btn-add-resource {
             width: 100%;
             margin-bottom: 1.5rem;
+            padding: 1rem;
         }
     </style>
 {% endblock %}
@@ -93,6 +93,7 @@
                                 <p><strong>Type :</strong> {{ resource.type }}</p>
                                 <p><strong>Localisation :</strong> {{ resource.location }}</p>
                                 <p><strong>Capacité :</strong> {{ resource.capacity }}</p>
+                                <p><strong>Description :</strong> {{ resource.description }}</p>
                                 <p><strong>Créée le :</strong> {{ resource.createdAt|date('d/m/Y H:i') }}</p>
                             </div>
 

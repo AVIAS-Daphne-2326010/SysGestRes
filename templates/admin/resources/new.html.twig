@@ -1,22 +1,75 @@
-{# templates/admin/ressource/new.html.twig #}
+{# templates/admin/resource/new.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}Nouvelle Ressource{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        h1 {
+            margin-top: 5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            border-radius: 0;
+            background-color: #d4ecff;
+        }
+
+        .card .card-body {
+            padding: 1.5rem;
+            border: 1.5px solid;
+        }
+        
+        .btn-custom-primary {
+            border-radius: 0;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            color: white;
+            background-color: black;
+            border: 1.5px solid black;
+            transition: 0.3s;
+            margin-top: 1rem;
+        }
+
+        .btn-custom-primary:hover {
+            background-color: #333;
+            border-color: #333;
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-top: 1rem;
+            color: black;
+            text-decoration: underline;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
-    <h1>Ajouter une Ressource</h1>
+    <div class="container mt-4">
+        <h1>Ajouter une Ressource</h1>
 
-    {% for message in app.flashes('error') %}
-        <div class="alert alert-danger">{{ message }}</div>
-    {% endfor %}
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger">{{ message }}</div>
+        {% endfor %}
 
-    {{ form_start(form) }}
-        {{ form_errors(form) }}
-        {{ form_row(form.name) }}
-        {{ form_row(form.type) }}
-        {{ form_row(form.description) }}
-        <button type="submit" class="btn btn-primary">Ajouter</button>
-    {{ form_end(form) }}
+        <div class="card shadow-sm">
+            <div class="card-body form-container">
+                {{ form_start(form) }}
+                    {{ form_errors(form) }}
+                    {{ form_row(form.name) }}
+                    {{ form_row(form.type) }}
+                    {{ form_row(form.description) }}
+                    {{ form_row(form.location) }}
+                    {{ form_row(form.capacity) }}
+                    {{ form_row(form.client) }}
+                    <button type="submit" class="btn btn-custom-primary">Ajouter</button>
+                {{ form_end(form) }}
 
-    <a href="{{ path('admin_resource_new') }}">Retour à la liste</a>
+                <a href="{{ path('admin_resource_new') }}" class="btn-back">← Retour à la liste</a>
+            </div>
+        </div>
+    </div>
 {% endblock %}
